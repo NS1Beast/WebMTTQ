@@ -1,0 +1,389 @@
+﻿@model WebMTTQ.Models.CongThongTinAnSXH
+
+@{
+    ViewData["Title"] = "Cổng thông tin an sinh xã hội";
+}
+
+<style>
+    :root {
+        --mttq-red: #b32624;
+        --mttq-red-dark: #8b1816;
+        --mttq-bg: #faf6f0;
+        --card-bg: #ffffff;
+        --text-dark: #2c2c2c;
+    }
+
+    body {
+        background-color: var(--mttq-bg);
+        color: var(--text-dark);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    .asxh-font-serif {
+        font-family: 'Playfair Display', 'Merriweather', 'Times New Roman', serif;
+    }
+
+    .asxh-wrapper {
+        background-color: var(--mttq-bg);
+        padding: 30px 0;
+    }
+
+    .asxh-container {
+        max-width: 1140px !important;
+        margin: 0 auto !important;
+        padding: 0 15px;
+        box-sizing: border-box;
+    }
+
+    .asxh-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: -15px;
+        margin-right: -15px;
+    }
+
+    .asxh-col-4 {
+        width: 33.333333%;
+        padding-left: 15px;
+        padding-right: 15px;
+        box-sizing: border-box;
+    }
+
+    .asxh-col-8 {
+        width: 66.666667%;
+        padding-left: 15px;
+        padding-right: 15px;
+        box-sizing: border-box;
+    }
+
+    .asxh-col-6 {
+        width: 50%;
+        padding-left: 10px;
+        padding-right: 10px;
+        box-sizing: border-box;
+    }
+
+    .asxh-col-12 {
+        width: 100%;
+        padding-left: 15px;
+        padding-right: 15px;
+        box-sizing: border-box;
+    }
+
+    @@media (max-width: 992px) {
+        .asxh-col-4, .asxh-col-8 {
+            width: 100%;
+        }
+    }
+
+    .asxh-hero {
+        background: linear-gradient(135deg, #a72d2d 0%, #d87233 100%);
+        border-radius: 20px;
+        padding: 60px 50px;
+        color: white;
+        margin-bottom: 24px;
+        box-sizing: border-box;
+    }
+
+    .asxh-card {
+        background-color: var(--card-bg);
+        border-radius: 24px;
+        padding: 35px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+        box-sizing: border-box;
+    }
+
+    .asxh-badge {
+        background-color: rgba(255, 255, 255, 0.25);
+        color: white;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: bold;
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+
+    .asxh-badge-light {
+        background-color: #f8f9fa;
+        color: #dc3545;
+        border: 1px solid #ddd;
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    .asxh-btn-white {
+        background-color: white;
+        color: var(--mttq-red);
+        padding: 12px 24px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    .asxh-btn-outline {
+        background-color: transparent;
+        border: 1px solid rgba(255,255,255,0.5);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: bold;
+        display: inline-block;
+        margin-left: 10px;
+    }
+
+    .qr-card-red {
+        background: linear-gradient(180deg, #c42d2d 0%, #8b1313 100%);
+        border-radius: 16px;
+        padding: 25px 20px;
+        color: white;
+        margin-bottom: 25px;
+        border: 2px solid #d44747;
+    }
+
+    .stat-box-solid {
+        background-color: var(--mttq-red-dark);
+        color: white;
+        border-radius: 12px;
+        padding: 25px 20px;
+        height: 100%;
+        box-sizing: border-box;
+    }
+
+    .stat-box-outline {
+        background-color: white;
+        border: 1px solid #f0f0f0;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        height: 100%;
+        box-sizing: border-box;
+    }
+
+    .val-red {
+        color: var(--mttq-red);
+        font-weight: bold;
+    }
+
+    .asxh-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+
+        .asxh-table th, .asxh-table td {
+            padding: 15px 10px;
+            border-bottom: 1px solid #f0f0f0;
+            text-align: center;
+        }
+
+        .asxh-table th {
+            color: #777;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .asxh-table .text-left {
+            text-align: left;
+        }
+
+        .asxh-table .text-right {
+            text-align: right;
+        }
+
+    .asxh-input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+        box-sizing: border-box;
+        margin-top: 5px;
+        margin-bottom: 15px;
+    }
+</style>
+
+<div class="asxh-wrapper">
+    <div class="asxh-container">
+
+        <!-- KHU VỰC 1: BANNER -->
+        <div class="asxh-hero">
+            <div class="asxh-badge">CỔNG THÔNG TIN ỦNG HỘ TRỰC TUYẾN</div>
+            <h1 class="asxh-font-serif" style="font-size: 2.8rem; font-weight: bold; line-height: 1.3; margin-top: 0; margin-bottom: 15px;">
+                Ủy ban MTTQ Việt Nam xã Phú Hòa Đông - <br />
+                Chung tay vì cộng đồng, minh bạch trong <br />
+                từng đóng góp
+            </h1>
+            <p style="font-size: 1.1rem; line-height: 1.6; opacity: 0.9; max-width: 750px; margin-bottom: 25px;">
+                Đây là trang tiếp nhận và công khai thông tin ủng hộ phục vụ các hoạt động an sinh xã hội, chăm lo
+                hộ khó khăn, học sinh cần tiếp sức, trường hợp bệnh hiểm nghèo và các hoàn cảnh cần trợ giúp trên
+                địa bàn xã Phú Hòa Đông.
+            </p>
+            <div>
+                <a href="#danh-sach-ung-ho" class="asxh-btn-white">Xem thông tin ủng hộ</a>
+                <a href="#nhu-cau-tro-giup" class="asxh-btn-outline">Để lại nhu cầu trợ giúp</a>
+            </div>
+        </div>
+
+        <!-- KHU VỰC 2: CHIA 2 CỘT -->
+        <div class="asxh-row" style="margin-bottom: 24px;">
+
+            <!-- CỘT TRÁI (QR CODE) -->
+            <div class="asxh-col-4">
+                <div class="asxh-card">
+                    <h3 class="asxh-font-serif" style="font-size: 1.5rem; font-weight: bold; margin-top: 0; margin-bottom: 25px;">
+                        Thông tin tiếp nhận ủng hộ
+                    </h3>
+
+                    <!-- BẮT ĐẦU ĐỔ DỮ LIỆU ĐỘNG TỪ DATABASE -->
+                    @if (ViewBag.DanhSachUngHo != null)
+                    {
+                        foreach (var item in ViewBag.DanhSachUngHo)
+                        {
+                            <div style="margin-bottom: 40px; border-bottom: 2px dashed #eee; padding-bottom: 10px;">
+                                <!-- Thẻ ATM Đỏ -->
+                                <div class="qr-card-red">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                                        <div style="font-size: 1.8rem; color: #ffc107;">★</div>
+                                        <div style="text-align: right;">
+                                            <div style="font-weight: bold; font-size: 1.2rem; letter-spacing: 1px; text-transform: uppercase;">@item.TenNgânHang</div>
+                                            <div style="font-size: 0.75rem; color: #ddd;">Chi nhánh @item.ChiNhanh</div>
+                                        </div>
+                                    </div>
+
+                                    <div style="text-align: right; color: #f9d857; font-family: 'Playfair Display', serif; font-style: italic; font-size: 0.85rem; line-height: 1.4; margin-bottom: 25px;">
+                                        "Cùng viết tiếp câu chuyện hòa bình,<br>
+                                        để Việt Nam vươn mình cất cánh"
+                                    </div>
+
+                                    <div style="text-align: center; margin-bottom: 25px;">
+                                        <div style="background-color: white; padding: 10px; display: inline-block; border-radius: 12px;">
+                                            <!-- Mẹo: Tự động truyền Tên NH và Số TK vào API tạo mã QR để sinh mã động -->
+                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=@(item.TenNgânHang)-@(item.SoTaiKhoan)" alt="QR Code @item.TenNgânHang" style="width: 140px; height: 140px; display: block;" />
+                                        </div>
+                                    </div>
+
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 0.75rem; color: #ddd; margin-bottom: 4px;">Tên tài khoản:</div>
+                                        <div style="font-weight: bold; font-size: 0.85rem; margin-bottom: 15px; text-transform: uppercase;">@item.TenTaiKhoan</div>
+                                        <div style="font-size: 0.75rem; color: #ddd; margin-bottom: 4px;">Số tài khoản:</div>
+                                        <div style="font-weight: bold; font-size: 1.4rem;">@item.SoTaiKhoan</div>
+                                    </div>
+                                </div>
+
+                                <!-- Chi tiết chữ bên dưới thẻ -->
+                                <div style="font-size: 0.95rem;">
+                                    <div style="color: #999; font-size: 0.75rem; font-weight: bold; margin-bottom: 4px;">ĐƠN VỊ THỤ HƯỞNG</div>
+                                    <div style="font-weight: bold; margin-bottom: 20px; text-transform: uppercase;">@item.DonViThuHuong</div>
+
+                                    <div style="color: #999; font-size: 0.75rem; font-weight: bold; margin-bottom: 4px;">NGÂN HÀNG</div>
+                                    <div style="font-weight: bold; margin-bottom: 20px;">@item.TenNgânHang / Tài khoản tiếp nhận ủng hộ</div>
+
+                                    <div style="color: #999; font-size: 0.75rem; font-weight: bold; margin-bottom: 4px;">SỐ TÀI KHOẢN</div>
+                                    <div style="font-weight: bold; margin-bottom: 20px;">@item.SoTaiKhoan</div>
+
+                                    <div style="color: #999; font-size: 0.75rem; font-weight: bold; margin-bottom: 4px;">NỘI DUNG CHUYỂN KHOẢN</div>
+                                    <div style="font-weight: bold;">HO TEN - SO DIEN THOAI</div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p style="text-align: center; color: #888; font-style: italic;">Chưa có thông tin tài khoản ủng hộ nào được thiết lập.</p>
+                    }
+                    <!-- KẾT THÚC ĐỔ DỮ LIỆU ĐỘNG -->
+
+                </div>
+            </div>
+            <!-- CỘT PHẢI (THỐNG KÊ & DANH SÁCH) -->
+            <div class="asxh-col-8">
+
+                <div class="asxh-card" style="margin-bottom: 24px;">
+                    <h3 class="asxh-font-serif" style="font-size: 1.6rem; font-weight: bold; margin-top: 0; margin-bottom: 15px;">Lan tỏa nghĩa tình - Kết nối cộng đồng - Chung tay vì Phú Hòa Đông</h3>
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: #666; margin-bottom: 20px;">
+                        Mỗi khoản đóng góp là một sự sẻ chia thiết thực để MTTQ và các đoàn thể địa phương phối hợp chăm lo đúng người, đúng hoàn cảnh, đúng nhu cầu. Cổng thông tin này hướng đến công khai minh bạch, cập nhật thông tin hỗ trợ và kết nối thêm nhiều tấm lòng cùng đồng hành vì cộng đồng.
+                    </p>
+                    <div class="asxh-row">
+                        <div class="asxh-col-6">
+                            <div class="stat-box-solid">
+                                <div style="font-size: 0.8rem; color: #ddd; font-weight: bold; margin-bottom: 5px;">TỔNG GIÁ TRỊ TIẾP NHẬN</div>
+                                <div style="font-size: 2.2rem; font-weight: bold;">256M</div>
+                            </div>
+                        </div>
+                        <div class="asxh-col-6">
+                            <div class="stat-box-solid">
+                                <div style="font-size: 0.8rem; color: #ddd; font-weight: bold; margin-bottom: 5px;">LƯỢT ỦNG HỘ GHI NHẬN</div>
+                                <div style="font-size: 2.2rem; font-weight: bold;">60</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: center; margin-top: 15px; font-size: 0.8rem; color: #999; font-style: italic;">* Số liệu cập nhật đến ngày 30/6/2026</div>
+                </div>
+
+                <div class="asxh-card" style="margin-bottom: 24px;">
+                    <h3 class="asxh-font-serif" style="font-size: 1.6rem; font-weight: bold; margin-top: 0; text-align: center; margin-bottom: 20px;">Công khai số dư Quỹ "Vì người nghèo"</h3>
+                    <div style="text-align: center; margin-bottom: 25px;">
+                        <span class="asxh-badge-light">Số dư đến ngày 30/6/2026</span>
+                    </div>
+
+                    <div class="asxh-row" style="margin-bottom: 20px;">
+                        <div class="asxh-col-4" style="width: 33.33%;">
+                            <div class="stat-box-outline">
+                                <div style="font-size: 0.8rem; font-weight: bold; color: #888; margin-bottom: 10px;">TIỀN MẶT</div>
+                                <div class="val-red" style="font-size: 1.15rem;">100.481.379đ</div>
+                            </div>
+                        </div>
+                        <div class="asxh-col-4" style="width: 33.33%;">
+                            <div class="stat-box-outline">
+                                <div style="font-size: 0.8rem; font-weight: bold; color: #888; margin-bottom: 10px;">TIỀN GỬI NGÂN HÀNG</div>
+                                <div class="val-red" style="font-size: 1.15rem;">182.121.174đ</div>
+                            </div>
+                        </div>
+                        <div class="asxh-col-4" style="width: 33.33%;">
+                            <div class="stat-box-solid" style="padding: 20px; text-align: center;">
+                                <div style="font-size: 0.8rem; color: #ddd; font-weight: bold; margin-bottom: 10px;">TỔNG TỒN QUỸ</div>
+                                <div style="font-size: 1.15rem; font-weight: bold; color: white;">282.602.553đ</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.8rem; color: #999; font-style: italic; text-align: center; margin: 0;">
+                        Nguồn: Ban Thường trực Ủy ban MTTQ Việt Nam xã Phú Hòa Đông. Quỹ "Vì người nghèo" được quản lý công khai, minh bạch; sử dụng chăm lo hộ nghèo, hộ cận nghèo, hộ có hoàn cảnh khó khăn trên địa bàn xã.
+                    </p>
+                </div>
+
+                <div class="asxh-card" id="danh-sach-ung-ho">
+                    <h3 class="asxh-font-serif" style="font-size: 1.6rem; font-weight: bold; margin-top: 0; margin-bottom: 10px;">Danh sách ủng hộ</h3>
+                    <div style="text-align: center; font-size: 0.8rem; color: #999; font-style: italic; margin-bottom: 20px;">* Số liệu cập nhật đến ngày 30/6/2026</div>
+
+                    <div style="background-color: #faf6f0; border-radius: 12px; padding: 15px;">
+                        <table class="asxh-table">
+                            <thead>
+                                <tr>
+                                    <th class="text-left">ĐƠN VỊ / CÁ NHÂN</th>
+                                    <th>THỜI GIAN</th>
+                                    <th class="text-right">GIÁ TRỊ ỦNG HỘ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="text-left">Thầy Thiện Xuân – Tự viện Linh Thứu</td><td>21/04/2026</td><td class="text-right val-red">5.000.000đ</td></tr>
+                                <tr><td class="text-left">Cty TNHH Thuc pham Tan Phu Hoa</td><td>14/02/2026</td><td class="text-right val-red">2.000.000đ</td></tr>
+                                <tr><td class="text-left">Phan Van Ut</td><td>07/02/2026</td><td class="text-right val-red">5.000.000đ</td></tr>
+                                <tr><td class="text-left">Agribank tai tro</td><td>04/02/2026</td><td class="text-right val-red">50.000.000đ</td></tr>
+                                <tr><td class="text-left" style="border-bottom: none;">Cty TNHH Jin Won Viet Nam</td><td style="border-bottom: none;">03/02/2026</td><td class="text-right val-red" style="border-bottom: none;">50.000.000đ</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>

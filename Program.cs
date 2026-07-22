@@ -1,5 +1,6 @@
 var builder = WebApplication.CreateBuilder(args);
-
+// Dán dòng này vào để hệ thống nhận diện được DataMTTQContext
+builder.Services.AddDbContext<WebMTTQ.Models.DataMTTQContext>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

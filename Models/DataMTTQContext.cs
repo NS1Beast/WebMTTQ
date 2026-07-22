@@ -21,6 +21,8 @@ public partial class DataMTTQContext : DbContext
 
     public virtual DbSet<ChuongTrinhHoTro> ChuongTrinhHoTros { get; set; }
 
+    public DbSet<ThongTinNhanUngHo> ThongTinNhanUngHos { get; set; }
+
     public virtual DbSet<ChuyenMuc> ChuyenMucs { get; set; }
 
     public virtual DbSet<DanhMucQuy> DanhMucQuies { get; set; }
@@ -51,10 +53,11 @@ public partial class DataMTTQContext : DbContext
 
     public virtual DbSet<VanBanTaiLieu> VanBanTaiLieus { get; set; }
 
+    /* protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+ #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+         => optionsBuilder.UseSqlServer("Server=.;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");*/
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=.;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");
-
+     => optionsBuilder.UseSqlServer("Server=DESKTOP-C5LJ9BM\\SQL2025_DEV;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<BaiViet>(entity =>

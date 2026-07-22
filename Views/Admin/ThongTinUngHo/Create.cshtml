@@ -1,0 +1,74 @@
+﻿@model WebMTTQ.Models.ThongTinNhanUngHo
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Code cũ của bạn giữ nguyên ở bên dưới -->
+@{
+    ViewData["Title"] = "Thêm thông tin ủng hộ";
+}
+
+<div class="container mt-4" style="max-width: 800px;">
+    <div class="card shadow-sm border-0 rounded-4 p-4">
+        <h3 class="fw-bold mb-4">Thêm mới tài khoản nhận ủng hộ</h3>
+
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="TenNgânHang" class="form-label fw-bold"></label>
+                    <input asp-for="TenNgânHang" class="form-control" placeholder="VD: BIDV" />
+                    <span asp-validation-for="TenNgânHang" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ChiNhanh" class="form-label fw-bold"></label>
+                    <input asp-for="ChiNhanh" class="form-control" placeholder="VD: Chi nhánh Củ Chi" />
+                    <span asp-validation-for="ChiNhanh" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="SoTaiKhoan" class="form-label fw-bold"></label>
+                    <input asp-for="SoTaiKhoan" class="form-control" placeholder="VD: 8675789789" />
+                    <span asp-validation-for="SoTaiKhoan" class="text-danger small"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="TenTaiKhoan" class="form-label fw-bold"></label>
+                    <input asp-for="TenTaiKhoan" class="form-control" placeholder="Chủ tài khoản" />
+                    <span asp-validation-for="TenTaiKhoan" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="DonViThuHuong" class="form-label fw-bold"></label>
+                <input asp-for="DonViThuHuong" class="form-control" placeholder="VD: QUỸ VÌ NGƯỜI NGHÈO XÃ PHÚ HÒA ĐÔNG" />
+                <span asp-validation-for="DonViThuHuong" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="QrCodeUrl" class="form-label fw-bold"></label>
+                <input asp-for="QrCodeUrl" class="form-control" placeholder="Dán link ảnh QR code vào đây (nếu có)" />
+                <span asp-validation-for="QrCodeUrl" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="NoiDungChuyenKhoan" class="form-label fw-bold"></label>
+                <input asp-for="NoiDungChuyenKhoan" class="form-control" placeholder="VD: HO TEN - SO DIEN THOAI" />
+                <span asp-validation-for="NoiDungChuyenKhoan" class="text-danger small"></span>
+            </div>
+
+            <div class="mt-4 pt-3 border-top">
+                <button type="submit" class="btn btn-success px-4 me-2">Lưu thông tin</button>
+                <a asp-action="Index" class="btn btn-secondary px-4">Hủy bỏ / Quay lại</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
