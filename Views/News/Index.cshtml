@@ -1,0 +1,162 @@
+@model WebMTTQ.Models.NewsIndexViewModel
+@{
+    ViewData["Title"] = Model.PageTitle;
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/css/news.css" asp-append-version="true" />
+}
+
+<!-- Page Hero -->
+<section class="m26-phero">
+    <div class="rays"></div>
+    <div class="wrap">
+        <nav class="m26-crumb" aria-label="Breadcrumb">
+            <a asp-controller="Home" asp-action="Index">Trang chủ</a>
+            <span class="sep">›</span><span>@Model.HeroEyebrow</span>
+        </nav>
+        <h1>@Model.HeroTitle</h1>
+    </div>
+</section>
+
+<div class="m26-body">
+    <div class="wrap m26-layout">
+
+        <!-- Danh mục chuyên mục (horizontal) -->
+        <nav class="m26-catnav" aria-label="Chuyên mục tin tức">
+            @foreach (var cat in Model.Categories)
+            {
+                <a href="@cat.Url" class="m26-catnav-link @(cat.IsActive ? "is-active" : "")">
+                    @cat.Title
+                </a>
+            }
+        </nav>
+
+        <!-- Main + Sidebar -->
+        <div class="m26-main">
+
+            <!-- Danh sách bài viết -->
+            <div class="m26-newslist">
+                @foreach (var article in Model.Articles)
+                {
+                    <article class="m26-newsitem reveal">
+                        <a href="@article.Url" class="thumb">
+                            <img src="@article.ImageUrl" alt="@article.Title" loading="lazy" />
+                        </a>
+                        <div class="body">
+                            <h4><a href="@article.Url">@article.Title</a></h4>
+                            <div class="date">📅 @article.Date</div>
+                            <div class="ex">@article.Excerpt</div>
+                        </div>
+                    </article>
+                }
+            </div>
+
+            <!-- Phân trang -->
+            <nav class="m26-pagination" aria-label="Phân trang">
+                @if (Model.Pagination.CurrentPage > 1)
+                {
+                    <a class="page-numbers prev" href="@Model.Pagination.BaseUrl&page=@(Model.Pagination.CurrentPage - 1)">‹</a>
+                }
+                @{
+                    var startPage = Math.Max(1, Model.Pagination.CurrentPage - 2);
+                    var endPage = Math.Min(Model.Pagination.TotalPages, startPage + 4);
+                    if (endPage - startPage < 4) { startPage = Math.Max(1, endPage - 4); }
+                }
+                @for (var p = startPage; p <= endPage; p++)
+                {
+                    if (p == Model.Pagination.CurrentPage)
+                    {
+                        <span aria-current="page" class="page-numbers current">@p</span>
+                    }
+                    else
+                    {
+                        <a class="page-numbers" href="@Model.Pagination.BaseUrl&page=@p">@p</a>
+                    }
+                }
+                @if (endPage < Model.Pagination.TotalPages)
+                {
+                    <span class="page-numbers dots">…</span>
+                    <a class="page-numbers" href="@Model.Pagination.BaseUrl&page=@Model.Pagination.TotalPages">@Model.Pagination.TotalPages</a>
+                }
+                @if (Model.Pagination.CurrentPage < Model.Pagination.TotalPages)
+                {
+                    <a class="page-numbers next" href="@Model.Pagination.BaseUrl&page=@(Model.Pagination.CurrentPage + 1)">›</a>
+                }
+            </nav>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="m26-side">
+            <!-- Banner an sinh -->
+            <a class="banner" href="#">
+                <img src="https://mttq.phuhoadong.vn/apps/uploads/2026/04/cong-thong-tin-an-sinh-xa-hoi.jpg" alt="Cổng thông tin an sinh xã hội" loading="lazy" />
+            </a>
+            <!-- Banner VH HCM -->
+            <a class="banner" href="#">
+                <img src="https://mttq.phuhoadong.vn/apps/themes/mttq-2026/assets/images/banner-hcm-1.jpg" alt="Không gian văn hóa Hồ Chí Minh" loading="lazy" />
+            </a>
+
+            <!-- Văn bản mới -->
+            <div class="m26-widget">
+                <h3>Văn bản mới</h3>
+                <div class="m26-doclist">
+                    @foreach (var doc in Model.RecentDocs)
+                    {
+                        <a href="@doc.Url">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/></svg>
+                            <span>@doc.Title</span>
+                        </a>
+                    }
+                </div>
+            </div>
+
+            <!-- Thời tiết -->
+            <div class="m26-widget">
+                <h3>Thời tiết</h3>
+                <iframe src="https://thoitiet247.vn/widget/embed/ho-chi-minh/cu-chi/phu-hoa-dong?style=2&day=7&td=%23ffffff&ntd=%231c84ee&mvb=%23848484&mv=%231c84ee&mdk=%23dddddd&htd=true"
+                        width="100%" height="430" scrolling="no" loading="lazy" allowtransparency="true"></iframe>
+            </div>
+
+            <!-- Liên kết website -->
+            <div class="m26-widget">
+                <h3>Liên kết</h3>
+                <select onchange="if(this.value){window.location.href=this.value}">
+                    <option value="">-- Liên kết website --</option>
+                    <option value="https://dichvucong.gov.vn/">Dịch vụ công quốc gia</option>
+                    <option value="https://chinhphu.vn/">Chính phủ CHXHCN Việt Nam</option>
+                    <option value="http://dangcongsan.vn/">Đảng Cộng sản Việt Nam</option>
+                    <option value="https://mattran.org.vn/">MTTQ Việt Nam</option>
+                    <option value="http://www.hochiminhcity.gov.vn/">TP Hồ Chí Minh</option>
+                    <option value="https://www.mof.gov.vn/">Bộ Tài chính</option>
+                    <option value="http://moh.gov.vn/">Bộ Y tế</option>
+                    <option value="http://www.moet.gov.vn/">Bộ Giáo dục - Đào tạo</option>
+                </select>
+            </div>
+
+            <!-- Thống kê truy cập -->
+            <div class="m26-widget">
+                <h3>Thống kê truy cập</h3>
+                <ul class="stats-list">
+                    <li><span>Đang truy cập:</span> <strong>—</strong></li>
+                    <li><span>Hôm nay:</span> <strong>—</strong></li>
+                    <li><span>Tuần này:</span> <strong>—</strong></li>
+                    <li><span>Tổng truy cập:</span> <strong>—</strong></li>
+                </ul>
+            </div>
+        </aside>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Activate the "Tin tức" nav item highlight if needed
+        document.querySelectorAll('.m26-catnav-link').forEach(function(link) {
+            link.addEventListener('click', function() {
+                document.querySelectorAll('.m26-catnav-link').forEach(function(l) { l.classList.remove('is-active'); });
+                this.classList.add('is-active');
+            });
+        });
+    </script>
+}

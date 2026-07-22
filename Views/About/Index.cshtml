@@ -1,0 +1,195 @@
+@model WebMTTQ.Models.AboutPageViewModel
+@{
+    ViewData["Title"] = Model.PageTitle;
+    ViewData["IsAbout"] = true;
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/css/about.css" asp-append-version="true" />
+}
+
+<!-- Page Hero -->
+<section class="m26-phero m26-phero--about">
+    <div class="rays"></div>
+    <div class="wrap">
+        <nav class="m26-crumb" aria-label="Breadcrumb">
+            <a asp-controller="Home" asp-action="Index">Trang chủ</a>
+            <span class="sep">›</span><span>@Model.PageTitle</span>
+        </nav>
+        <span class="eyebrow on-dark">@Model.HeroEyebrow</span>
+        <h1>@Model.HeroTitle</h1>
+        <p class="p-sub">@Model.HeroSubtitle</p>
+    </div>
+</section>
+
+<div class="m26-body ab-body">
+    <div class="wrap">
+
+        <!-- Dấu mốc thành lập -->
+        <section class="ab-sec ab-found">
+            <div class="ab-found-txt reveal">
+                <span class="eyebrow">@Model.FoundEyebrow</span>
+                <h2>@Model.FoundTitle</h2>
+                @Html.Raw(Model.FoundContent)
+            </div>
+            <aside class="ab-seal reveal d2">
+                <span class="ab-seal-ring"></span>
+                <div class="ab-seal-body">
+                    <svg class="ab-seal-star" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><polygon points="50,6 61,38 95,38 67,58 78,92 50,72 22,92 33,58 5,38 39,38"/></svg>
+                    <span class="k">Quyết định</span>
+                    <strong>@Model.FoundDecisionNumber</strong>
+                    <span class="d">@Model.FoundDecisionDate</span>
+                    <span class="d">@Model.FoundAnnounceDate</span>
+                </div>
+            </aside>
+        </section>
+    </div>
+
+    <!-- Con số -->
+    <section class="m26-stats ab-stats">
+        <div class="stars"></div>
+        <div class="wrap">
+            <div class="stats-head">
+                <span class="eyebrow on-dark" style="justify-content:center">Một tập thể — Một niềm tin</span>
+                <h2>Khối đại đoàn kết ở Phường Tân Định</h2>
+            </div>
+            <div class="grid ab-statgrid">
+                @{ var sd = 1; }
+                @foreach (var stat in Model.Stats)
+                {
+                    <div class="m26-stat reveal d@(sd)">
+                        <b data-count="@stat.Count" data-suffix="@stat.Suffix">0</b>
+                        <span>@stat.Label</span>
+                    </div>
+                    sd++;
+                }
+            </div>
+        </div>
+    </section>
+
+    <div class="wrap">
+        <!-- Ban Thường trực -->
+        <section class="ab-sec ab-team">
+            <div class="ab-head reveal">
+                <span class="eyebrow">@Model.TeamEyebrow</span>
+                <h2>@Model.TeamTitle</h2>
+            </div>
+
+            @if (Model.Chairman != null)
+            {
+                <div class="ab-lead reveal">
+                    <div class="ab-ava ab-ava-lead has-photo">
+                        <span class="ring"></span>
+                        @if (!string.IsNullOrEmpty(Model.Chairman.PhotoUrl))
+                        {
+                            <img class="pic js-ablb" src="@Model.Chairman.PhotoUrl" data-full="@Model.Chairman.PhotoFullUrl"
+                                 style="object-position:@Model.Chairman.PhotoPosition" alt="@Model.Chairman.Name" loading="lazy" />
+                        }
+                    </div>
+                    <div class="ab-lead-info">
+                        <span class="pill">@Model.Chairman.Pill</span>
+                        <h3>@Model.Chairman.Name</h3>
+                        <p class="role">@Model.Chairman.Role</p>
+                    </div>
+                </div>
+            }
+
+            <div class="ab-grid">
+                @{ var md = 1; }
+                @foreach (var member in Model.Members)
+                {
+                    <article class="ab-card reveal d@(md)">
+                        <div class="ab-ava has-photo">
+                            <span class="ring"></span>
+                            @if (!string.IsNullOrEmpty(member.PhotoUrl))
+                            {
+                                <img class="pic js-ablb" src="@member.PhotoUrl" data-full="@member.PhotoFullUrl"
+                                     style="object-position:@member.PhotoPosition" alt="@member.Name" loading="lazy" />
+                            }
+                        </div>
+                        <h4>@member.Name</h4>
+                        <p class="role">@member.Role</p>
+                    </article>
+                    md = md >= 4 ? 1 : md + 1;
+                }
+            </div>
+        </section>
+
+        <!-- Khoảnh khắc / Hình ảnh -->
+        @if (!string.IsNullOrEmpty(Model.GalleryImageUrl))
+        {
+            <section class="ab-sec ab-gallery-sec">
+                <div class="ab-head reveal">
+                    <span class="eyebrow">@Model.GalleryEyebrow</span>
+                    <h2>@Html.Raw(Model.GalleryTitle)</h2>
+                </div>
+                <div class="ab-gallery ab-gallery-single">
+                    <figure class="ab-photo wide reveal">
+                        <img src="@Model.GalleryImageUrl" alt="@Model.GalleryImageAlt" loading="lazy" />
+                        <span class="fr"></span>
+                    </figure>
+                </div>
+            </section>
+        }
+
+        <!-- CTA -->
+        <section class="ab-sec ab-cta reveal">
+            <h2>@Model.CtaTitle</h2>
+            <p>@Model.CtaText</p>
+            <div class="ab-cta-row">
+                <a class="ab-btn gold" href="@Model.CtaDocsUrl">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/></svg>
+                    @Html.Raw(Model.CtaDocsLabel)
+                </a>
+                <a class="ab-btn ghost" href="@Model.CtaFeedbackUrl">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v12H7l-3 3V4Z"/></svg>
+                    @Html.Raw(Model.CtaFeedbackLabel)
+                </a>
+            </div>
+            <div class="ab-share">
+                <div class="m26-share">
+                    <a class="fb" target="_blank" rel="noopener"
+                       href="https://www.facebook.com/sharer/sharer.php?u=@Uri.EscapeDataString($"https://mttq.phuhoadong.vn{Model.ShareUrl}")"
+                       aria-label="Chia sẻ Facebook">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12Z"/></svg>
+                        <span>Chia sẻ Facebook</span>
+                    </a>
+                    <div class="zalo-share-button m26-zalo" data-href="https://mttq.phuhoadong.vn@(Model.ShareUrl)" data-oaid="84978279738049304" data-customize="true">
+                        <a class="zl" role="button" tabindex="0" aria-label="Chia sẻ Zalo">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.9 3 3 6.5 3 10.9c0 2.4 1.2 4.5 3.1 6-.1.9-.5 2-1.4 3 1.6-.2 2.9-.8 3.8-1.4 1 .3 2.2.5 3.5.5 5.1 0 9-3.5 9-7.9S17.1 3 12 3Z"/></svg>
+                            <span>Chia sẻ Zalo</span>
+                        </a>
+                    </div>
+                    <button type="button" class="m26-native-share" data-url="https://mttq.phuhoadong.vn@(Model.ShareUrl)" data-title="@Model.PageTitle">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5 15.4 17.5M15.4 6.5 8.6 10.5"/></svg>
+                        <span>Chia sẻ liên kết</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // About page: lightbox for member photos
+        document.querySelectorAll('.js-ablb').forEach(function (img) {
+            img.addEventListener('click', function () {
+                var full = this.getAttribute('data-full');
+                if (!full) return;
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        imageUrl: full,
+                        imageAlt: this.alt,
+                        showConfirmButton: false,
+                        background: 'rgba(0,0,0,.92)',
+                        backdrop: 'rgba(0,0,0,.7)',
+                        width: 'auto',
+                        padding: 0,
+                        customClass: { popup: 'ab-lightbox' }
+                    });
+                }
+            });
+        });
+    </script>
+}

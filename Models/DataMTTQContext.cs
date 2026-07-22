@@ -1,0 +1,262 @@
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+
+namespace WebMTTQ.Models;
+
+public partial class DataMTTQContext : DbContext
+{
+    public DataMTTQContext()
+    {
+    }
+
+    public DataMTTQContext(DbContextOptions<DataMTTQContext> options)
+        : base(options)
+    {
+    }
+
+    public virtual DbSet<BaiViet> BaiViets { get; set; }
+
+    public virtual DbSet<CauHinhHeThong> CauHinhHeThongs { get; set; }
+
+    public virtual DbSet<ChuongTrinhHoTro> ChuongTrinhHoTros { get; set; }
+
+    public virtual DbSet<ChuyenMuc> ChuyenMucs { get; set; }
+
+    public virtual DbSet<DanhMucQuy> DanhMucQuies { get; set; }
+
+    public virtual DbSet<DiaDiemBanDo> DiaDiemBanDos { get; set; }
+
+    public virtual DbSet<DoanTheToChuc> DoanTheToChucs { get; set; }
+
+    public virtual DbSet<DonXinHoTro> DonXinHoTros { get; set; }
+
+    public virtual DbSet<HopThuGopY> HopThuGopies { get; set; }
+
+    public virtual DbSet<KhoanDongGop> KhoanDongGops { get; set; }
+
+    public virtual DbSet<LuotTraoTang> LuotTraoTangs { get; set; }
+
+    public virtual DbSet<NguoiCanGiupDo> NguoiCanGiupDos { get; set; }
+
+    public virtual DbSet<NguoiDung> NguoiDungs { get; set; }
+
+    public virtual DbSet<NhaHaoTam> NhaHaoTams { get; set; }
+
+    public virtual DbSet<NhatKyHeThong> NhatKyHeThongs { get; set; }
+
+    public virtual DbSet<ThanhPhanGiaoDien> ThanhPhanGiaoDiens { get; set; }
+
+    public virtual DbSet<VaiTro> VaiTros { get; set; }
+
+    public virtual DbSet<VanBanTaiLieu> VanBanTaiLieus { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=.;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<BaiViet>(entity =>
+        {
+            entity.HasKey(e => e.IdbaiViet).HasName("PK__BaiViet__FC50A207B66391FD");
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.LaTinNoiBat).HasDefaultValue(false);
+            entity.Property(e => e.LuotXem).HasDefaultValue(0);
+            entity.Property(e => e.TrangThai).HasDefaultValue("BanNhap");
+
+            entity.HasOne(d => d.IdchuyenMucNavigation).WithMany(p => p.BaiViets).HasConstraintName("FK_BaiViet_ChuyenMuc");
+
+            entity.HasOne(d => d.IdnguoiDungNavigation).WithMany(p => p.BaiViets).HasConstraintName("FK_BaiViet_NguoiDung");
+        });
+
+        modelBuilder.Entity<CauHinhHeThong>(entity =>
+        {
+            entity.HasKey(e => e.IdcauHinh).HasName("PK__CauHinhH__DE9A3B7A3F70271C");
+        });
+
+        modelBuilder.Entity<ChuongTrinhHoTro>(entity =>
+        {
+            entity.HasKey(e => e.IdchuongTrinh).HasName("PK__ChuongTr__7B0509A41C0A9DEB");
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.TrangThai).HasDefaultValue("DangTrienKhai");
+        });
+
+        modelBuilder.Entity<ChuyenMuc>(entity =>
+        {
+            entity.HasKey(e => e.IdchuyenMuc).HasName("PK__ChuyenMu__1078CD135189713F");
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.ThuTu).HasDefaultValue(0);
+
+            entity.HasOne(d => d.IdchuyenMucChaNavigation).WithMany(p => p.InverseIdchuyenMucChaNavigation).HasConstraintName("FK_ChuyenMuc_ChuyenMucCha");
+        });
+
+        modelBuilder.Entity<DanhMucQuy>(entity =>
+        {
+            entity.HasKey(e => e.Idquy).HasName("PK__DanhMucQ__A743077E0D5CACAF");
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.TonQuy).HasDefaultValue(0m);
+            entity.Property(e => e.TongChi).HasDefaultValue(0m);
+            entity.Property(e => e.TongThu).HasDefaultValue(0m);
+            entity.Property(e => e.TrangThai).HasDefaultValue("HoatDong");
+        });
+
+        modelBuilder.Entity<DiaDiemBanDo>(entity =>
+        {
+            entity.HasKey(e => e.IddiaDiem).HasName("PK__DiaDiemB__3DD0D654483F5641");
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.TrangThai).HasDefaultValue("HienThi");
+
+            entity.HasOne(d => d.IddonViNavigation).WithMany(p => p.DiaDiemBanDos).HasConstraintName("FK_DiaDiem_DonVi");
+        });
+
+        modelBuilder.Entity<DoanTheToChuc>(entity =>
+        {
+            entity.HasKey(e => e.IddonVi).HasName("PK__DoanTheT__082302BFBA08A593");
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+        });
+
+        modelBuilder.Entity<DonXinHoTro>(entity =>
+        {
+            entity.HasKey(e => e.Iddon).HasName("PK__DonXinHo__93E3A4198A461737");
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.MucDoUuTien).HasDefaultValue("BinhThuong");
+            entity.Property(e => e.NgayGui).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.TrangThai).HasDefaultValue("ChoXuLy");
+
+            entity.HasOne(d => d.IdnguoiCanGiupNavigation).WithMany(p => p.DonXinHoTros).HasConstraintName("FK_DonXin_NguoiCanGiup");
+
+            entity.HasOne(d => d.IdnguoiXuLyNavigation).WithMany(p => p.DonXinHoTros).HasConstraintName("FK_DonXin_NguoiDung");
+        });
+
+        modelBuilder.Entity<HopThuGopY>(entity =>
+        {
+            entity.HasKey(e => e.IdgopY).HasName("PK__HopThuGo__D232A95EF309C612");
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.NgayGui).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.TrangThai).HasDefaultValue("ChoXuLy");
+
+            entity.HasOne(d => d.IdnguoiXuLyNavigation).WithMany(p => p.HopThuGopies).HasConstraintName("FK_GopY_NguoiDung");
+        });
+
+        modelBuilder.Entity<KhoanDongGop>(entity =>
+        {
+            entity.HasKey(e => e.IdgiaoDich).HasName("PK__KhoanDon__5E5A4D81942F33FF");
+
+            entity.ToTable("KhoanDongGop", tb => tb.HasTrigger("trg_KhoanDongGop_AuditQuy"));
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.NgayUngHo).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.SoTien).HasDefaultValue(0m);
+            entity.Property(e => e.TrangThai).HasDefaultValue("ThanhCong");
+
+            entity.HasOne(d => d.IdnguoiTiepNhanNavigation).WithMany(p => p.KhoanDongGops)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_DongGop_NguoiDung");
+
+            entity.HasOne(d => d.IdnhaHaoTamNavigation).WithMany(p => p.KhoanDongGops)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_DongGop_NhaHaoTam");
+
+            entity.HasOne(d => d.IdquyNavigation).WithMany(p => p.KhoanDongGops).HasConstraintName("FK_DongGop_Quy");
+        });
+
+        modelBuilder.Entity<LuotTraoTang>(entity =>
+        {
+            entity.HasKey(e => e.IdtraoTang).HasName("PK__LuotTrao__45A28075254501D6");
+
+            entity.ToTable("LuotTraoTang", tb => tb.HasTrigger("trg_LuotTraoTang_AuditQuy"));
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.NgayPhanBo).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.SoTienHoTro).HasDefaultValue(0m);
+
+            entity.HasOne(d => d.IdchuongTrinhNavigation).WithMany(p => p.LuotTraoTangs)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TraoTang_ChuongTrinh");
+
+            entity.HasOne(d => d.IdnguoiCanGiupNavigation).WithMany(p => p.LuotTraoTangs)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TraoTang_NguoiCanGiup");
+
+            entity.HasOne(d => d.IdnguoiCapNavigation).WithMany(p => p.LuotTraoTangs)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_TraoTang_NguoiDung");
+
+            entity.HasOne(d => d.IdquyNavigation).WithMany(p => p.LuotTraoTangs).HasConstraintName("FK_TraoTang_Quy");
+        });
+
+        modelBuilder.Entity<NguoiCanGiupDo>(entity =>
+        {
+            entity.HasKey(e => e.IdnguoiCanGiup).HasName("PK__NguoiCan__92DA5CD99DA55672");
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+        });
+
+        modelBuilder.Entity<NguoiDung>(entity =>
+        {
+            entity.HasKey(e => e.IdnguoiDung).HasName("PK__NguoiDun__FCD7DB090922A357");
+
+            entity.ToTable("NguoiDung", tb => tb.HasTrigger("trg_NguoiDung_UpdateNgay"));
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.NgayCapNhat).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.NgayTao).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.TrangThai).HasDefaultValue("HoatDong");
+
+            entity.HasOne(d => d.IdvaiTroNavigation).WithMany(p => p.NguoiDungs).HasConstraintName("FK_NguoiDung_VaiTro");
+        });
+
+        modelBuilder.Entity<NhaHaoTam>(entity =>
+        {
+            entity.HasKey(e => e.IdnhaHaoTam).HasName("PK__NhaHaoTa__9835F40B35BF40E3");
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+        });
+
+        modelBuilder.Entity<NhatKyHeThong>(entity =>
+        {
+            entity.HasKey(e => e.IdnhatKy).HasName("PK__NhatKyHe__72F501D28C3EF6A3");
+
+            entity.Property(e => e.ThoiGianTao).HasDefaultValueSql("(getdate())");
+
+            entity.HasOne(d => d.IdnguoiDungNavigation).WithMany(p => p.NhatKyHeThongs).HasConstraintName("FK_NhatKy_NguoiDung");
+        });
+
+        modelBuilder.Entity<ThanhPhanGiaoDien>(entity =>
+        {
+            entity.HasKey(e => e.IdthanhPhan).HasName("PK__ThanhPha__90B69433059DBB34");
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.ThuTu).HasDefaultValue(0);
+        });
+
+        modelBuilder.Entity<VaiTro>(entity =>
+        {
+            entity.HasKey(e => e.IdvaiTro).HasName("PK__VaiTro__45D3FF49D7A1FDCD");
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+        });
+
+        modelBuilder.Entity<VanBanTaiLieu>(entity =>
+        {
+            entity.HasKey(e => e.IdvanBan).HasName("PK__VanBanTa__FDADF58BFAC3319C");
+
+            entity.Property(e => e.DaXoa).HasDefaultValue(false);
+
+            entity.HasOne(d => d.IdchuyenMucNavigation).WithMany(p => p.VanBanTaiLieus).HasConstraintName("FK_VanBan_ChuyenMuc");
+        });
+
+        OnModelCreatingPartial(modelBuilder);
+    }
+
+    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+}
