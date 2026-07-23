@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Quản trị</title>
-    <!-- Nếu bạn có dùng FontAwesome cho icon thì nhớ nhúng ở đây, ví dụ: -->
+    <!-- Nhúng FontAwesome cho icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <style>
@@ -65,6 +65,7 @@
     <!-- Menu Trái -->
     <div class="sidebar">
         <h2>Admin Panel</h2>
+
         <a href="/admin">
             <span>📊 Dashboard Tổng</span>
         </a>
@@ -87,10 +88,20 @@
             <span>Kết quả chăm lo</span>
         </a>
 
-        <!-- ĐÂY LÀ NÚT MỚI THÊM: Dẫn tới trang quản lý thêm/xóa/sửa bản đồ -->
         <a class="nav-link" href="/AdminDiaDiemBanDo/Index">
             <i class="fas fa-map-marked-alt"></i>
             <span>Quản lý Bản đồ An sinh</span>
+        </a>
+
+        <a class="nav-link" href="/AdminNguoiDanCanTroGiup/Index">
+            <i class="fas fa-life-ring"></i>
+            <span>Yêu cầu trợ giúp</span>
+        </a>
+
+        <!-- NÚT MỚI THÊM: Hộp thư góp ý -->
+        <a class="nav-link" href="/AdminGopY/Index">
+            <i class="fas fa-envelope-open-text"></i>
+            <span>Hộp thư góp ý</span>
         </a>
 
         <a href="#">
@@ -103,8 +114,7 @@
         @RenderBody() <!-- Code của các trang Index, Create, Edit sẽ được nhúng vào đây -->
     </div>
 
-    <!-- Cho phép Layout nhận Script từ các trang con (như Create, Edit chứa script bản đồ) -->
+    <!-- Cho phép Layout nhận Script từ các trang con -->
     @await RenderSectionAsync("Scripts", required: false)
-
 </body>
 </html>

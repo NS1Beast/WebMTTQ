@@ -1,0 +1,43 @@
+﻿@model WebMTTQ.Models.NguoiDanCanTroGiup
+@{
+    ViewData["Title"] = "Chi tiết yêu cầu trợ giúp";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid mt-4">
+    <div class="card shadow">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Chi tiết yêu cầu từ: @Model.HoTen</h6>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6"><p><strong>Số điện thoại:</strong> @Model.SoDienThoai</p></div>
+                <div class="col-md-6"><p><strong>Ngày gửi:</strong> @Model.NgayGui?.ToString("dd/MM/yyyy HH:mm")</p></div>
+                <div class="col-md-6"><p><strong>Mức độ:</strong> @Model.MucDoUuTien</p></div>
+                <div class="col-md-6"><p><strong>Địa chỉ:</strong> @Model.DiaChi</p></div>
+                <div class="col-md-12">
+                    <p><strong>Nội dung cần trợ giúp:</strong></p>
+                    <div class="p-3 bg-light border rounded">@Model.NoiDung</div>
+                </div>
+            </div>
+
+            <hr />
+            <form action="@Url.Action("Edit")" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+
+                <div class="form-group mb-3">
+                    <label class="font-weight-bold">Cập nhật Trạng thái xử lý:</label>
+                    <select asp-for="TrangThai" class="form-control" style="max-width: 300px;">
+                        <option value="Chưa xử lý">Chưa xử lý</option>
+                        <option value="Đang xử lý">Đang xử lý</option>
+                        <option value="Đã xử lý">Đã xử lý</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Lưu trạng thái</button>
+                <a href="@Url.Action("Index")" class="btn btn-secondary">Quay lại</a>
+            </form>
+        </div>
+    </div>
+</div>

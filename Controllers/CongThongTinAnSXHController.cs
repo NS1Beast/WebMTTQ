@@ -166,6 +166,27 @@ namespace WebMTTQ.Controllers
 
             return PartialView("_DanhSachUngHoTable");
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GuiYeuCauTroGiup(NguoiDanCanTroGiup model)
+        {
+            if (ModelState.IsValid)
+            {
+                model.NgayGui = DateTime.Now;
+                model.TrangThai = "Chưa xử lý";
+                model.DaXoa = false;
+
+                _context.NguoiDanCanTroGiups.Add(model);
+                await _context.SaveChangesAsync();
+
+                // Trả về thông báo thành công
+                TempData["SuccessMessage"] = "Gửi thông tin thành công! UBMTTQ sẽ liên hệ với bạn trong thời gian sớm nhất.";
+                return RedirectToAction("Index", null, "nhu-cau-tro-giup"); // Trở lại trang chủ và cuộn đúng vị trí form
+            }
+
+            TempData["ErrorMessage"] = "Vui lòng điền đầy đủ thông tin bắt buộc.";
+            return RedirectToAction("Index", null, "nhu-cau-tro-giup");
+        }
     }
 
     // Các Class DTO hỗ trợ cho việc Cache phía trên

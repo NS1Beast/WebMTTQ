@@ -1,0 +1,354 @@
+﻿@model WebMTTQ.Models.HopThuGopY
+
+@{
+    ViewData["Title"] = "Hộp Thư Góp Ý";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Thay đổi layout theo dự án của bạn
+}
+
+<style>
+    :root {
+        --gy-red-dark: #5a1b1b;
+        --gy-red: #c43232;
+        --gy-bg: #faf6f0;
+        --gy-text: #333333;
+        --gy-border: #e0d5d5;
+    }
+
+    body {
+        background-color: var(--gy-bg);
+        color: var(--gy-text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    /* BANNER */
+    .gy-banner {
+        background-color: var(--gy-red-dark);
+        color: white;
+        padding: 40px 0 50px 0;
+    }
+
+    .gy-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .gy-breadcrumb {
+        font-size: 0.85rem;
+        color: #e0c8c8;
+        margin-bottom: 15px;
+    }
+
+        .gy-breadcrumb a {
+            color: #e0c8c8;
+            text-decoration: none;
+        }
+
+    .gy-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.2rem;
+        font-weight: bold;
+        margin: 0 0 10px 0;
+    }
+
+    .gy-subtitle {
+        font-size: 1rem;
+        color: #e8d0d0;
+        margin: 0;
+    }
+
+    /* FORM CARD */
+    .gy-form-wrapper {
+        margin-top: -30px;
+        padding-bottom: 50px;
+    }
+
+    .gy-form-card {
+        background: white;
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .gy-intro-text {
+        color: #555;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #f0e6e0;
+    }
+
+    /* FORM CONTROLS */
+    .gy-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-left: -10px;
+        margin-right: -10px;
+    }
+
+    .gy-col-6 {
+        width: 50%;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+
+    .gy-col-12 {
+        width: 100%;
+        padding: 0 10px;
+        box-sizing: border-box;
+    }
+
+    .gy-form-group {
+        margin-bottom: 20px;
+    }
+
+    .gy-label {
+        display: block;
+        font-weight: bold;
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+        color: #222;
+    }
+
+    .gy-req {
+        color: var(--gy-red);
+    }
+
+    .gy-hint {
+        font-weight: normal;
+        color: #888;
+        font-size: 0.85rem;
+    }
+
+    .gy-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid var(--gy-border);
+        border-radius: 8px;
+        font-size: 0.95rem;
+        box-sizing: border-box;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        font-family: inherit;
+        background-color: #fff;
+    }
+
+        .gy-control:focus {
+            border-color: var(--gy-red);
+            box-shadow: 0 0 0 3px rgba(196, 50, 50, 0.1);
+        }
+
+    textarea.gy-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    /* CUSTOM SELECT */
+    select.gy-control {
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a72d2d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+        padding-right: 40px;
+        color: #333;
+    }
+
+    /* FILE UPLOAD */
+    .gy-file-wrap {
+        border: 1px solid var(--gy-border);
+        border-radius: 8px;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        background: #fff;
+    }
+
+        .gy-file-wrap input[type="file"] {
+            width: 100%;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+            .gy-file-wrap input[type="file"]::file-selector-button {
+                background-color: #f4f4f4;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                padding: 6px 12px;
+                cursor: pointer;
+                color: #333;
+                font-weight: 500;
+                margin-right: 15px;
+                transition: 0.2s;
+            }
+
+                .gy-file-wrap input[type="file"]::file-selector-button:hover {
+                    background-color: #e9e9e9;
+                }
+
+    .gy-note {
+        font-size: 0.85rem;
+        color: #888;
+        margin-top: 8px;
+        display: block;
+    }
+
+    /* BUTTONS */
+    .gy-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .btn-submit {
+        background-color: var(--gy-red-dark);
+        color: white;
+        border: none;
+        padding: 12px 35px;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .btn-submit:hover {
+            background-color: #7a2222;
+        }
+
+    .btn-reset {
+        background-color: white;
+        color: #555;
+        border: 1px solid #ccc;
+        padding: 12px 35px;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .btn-reset:hover {
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+        .gy-col-6 {
+            width: 100%;
+        }
+
+        .gy-form-card {
+            padding: 25px 20px;
+        }
+
+        .gy-actions {
+            flex-direction: column;
+        }
+
+        .btn-submit, .btn-reset {
+            width: 100%;
+        }
+    }
+</style>
+
+<!-- BANNER -->
+<div class="gy-banner">
+    <div class="gy-container">
+        <div class="gy-breadcrumb">
+            <a href="/">Trang chủ</a> > Góp ý
+        </div>
+        <h1 class="gy-title">Hộp Thư Góp Ý</h1>
+        <p class="gy-subtitle">Gửi ý kiến, phản ánh tới Ủy ban MTTQ Việt Nam xã Phú Hòa Đông.</p>
+    </div>
+</div>
+
+<!-- FORM KHU VỰC -->
+<div class="gy-form-wrapper">
+    <div class="gy-container">
+        <div class="gy-form-card">
+            <p class="gy-intro-text">
+                Nếu Quý vị có ý kiến, xin vui lòng gửi về Ủy ban Mặt trận Tổ quốc Việt Nam xã Phú Hòa Đông theo biểu mẫu dưới đây. Chúng tôi sẽ tiếp nhận và phản hồi qua website và Email. Trân trọng!
+            </p>
+
+            <!-- Hiển thị thông báo (nếu có) -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
+            <form asp-action="GuiGopY" asp-controller="GopY" method="post" enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+
+                <div class="gy-row">
+                    <!-- Lĩnh vực góp ý -->
+                    <div class="gy-col-12 gy-form-group">
+                        <label class="gy-label">Lĩnh vực góp ý <span class="gy-req">*</span></label>
+                        <select asp-for="LinhVuc" class="gy-control" required>
+                            <option value="">— Chọn lĩnh vực —</option>
+                            <option value="An sinh xã hội">An sinh xã hội</option>
+                            <option value="Cơ sở hạ tầng">Cơ sở hạ tầng</option>
+                            <option value="Thái độ cán bộ">Thái độ cán bộ</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+                    </div>
+
+                    <!-- Tiêu đề -->
+                    <div class="gy-col-12 gy-form-group">
+                        <label class="gy-label">Tiêu đề góp ý <span class="gy-req">*</span></label>
+                        <input asp-for="TieuDe" type="text" class="gy-control" required />
+                    </div>
+
+                    <!-- Họ tên & Điện thoại -->
+                    <div class="gy-col-6 gy-form-group">
+                        <label class="gy-label">Họ tên người gửi <span class="gy-req">*</span></label>
+                        <input asp-for="HoTen" type="text" class="gy-control" required />
+                    </div>
+                    <div class="gy-col-6 gy-form-group">
+                        <label class="gy-label">Điện thoại <span class="gy-req">*</span></label>
+                        <input asp-for="SoDienThoai" type="tel" class="gy-control" required />
+                    </div>
+
+                    <!-- Email -->
+                    <div class="gy-col-12 gy-form-group">
+                        <label class="gy-label">Email <span class="gy-hint">(không bắt buộc)</span></label>
+                        <input asp-for="Email" type="email" class="gy-control" />
+                    </div>
+
+                    <!-- Địa chỉ -->
+                    <div class="gy-col-12 gy-form-group">
+                        <label class="gy-label">Địa chỉ <span class="gy-req">*</span></label>
+                        <input asp-for="DiaChi" type="text" class="gy-control" required />
+                    </div>
+
+                    <!-- Nội dung -->
+                    <div class="gy-col-12 gy-form-group">
+                        <label class="gy-label">Nội dung <span class="gy-req">*</span></label>
+                        <textarea asp-for="NoiDung" class="gy-control" required></textarea>
+                    </div>
+
+                    <!-- Đính kèm file -->
+                    <div class="gy-col-12 gy-form-group">
+                        <label class="gy-label">Đính kèm file (PDF hoặc ảnh) <span class="gy-hint">(không bắt buộc)</span></label>
+                        <div class="gy-file-wrap">
+                            <!-- Lưu ý ở Backend Controller tham số nhận file phải đặt tên là 'tepDinhKem' -->
+                            <input type="file" name="tepDinhKem" accept=".pdf, .jpg, .jpeg, .png" />
+                        </div>
+                        <span class="gy-note">Chỉ nhận PDF/JPG/PNG. Khuyến nghị &lt; 10MB.</span>
+                        <span class="gy-note">Biểu mẫu này được bảo vệ bởi Google reCAPTCHA v3.</span>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="gy-actions">
+                    <button type="submit" class="btn-submit">Gửi góp ý</button>
+                    <button type="reset" class="btn-reset">Nhập lại</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

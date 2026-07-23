@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +11,14 @@ public partial class HopThuGopY
     [Key]
     [Column("IDGopY")]
     public int IdgopY { get; set; }
+
+    // === 2 TRƯỜNG THÊM MỚI ĐỂ KHỚP VỚI UI ===
+    [StringLength(100)]
+    public string? LinhVuc { get; set; } // Lĩnh vực góp ý
+
+    [StringLength(250)]
+    public string? DiaChi { get; set; } // Địa chỉ người gửi
+    // =======================================
 
     [StringLength(500)]
     public string TieuDe { get; set; } = null!;

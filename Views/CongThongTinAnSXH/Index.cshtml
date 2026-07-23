@@ -11,10 +11,10 @@
 
 <style>
     /* =======================================
-               1. BIẾN MÀU SẮC & CƠ BẢN
-               ======================================= */
+           1. BIẾN MÀU SẮC & CƠ BẢN
+           ======================================= */
     :root {
-        --mttq-red: #b32624;
+        --mttq-red: #c43232;
         --mttq-red-dark: #8b1816;
         --mttq-bg: #faf6f0;
         --card-bg: #ffffff;
@@ -54,43 +54,33 @@
 
     .asxh-col-4 {
         width: 33.333333%;
-        padding-left: 15px;
-        padding-right: 15px;
+        padding: 0 15px;
         box-sizing: border-box;
     }
 
     .asxh-col-6 {
         width: 50%;
-        padding-left: 10px;
-        padding-right: 10px;
+        padding: 0 15px;
         box-sizing: border-box;
     }
 
     .asxh-col-8 {
         width: 66.666667%;
-        padding-left: 15px;
-        padding-right: 15px;
+        padding: 0 15px;
         box-sizing: border-box;
     }
 
     .asxh-col-12 {
         width: 100%;
-        padding-left: 15px;
-        padding-right: 15px;
+        padding: 0 15px;
         box-sizing: border-box;
     }
 
-    @@media (max-width: 992px) {
-        .asxh-col-4, .asxh-col-8 {
-            width: 100%;
-        }
-    }
-
     /* =======================================
-               2. UI CHUNG & COMPONENTS
-               ======================================= */
+           2. UI CHUNG & COMPONENTS
+           ======================================= */
     .asxh-hero {
-        background: linear-gradient(135deg, #a72d2d 0%, #d87233 100%);
+        background: linear-gradient(135deg, #b83434 0%, #d87233 100%);
         border-radius: 20px;
         padding: 60px 50px;
         color: white;
@@ -137,6 +127,7 @@
         text-decoration: none;
         font-weight: bold;
         display: inline-block;
+        text-align: center;
     }
 
     .asxh-btn-outline {
@@ -149,6 +140,7 @@
         font-weight: bold;
         display: inline-block;
         margin-left: 10px;
+        text-align: center;
     }
 
     .qr-card-red {
@@ -184,9 +176,16 @@
         font-weight: bold;
     }
 
-    /* CSS CHO BẢNG DANH SÁCH ỦNG HỘ VÀ PHÂN TRANG */
+    /* BẢNG & PHÂN TRANG */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
     .asxh-table {
         width: 100%;
+        min-width: 500px;
         border-collapse: collapse;
         background-color: #ffffff;
         border-radius: 12px;
@@ -201,7 +200,8 @@
             border-bottom: 2px solid #f0e6e0;
             background-color: #fdfbf8;
             font-weight: bold;
-            text-align: center; /* Căn giữa cột */
+            text-align: center;
+            white-space: nowrap;
         }
 
         .asxh-table td {
@@ -210,7 +210,7 @@
             color: #444;
             font-size: 0.95rem;
             vertical-align: middle;
-            text-align: center; /* Căn giữa cột */
+            text-align: center;
         }
 
         .asxh-table tbody tr:last-child td {
@@ -220,6 +220,7 @@
     .asxh-pagination {
         display: flex;
         justify-content: center;
+        flex-wrap: wrap;
         gap: 8px;
         margin-top: 25px;
         padding-bottom: 10px;
@@ -254,10 +255,9 @@
             box-shadow: 0 2px 6px rgba(179, 38, 36, 0.3);
         }
 
-
     /* =======================================
-               3. CSS CHĂM LO (CL)
-               ======================================= */
+           3. CSS CHĂM LO (CL)
+           ======================================= */
     .cl-container {
         background-color: #fdf8f4;
         border-radius: 20px;
@@ -291,6 +291,7 @@
         color: #666;
         font-weight: bold;
         margin-bottom: 8px;
+        text-transform: uppercase;
     }
 
     .cl-stat-val {
@@ -305,6 +306,8 @@
         align-items: center;
         margin-top: 40px;
         margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
     }
 
     .cl-section-title {
@@ -360,85 +363,10 @@
         border: 1px solid #e0d5d5;
         border-radius: 25px;
         outline: none;
-        background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 15px center/14px;
         width: 200px;
-        appearance: none;
-        -webkit-appearance: none;
         cursor: pointer;
         color: #444;
         font-size: 0.95rem;
-    }
-
-    .cl-chart {
-        display: flex;
-        justify-content: space-around;
-        align-items: flex-end;
-        height: 220px;
-        border-bottom: 2px solid #f0e6e0;
-        padding-bottom: 0;
-        margin-bottom: 30px;
-    }
-
-    .cl-col-wrap {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-        align-items: center;
-        height: 100%;
-        width: 60px;
-    }
-
-    .cl-bar {
-        background-color: #cb3e3e;
-        width: 45px;
-        border-radius: 6px 6px 0 0;
-        transition: height 0.5s;
-    }
-
-    .cl-chart-val {
-        font-size: 0.8rem;
-        font-weight: bold;
-        color: #c43232;
-        margin-bottom: 8px;
-    }
-
-    .cl-chart-label {
-        font-weight: bold;
-        font-size: 0.95rem;
-        margin-top: 10px;
-        color: #333;
-    }
-
-    .cl-chart-sub {
-        font-size: 0.75rem;
-        color: #888;
-    }
-
-    .cl-prog-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        margin-bottom: 5px;
-    }
-
-    .cl-prog-bg {
-        background-color: #f0e6e0;
-        height: 6px;
-        border-radius: 3px;
-        width: 100%;
-        overflow: hidden;
-        margin-bottom: 5px;
-    }
-
-    .cl-prog-fill {
-        background: linear-gradient(90deg, #d87233 0%, #a72d2d 100%);
-        height: 100%;
-        border-radius: 3px;
-    }
-
-    .cl-prog-sub {
-        font-size: 0.75rem;
-        color: #888;
     }
 
     .cl-table-wrapper {
@@ -451,6 +379,7 @@
 
     .cl-table {
         width: 100%;
+        min-width: 600px;
         border-collapse: collapse;
     }
 
@@ -463,6 +392,7 @@
             font-size: 0.9rem;
             text-align: left;
             z-index: 2;
+            white-space: nowrap;
         }
 
         .cl-table tbody td {
@@ -486,8 +416,8 @@
     }
 
     /* =======================================
-               4. CSS BẢN ĐỒ AN SINH (CUSTOM MODAL)
-               ======================================= */
+           4. CSS BẢN ĐỒ AN SINH
+           ======================================= */
     .map-container-wrapper {
         background: white;
         border-radius: 20px;
@@ -501,6 +431,8 @@
         justify-content: space-between;
         align-items: flex-start;
         margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 15px;
     }
 
     .map-title {
@@ -521,9 +453,12 @@
     .map-stats-group {
         display: flex;
         gap: 15px;
+        flex-wrap: wrap;
+        width: 100%;
     }
 
     .map-stat-box {
+        flex: 1;
         border: 1px solid #f0e6e0;
         border-radius: 12px;
         padding: 10px 20px;
@@ -551,39 +486,7 @@
         gap: 15px;
         margin-bottom: 15px;
         align-items: center;
-    }
-
-    .search-input-wrap {
-        position: relative;
-        flex: 1;
-    }
-
-        .search-input-wrap svg {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-    .map-search-input {
-        width: 100%;
-        padding: 12px 20px 12px 45px;
-        border: 1px solid #eee;
-        border-radius: 25px;
-        font-size: 0.95rem;
-        outline: none;
-        background: #fdfdfd;
-        box-sizing: border-box;
-    }
-
-    .btn-clear-filter {
-        color: var(--map-red);
-        font-size: 0.9rem;
-        font-weight: bold;
-        cursor: pointer;
-        text-decoration: none;
-        border: none;
-        background: none;
+        flex-wrap: wrap;
     }
 
     .info-tags-row {
@@ -621,6 +524,8 @@
         gap: 10px;
         flex-wrap: wrap;
         margin-bottom: 20px;
+        overflow-x: auto;
+        padding-bottom: 5px;
     }
 
     .chip {
@@ -636,6 +541,7 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        white-space: nowrap;
     }
 
         .chip:hover {
@@ -655,6 +561,7 @@
             border-radius: 50%;
         }
 
+    /* LAYOUT BẢN ĐỒ & DANH SÁCH */
     .map-content-row {
         display: flex;
         gap: 30px;
@@ -736,6 +643,7 @@
         display: flex;
         align-items: center;
         gap: 12px;
+        flex-wrap: wrap;
     }
 
     .unit-badge {
@@ -753,26 +661,287 @@
         line-height: 1.5;
     }
 
-    /* THANH CUỘN */
-    .list-wrapper::-webkit-scrollbar, .cl-table-wrapper::-webkit-scrollbar {
-        width: 8px;
+    /* Scrollbar */
+    .list-wrapper::-webkit-scrollbar, .cl-table-wrapper::-webkit-scrollbar, .table-responsive::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
     }
 
-    .list-wrapper::-webkit-scrollbar-track, .cl-table-wrapper::-webkit-scrollbar-track {
+    .list-wrapper::-webkit-scrollbar-track, .cl-table-wrapper::-webkit-scrollbar-track, .table-responsive::-webkit-scrollbar-track {
         background: #f9f9f9;
         border-radius: 8px;
     }
 
-    .list-wrapper::-webkit-scrollbar-thumb, .cl-table-wrapper::-webkit-scrollbar-thumb {
+    .list-wrapper::-webkit-scrollbar-thumb, .cl-table-wrapper::-webkit-scrollbar-thumb, .table-responsive::-webkit-scrollbar-thumb {
         background-color: #c4c4c4;
         border-radius: 8px;
     }
 
-        .list-wrapper::-webkit-scrollbar-thumb:hover {
-            background-color: #999;
+    /* Ẩn Tab Nút chuyển đổi trên Desktop */
+    .mobile-map-tabs {
+        display: none;
+    }
+
+    /* =======================================
+           5. CSS FORM TRỢ GIÚP
+           ======================================= */
+    .help-section {
+        background-color: white;
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 40px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+
+    .help-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #222;
+        margin-bottom: 15px;
+    }
+
+    .help-desc {
+        color: #555;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 25px;
+    }
+
+    .help-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+        .help-list li {
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 15px;
+            color: #444;
+            font-size: 0.95rem;
+            line-height: 1.5;
         }
 
-    /* MODAL TÙY CHỈNH */
+            .help-list li::before {
+                content: '✓';
+                position: absolute;
+                left: 0;
+                top: 0;
+                background-color: #fcebeb;
+                color: var(--map-red);
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                font-weight: bold;
+            }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #333;
+    }
+
+    .form-control, .form-select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        background-color: #fdfdfd;
+        font-size: 0.95rem;
+        box-sizing: border-box;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--map-red);
+        }
+
+    .btn-submit {
+        background-color: var(--map-red);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 0.95rem;
+        transition: 0.3s;
+        width: 100%;
+    }
+
+        .btn-submit:hover {
+            background-color: #9a2626;
+        }
+
+    /* =======================================
+           6. MEDIA QUERIES (CHO MOBILE - RESPONSIVE)
+           ======================================= */
+    @@media (max-width: 992px) {
+        /* Chỉnh lại padding cơ bản */
+        .asxh-container {
+            padding: 0 10px;
+        }
+
+        .asxh-card, .cl-container, .map-container-wrapper, .help-section {
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+
+        .asxh-col-4, .asxh-col-6, .asxh-col-8 {
+            width: 100%;
+            padding: 0 10px;
+            margin-bottom: 15px;
+        }
+        /* Banner Hero */
+        .asxh-hero {
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+            .asxh-hero h1 {
+                font-size: 1.8rem !important;
+            }
+
+        .asxh-btn-white, .asxh-btn-outline {
+            width: 100%;
+            margin: 0 0 10px 0;
+            display: block;
+            box-sizing: border-box;
+        }
+        /* QR Code Card */
+        .qr-card-red {
+            padding: 20px 15px;
+        }
+        /* Font chữ tiêu đề */
+        .asxh-font-serif {
+            font-size: 1.4rem !important;
+        }
+        /* Khối thống kê */
+        .stat-box-solid, .stat-box-outline {
+            margin-bottom: 15px;
+            padding: 15px;
+        }
+        /* Bản đồ An sinh: Header & Stats */
+        .map-stats-group {
+            flex-direction: column;
+            width: 100%;
+            gap: 10px;
+        }
+
+        .map-stat-box {
+            margin-bottom: 0;
+        }
+
+        .search-input-wrap {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn-clear-filter {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            padding: 10px;
+            text-align: center;
+        }
+        /* Nút Tab chuyển đổi Bản đồ / Danh sách cho Mobile */
+        .mobile-map-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 5px;
+            border: 1px solid #f0e6e0;
+        }
+
+        .m-tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            background: transparent;
+            color: #555;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+            .m-tab-btn.active {
+                background: var(--map-red);
+                color: white;
+            }
+
+        .m-badge {
+            background: #fcebeb;
+            color: var(--map-red);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            margin-left: 5px;
+        }
+
+        .m-tab-btn.active .m-badge {
+            background: white;
+            color: var(--map-red);
+        }
+        /* Chuyển layout Bản đồ & Danh sách thành dọc và ẩn hiện theo tab */
+        .map-content-row {
+            display: block;
+            height: auto;
+        }
+
+        .map-col {
+            width: 100%;
+            height: 450px;
+            display: block;
+            border-radius: 12px;
+        }
+
+        .list-col {
+            width: 100%;
+            height: auto;
+            display: none;
+        }
+        /* Ẩn list mặc định */
+        .list-header {
+            display: none;
+        }
+        /* Ẩn thẻ H4 vì đã có nút Tab */
+        .list-wrapper {
+            max-height: 600px;
+            padding-right: 0;
+        }
+        /* Logic ẩn hiện CSS dựa vào class show-list */
+        .map-content-row.show-list .map-col {
+            display: none;
+        }
+
+        .map-content-row.show-list .list-col {
+            display: flex;
+        }
+        /* Chăm lo: Filter Inputs */
+        .cl-select {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    }
+
+    /* MODAL */
     .custom-modal-overlay {
         position: fixed;
         top: 0;
@@ -786,6 +955,7 @@
         z-index: 9999;
         opacity: 0;
         transition: opacity 0.3s ease;
+        padding: 15px;
     }
 
         .custom-modal-overlay.active {
@@ -795,10 +965,10 @@
 
     .custom-modal-content {
         background: #fff;
-        width: 90%;
+        width: 100%;
         max-width: 600px;
         border-radius: 16px;
-        padding: 30px;
+        padding: 25px;
         position: relative;
         box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         max-height: 90vh;
@@ -807,8 +977,8 @@
 
     .btn-close-modal {
         position: absolute;
-        top: 15px;
-        right: 15px;
+        top: 10px;
+        right: 10px;
         background: #111;
         color: #fff;
         border: none;
@@ -823,17 +993,17 @@
     }
 
     .modal-title {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         font-weight: bold;
         color: #222;
         text-transform: uppercase;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
         line-height: 1.4;
         padding-right: 30px;
     }
 
     .modal-meta {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         color: #555;
         margin-bottom: 5px;
     }
@@ -845,13 +1015,13 @@
     .modal-image {
         width: 100%;
         border-radius: 12px;
-        margin: 20px 0;
+        margin: 15px 0;
         object-fit: cover;
-        max-height: 400px;
+        max-height: 300px;
     }
 
     .modal-desc {
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         color: #444;
         line-height: 1.6;
     }
@@ -860,9 +1030,7 @@
 <div class="asxh-wrapper">
     <div class="asxh-container">
 
-        <!-- ==============================================
-             KHU VỰC 1: BANNER HERO
-             ============================================== -->
+        <!-- KHU VỰC 1: BANNER HERO -->
         <div class="asxh-hero">
             <div class="asxh-badge">CỔNG THÔNG TIN ỦNG HỘ TRỰC TUYẾN</div>
             <h1 class="asxh-font-serif" style="font-size: 2.8rem; font-weight: bold; line-height: 1.3; margin-top: 0; margin-bottom: 15px;">
@@ -870,7 +1038,7 @@
                 Chung tay vì cộng đồng, minh bạch trong <br />
                 từng đóng góp
             </h1>
-            <p style="font-size: 1.1rem; line-height: 1.6; opacity: 0.9; max-width: 750px; margin-bottom: 25px;">
+            <p style="font-size: 1.1rem; line-height: 1.6; opacity: 0.9; max-width: 750px; margin-bottom: 25px; margin-left: auto; margin-right: auto;">
                 Đây là trang tiếp nhận và công khai thông tin ủng hộ phục vụ các hoạt động an sinh xã hội, chăm lo
                 hộ khó khăn, học sinh cần tiếp sức, trường hợp bệnh hiểm nghèo và các hoàn cảnh cần trợ giúp trên
                 địa bàn xã Phú Hòa Đông.
@@ -881,157 +1049,98 @@
             </div>
         </div>
 
-        <!-- ==============================================
-             KHU VỰC 2: CHIA 2 CỘT (MÃ QR VÀ THỐNG KÊ QUỸ)
-             ============================================== -->
+        <!-- KHU VỰC 2: CHIA 2 CỘT (MÃ QR VÀ THỐNG KÊ QUỸ) -->
         <div class="asxh-row" style="margin-bottom: 24px;">
-            <!-- CỘT TRÁI (QR CODE) -->
             <div class="asxh-col-4">
                 <div class="asxh-card">
-                    <h3 class="asxh-font-serif" style="font-size: 1.5rem; font-weight: bold; margin-top: 0; margin-bottom: 25px;">
-                        Thông tin tiếp nhận ủng hộ
-                    </h3>
-
+                    <h3 class="asxh-font-serif" style="font-size: 1.5rem; font-weight: bold; margin-top: 0; margin-bottom: 25px;">Thông tin tiếp nhận ủng hộ</h3>
                     @if (ViewBag.DanhSachUngHo != null)
                     {
                         foreach (var item in ViewBag.DanhSachUngHo)
                         {
-                            <div style="margin-bottom: 40px; border-bottom: 2px dashed #eee; padding-bottom: 10px;">
+                            <div style="margin-bottom: 30px; border-bottom: 2px dashed #eee; padding-bottom: 10px;">
                                 <div class="qr-card-red">
-                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
-                                        <div style="font-size: 1.8rem; color: #ffc107;">★</div>
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                                        <div style="font-size: 1.8rem; color: #ffc107; line-height: 1;">★</div>
                                         <div style="text-align: right;">
-                                            <div style="font-weight: bold; font-size: 1.2rem; letter-spacing: 1px; text-transform: uppercase;">@item.TenNgânHang</div>
+                                            <div style="font-weight: bold; font-size: 1.1rem; letter-spacing: 1px; text-transform: uppercase;">@item.TenNgânHang</div>
                                             <div style="font-size: 0.75rem; color: #ddd;">Chi nhánh @item.ChiNhanh</div>
                                         </div>
                                     </div>
-
-                                    <div style="text-align: right; color: #f9d857; font-family: 'Playfair Display', serif; font-style: italic; font-size: 0.85rem; line-height: 1.4; margin-bottom: 25px;">
-                                        "Cùng viết tiếp câu chuyện hòa bình,<br>
-                                        để Việt Nam vươn mình cất cánh"
+                                    <div style="text-align: center; color: #f9d857; font-family: 'Playfair Display', serif; font-style: italic; font-size: 0.9rem; line-height: 1.4; margin-bottom: 20px;">
+                                        "Cùng viết tiếp câu chuyện hòa bình,<br> để Việt Nam vươn mình cất cánh"
                                     </div>
-
-                                    <div style="text-align: center; margin-bottom: 25px;">
+                                    <div style="text-align: center; margin-bottom: 20px;">
                                         <div style="background-color: white; padding: 10px; display: inline-block; border-radius: 12px;">
-                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=@(item.TenNgânHang)-@(item.SoTaiKhoan)" alt="QR Code @item.TenNgânHang" style="width: 140px; height: 140px; display: block;" />
+                                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=@(item.TenNgânHang)-@(item.SoTaiKhoan)" alt="QR Code @item.TenNgânHang" style="width: 130px; height: 130px; display: block;" />
                                         </div>
                                     </div>
-
                                     <div style="text-align: center;">
                                         <div style="font-size: 0.75rem; color: #ddd; margin-bottom: 4px;">Tên tài khoản:</div>
                                         <div style="font-weight: bold; font-size: 0.85rem; margin-bottom: 15px; text-transform: uppercase;">@item.TenTaiKhoan</div>
                                         <div style="font-size: 0.75rem; color: #ddd; margin-bottom: 4px;">Số tài khoản:</div>
-                                        <div style="font-weight: bold; font-size: 1.4rem;">@item.SoTaiKhoan</div>
+                                        <div style="font-weight: bold; font-size: 1.3rem;">@item.SoTaiKhoan</div>
                                     </div>
                                 </div>
-
-                                <div style="font-size: 0.95rem;">
+                                <div style="font-size: 0.9rem;">
                                     <div style="color: #999; font-size: 0.75rem; font-weight: bold; margin-bottom: 4px;">ĐƠN VỊ THỤ HƯỞNG</div>
-                                    <div style="font-weight: bold; margin-bottom: 20px; text-transform: uppercase;">@item.DonViThuHuong</div>
-
+                                    <div style="font-weight: bold; margin-bottom: 15px; text-transform: uppercase;">@item.DonViThuHuong</div>
                                     <div style="color: #999; font-size: 0.75rem; font-weight: bold; margin-bottom: 4px;">NGÂN HÀNG</div>
-                                    <div style="font-weight: bold; margin-bottom: 20px;">@item.TenNgânHang / Tài khoản tiếp nhận ủng hộ</div>
-
+                                    <div style="font-weight: bold; margin-bottom: 15px;">@item.TenNgânHang / Tài khoản tiếp nhận ủng hộ</div>
                                     <div style="color: #999; font-size: 0.75rem; font-weight: bold; margin-bottom: 4px;">SỐ TÀI KHOẢN</div>
-                                    <div style="font-weight: bold; margin-bottom: 20px;">@item.SoTaiKhoan</div>
-
+                                    <div style="font-weight: bold; margin-bottom: 15px;">@item.SoTaiKhoan</div>
                                     <div style="color: #999; font-size: 0.75rem; font-weight: bold; margin-bottom: 4px;">NỘI DUNG CHUYỂN KHOẢN</div>
                                     <div style="font-weight: bold;">HO TEN - SO DIEN THOAI</div>
                                 </div>
                             </div>
                         }
                     }
-                    else
-                    {
-                        <p style="text-align: center; color: #888; font-style: italic;">Chưa có thông tin tài khoản ủng hộ nào được thiết lập.</p>
-                    }
                 </div>
             </div>
 
-            <!-- CỘT PHẢI (THỐNG KÊ & DANH SÁCH) -->
+            <!-- CỘT PHẢI -->
             <div class="asxh-col-8">
                 <div class="asxh-card" style="margin-bottom: 24px;">
                     <h3 class="asxh-font-serif" style="font-size: 1.6rem; font-weight: bold; margin-top: 0; margin-bottom: 15px;">Lan tỏa nghĩa tình - Kết nối cộng đồng - Chung tay vì Phú Hòa Đông</h3>
-                    <p style="font-size: 0.95rem; line-height: 1.6; color: #666; margin-bottom: 20px;">
-                        Mỗi khoản đóng góp là một sự sẻ chia thiết thực để MTTQ và các đoàn thể địa phương phối hợp chăm lo đúng người, đúng hoàn cảnh, đúng nhu cầu. Cổng thông tin này hướng đến công khai minh bạch, cập nhật thông tin hỗ trợ và kết nối thêm nhiều tấm lòng cùng đồng hành vì cộng đồng.
-                    </p>
+                    <p style="font-size: 0.95rem; line-height: 1.6; color: #666; margin-bottom: 20px;">Mỗi khoản đóng góp là một sự sẻ chia thiết thực để MTTQ và các đoàn thể địa phương phối hợp chăm lo đúng người, đúng hoàn cảnh, đúng nhu cầu.</p>
                     <div class="asxh-row">
                         <div class="asxh-col-6">
                             <div class="stat-box-solid">
                                 <div style="font-size: 0.8rem; color: #ddd; font-weight: bold; margin-bottom: 5px;">TỔNG GIÁ TRỊ TIẾP NHẬN</div>
-                                <div style="font-size: 2.2rem; font-weight: bold;">
-                                    @(((decimal)(ViewBag.TongTien ?? 0)).ToString("N0"))<span style="font-size: 1.2rem; font-weight: normal; margin-left: 3px;">đ</span>
-                                </div>
+                                <div style="font-size: 2rem; font-weight: bold;">@(((decimal)(ViewBag.TongTien ?? 0)).ToString("N0"))<span style="font-size: 1rem; font-weight: normal; margin-left: 3px;">đ</span></div>
                             </div>
                         </div>
                         <div class="asxh-col-6">
                             <div class="stat-box-solid">
                                 <div style="font-size: 0.8rem; color: #ddd; font-weight: bold; margin-bottom: 5px;">LƯỢT ỦNG HỘ GHI NHẬN</div>
-                                <div style="font-size: 2.2rem; font-weight: bold;">
-                                    @(ViewBag.TongSoLuot ?? 0)
-                                </div>
+                                <div style="font-size: 2rem; font-weight: bold;">@(ViewBag.TongSoLuot ?? 0)</div>
                             </div>
                         </div>
                     </div>
-
-                    <div style="text-align: center; margin-top: 15px; font-size: 0.8rem; color: #999; font-style: italic;">
-                        * Số liệu được hệ thống ghi nhận và cập nhật tự động
-                    </div>
-                    <div style="text-align: center; margin-top: 15px; font-size: 0.8rem; color: #999; font-style: italic;">
-                        * Số liệu cập nhật đến ngày @ViewBag.NgayCapNhat
-                    </div>
+                    <div style="text-align: center; margin-top: 15px; font-size: 0.8rem; color: #999; font-style: italic;">* Số liệu cập nhật đến ngày @ViewBag.NgayCapNhat</div>
                 </div>
 
                 <div class="asxh-card" style="margin-bottom: 24px;">
                     <h3 class="asxh-font-serif" style="font-size: 1.6rem; font-weight: bold; margin-top: 0; text-align: center; margin-bottom: 20px;">Công khai số dư Quỹ "Vì người nghèo"</h3>
-
                     @if (ViewBag.SoDuQuy != null)
                     {
-                        <div style="text-align: center; margin-bottom: 25px;">
-                            <span class="asxh-badge-light">Số dư đến ngày @ViewBag.SoDuQuy.NgayCapNhat.ToString("dd/M/yyyy")</span>
-                        </div>
-
-                        <div class="asxh-row" style="margin-bottom: 20px;">
-                            <div class="asxh-col-4" style="width: 33.33%;">
-                                <div class="stat-box-outline">
-                                    <div style="font-size: 0.8rem; font-weight: bold; color: #888; margin-bottom: 10px;">TIỀN MẶT</div>
-                                    <div class="val-red" style="font-size: 1.15rem;">@ViewBag.SoDuQuy.TienMat.ToString("N0")đ</div>
-                                </div>
-                            </div>
-                            <div class="asxh-col-4" style="width: 33.33%;">
-                                <div class="stat-box-outline">
-                                    <div style="font-size: 0.8rem; font-weight: bold; color: #888; margin-bottom: 10px;">TIỀN GỬI NGÂN HÀNG</div>
-                                    <div class="val-red" style="font-size: 1.15rem;">@ViewBag.SoDuQuy.TienGuiNganHang.ToString("N0")đ</div>
-                                </div>
-                            </div>
-                            <div class="asxh-col-4" style="width: 33.33%;">
-                                <div class="stat-box-solid" style="padding: 20px; text-align: center;">
-                                    <div style="font-size: 0.8rem; color: #ddd; font-weight: bold; margin-bottom: 10px;">TỔNG TỒN QUỸ</div>
-                                    <div style="font-size: 1.15rem; font-weight: bold; color: white;">@ViewBag.SoDuQuy.TongTonQuy.ToString("N0")đ</div>
-                                </div>
-                            </div>
+                        <div style="text-align: center; margin-bottom: 20px;"><span class="asxh-badge-light">Số dư đến ngày @ViewBag.SoDuQuy.NgayCapNhat.ToString("dd/M/yyyy")</span></div>
+                        <div class="asxh-row" style="margin-bottom: 10px;">
+                            <div class="asxh-col-4"><div class="stat-box-outline"><div style="font-size: 0.8rem; font-weight: bold; color: #888; margin-bottom: 5px;">TIỀN MẶT</div><div class="val-red" style="font-size: 1.15rem;">@ViewBag.SoDuQuy.TienMat.ToString("N0")đ</div></div></div>
+                            <div class="asxh-col-4"><div class="stat-box-outline"><div style="font-size: 0.8rem; font-weight: bold; color: #888; margin-bottom: 5px;">TIỀN GỬI NGÂN HÀNG</div><div class="val-red" style="font-size: 1.15rem;">@ViewBag.SoDuQuy.TienGuiNganHang.ToString("N0")đ</div></div></div>
+                            <div class="asxh-col-4"><div class="stat-box-solid" style="padding: 15px; text-align: center;"><div style="font-size: 0.8rem; color: #ddd; font-weight: bold; margin-bottom: 5px;">TỔNG TỒN QUỸ</div><div style="font-size: 1.2rem; font-weight: bold; color: white;">@ViewBag.SoDuQuy.TongTonQuy.ToString("N0")đ</div></div></div>
                         </div>
                     }
                     else
                     {
                         <p class="text-center text-muted" style="font-style: italic;">Đang cập nhật số liệu mới nhất...</p>
                     }
-
-                    <p style="font-size: 0.8rem; color: #999; font-style: italic; text-align: center; margin: 0;">
-                        Nguồn: Ban Thường trực Ủy ban MTTQ Việt Nam xã Phú Hòa Đông. Quỹ "Vì người nghèo" được quản lý công khai, minh bạch; sử dụng chăm lo hộ nghèo, hộ cận nghèo, hộ có hoàn cảnh khó khăn trên địa bàn xã.
-                    </p>
                 </div>
 
                 <div class="asxh-card" id="danh-sach-ung-ho">
                     <h3 class="asxh-font-serif" style="font-size: 1.6rem; font-weight: bold; margin-top: 0; margin-bottom: 10px;">Danh sách ủng hộ</h3>
-                    <div style="text-align: center; font-size: 0.8rem; color: #999; font-style: italic; margin-bottom: 20px;">
-                        * Số liệu cập nhật đến ngày @ViewBag.NgayCapNhat
-                    </div>
-
-                    <div style="background-color: #faf6f0; border-radius: 12px; padding: 15px;">
-                        <div id="vung-chua-bang-danh-sach">
-
-                            <!-- Đã thay thẻ partial bằng trực tiếp code bảng và phân trang bạn yêu cầu -->
+                    <div style="background-color: #faf6f0; border-radius: 12px; padding: 10px;">
+                        <div class="table-responsive" id="vung-chua-bang-danh-sach">
                             <table class="asxh-table">
                                 <thead>
                                     <tr>
@@ -1046,282 +1155,149 @@
                                         foreach (var item in ViewBag.DanhSachNguoiUngHo)
                                         {
                                             <tr>
-                                                <td class="text-center">@item.TenNguoiUngHo</td>
-                                                <td class="text-center">@item.NgayUngHo.ToString("dd/MM/yyyy")</td>
-                                                <td class="text-center val-red">@item.SoTien.ToString("N0")đ</td>
+                                                <td class="text-center" style="white-space: nowrap;">@item.TenNguoiUngHo</td>
+                                                <td class="text-center" style="white-space: nowrap;">@item.NgayUngHo.ToString("dd/MM/yyyy")</td>
+                                                <td class="text-center val-red" style="white-space: nowrap;">@item.SoTien.ToString("N0")đ</td>
                                             </tr>
                                         }
                                     }
-                                    else
-                                    {
-                                        <tr>
-                                            <td colspan="3" class="text-center" style="color: #888; font-style: italic;">
-                                                Chưa có dữ liệu ủng hộ nào được ghi nhận.
-                                            </td>
-                                        </tr>
-                                    }
                                 </tbody>
                             </table>
-
                             @if (ViewBag.TotalPages > 1)
                             {
                                 <div class="asxh-pagination">
-                                    <!-- Nút Lùi (<) -->
                                     @if (ViewBag.CurrentPage > 1)
                                     {
                                         <a href="javascript:void(0)" data-page="@(ViewBag.CurrentPage - 1)" class="asxh-page-link ajax-page-link">&laquo;</a>
                                     }
-
-                                    <!-- Số trang -->
                                     @for (int i = 1; i <= ViewBag.TotalPages; i++)
                                     {
-                                        <a href="javascript:void(0)" data-page="@i" class="asxh-page-link ajax-page-link @(i == ViewBag.CurrentPage ? "active" : "")">
-                                            @i
-                                        </a>
+                                        <a href="javascript:void(0)" data-page="@i" class="asxh-page-link ajax-page-link @(i == ViewBag.CurrentPage ? "active" : "")">@i</a>
                                     }
-
-                                    <!-- Nút Tiến (>) -->
                                     @if (ViewBag.CurrentPage < ViewBag.TotalPages)
                                     {
                                         <a href="javascript:void(0)" data-page="@(ViewBag.CurrentPage + 1)" class="asxh-page-link ajax-page-link">&raquo;</a>
                                     }
                                 </div>
                             }
-                            <!-- KẾT THÚC KHU VỰC BẢNG TRỰC TIẾP -->
-
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ==============================================
-             KHU VỰC 3: KẾT QUẢ CHĂM LO
-             ============================================== -->
+        <!-- KHU VỰC 3: KẾT QUẢ CHĂM LO -->
         <div class="cl-container">
-            <div style="font-size: 0.8rem; font-weight: bold; letter-spacing: 1px; color: #666; text-transform: uppercase; margin-bottom: 10px;">Minh bạch - Kịp thời - Đúng đối tượng</div>
-            <h3 class="asxh-font-serif" style="font-size: 2.2rem; font-weight: bold; color: #222; margin-top: 0; margin-bottom: 15px;">Kết quả chăm lo an sinh thường xuyên</h3>
-            <p style="font-size: 1rem; color: #666; margin-bottom: 25px;">Tổng hợp từ Sổ theo dõi chăm lo thường xuyên của Ban Thường trực UBMTTQ Việt Nam xã...</p>
-
-            <div class="cl-badge mb-4">Cập nhật đến tháng @ViewBag.ThangCapNhat/@DateTime.Now.Year</div>
-
+            <h3 class="asxh-font-serif" style="font-size: 1.8rem; font-weight: bold; color: #222; margin-top: 0; margin-bottom: 15px;">Kết quả chăm lo an sinh thường xuyên</h3>
             <div class="asxh-row">
-                <div class="asxh-col-4" style="width: 25%;">
-                    <div class="cl-stat-box">
-                        <div class="cl-stat-title">TỔNG KINH PHÍ CHĂM LO</div>
-                        <div class="cl-stat-val">@(((decimal)(ViewBag.TongKinhPhiCL ?? 0)).ToString("N0"))đ</div>
-                    </div>
-                </div>
-                <div class="asxh-col-4" style="width: 25%;">
-                    <div class="cl-stat-box">
-                        <div class="cl-stat-title">LƯỢT HỘ ĐƯỢC CHĂM LO</div>
-                        <div class="cl-stat-val">@(((int)(ViewBag.TongLuotHoCL ?? 0)).ToString("N0")) <span style="font-size: 1rem; color:#666; font-weight:normal;">lượt</span></div>
-                    </div>
-                </div>
-                <div class="asxh-col-4" style="width: 25%;">
-                    <div class="cl-stat-box">
-                        <div class="cl-stat-title">HOẠT ĐỘNG CHĂM LO</div>
-                        <div class="cl-stat-val">@(ViewBag.TongHoatDongCL ?? 0)</div>
-                    </div>
-                </div>
-                <div class="asxh-col-4" style="width: 25%;">
-                    <div class="cl-stat-box">
-                        <div class="cl-stat-title">ĐƠN VỊ CHUNG TAY</div>
-                        <div class="cl-stat-val">@(ViewBag.TongDonViCL ?? 0)</div>
-                    </div>
-                </div>
+                <div class="asxh-col-6"><div class="cl-stat-box"><div class="cl-stat-title">TỔNG KINH PHÍ CHĂM LO</div><div class="cl-stat-val">@(((decimal)(ViewBag.TongKinhPhiCL ?? 0)).ToString("N0"))<span style="font-size: 1rem; font-weight: normal; margin-left: 2px;">đ</span></div></div></div>
+                <div class="asxh-col-6"><div class="cl-stat-box"><div class="cl-stat-title">LƯỢT HỘ ĐƯỢC CHĂM LO</div><div class="cl-stat-val">@(((int)(ViewBag.TongLuotHoCL ?? 0)).ToString("N0")) <span style="font-size: 0.9rem; font-weight: normal; color: #666;">lượt</span></div></div></div>
+                <div class="asxh-col-6"><div class="cl-stat-box"><div class="cl-stat-title">HOẠT ĐỘNG CHĂM LO</div><div class="cl-stat-val">@(ViewBag.TongHoatDongCL ?? 0)</div></div></div>
+                <div class="asxh-col-6"><div class="cl-stat-box"><div class="cl-stat-title">ĐƠN VỊ CHUNG TAY</div><div class="cl-stat-val">@(ViewBag.TongDonViCL ?? 0)</div></div></div>
             </div>
 
-            <!-- BIỂU ĐỒ THEO THÁNG -->
-            <div class="cl-section-header" style="margin-top: 40px; margin-bottom: 20px;">
-                <h4 class="cl-section-title">Kinh phí chăm lo theo tháng</h4>
-                <div class="cl-badge">@(ViewBag.ChuoiThang ?? "N/A")</div>
-            </div>
-            <div class="cl-chart">
-                @if (ViewBag.ThongKeThang != null)
-                {
-                    foreach (var item in ViewBag.ThongKeThang)
-                    {
-                        decimal pct = ViewBag.MaxThangTien > 0 ? (item.TongTien / ViewBag.MaxThangTien) * 100 : 0;
-                        string tienGon = (item.TongTien / 1000000).ToString("0.0") + " tr";
-
-                        <div class="cl-col-wrap">
-                            <div class="cl-chart-val">@tienGon</div>
-                            <div class="cl-bar" style="height: @(pct)%"></div>
-                            <div class="cl-chart-label">T@(item.Thang)</div>
-                            <div class="cl-chart-sub">@item.SoHoatDong lượt</div>
-                        </div>
-                    }
-                }
-            </div>
-
-            <!-- ĐÓNG GÓP THEO ĐƠN VỊ -->
-            <div class="cl-section-header" style="margin-top: 40px; margin-bottom: 20px;">
-                <h4 class="cl-section-title">Đóng góp theo đơn vị</h4>
-                <div class="cl-badge">@(ViewBag.TongNhomDonVi ?? 0) nhóm đơn vị</div>
-            </div>
-            <div class="asxh-row">
-                @if (ViewBag.ThongKeDonVi != null)
-                {
-                    foreach (var item in ViewBag.ThongKeDonVi)
-                    {
-                        decimal phanTram = ViewBag.TongKinhPhiCL > 0 ? (item.TongTien / ViewBag.TongKinhPhiCL) * 100 : 0;
-
-                        <div class="asxh-col-6" style="margin-bottom: 20px;">
-                            <div class="cl-prog-row">
-                                <span style="font-weight: bold; color: #222; font-size:0.95rem;">@item.TenLoai</span>
-                                <span style="font-weight: bold; color: #c43232;">@item.TongTien.ToString("N0")đ</span>
-                            </div>
-                            <div class="cl-prog-bg">
-                                <div class="cl-prog-fill" style="width: @(phanTram.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture))%"></div>
-                            </div>
-                            <div class="cl-prog-sub">
-                                @item.SoHoatDong hoạt động - @phanTram.ToString("0")%
-                            </div>
-                        </div>
-                    }
-                }
-            </div>
-
-            <!-- BẢNG CHI TIẾT VÀ BỘ LỌC TÌM KIẾM -->
             <div class="cl-section-header">
                 <h4 class="cl-section-title">Chi tiết các lượt chăm lo</h4>
-                <div class="cl-badge-stat">@(ViewBag.TongHoatDongCL ?? 0) hoạt động - @(((decimal)(ViewBag.TongKinhPhiCL ?? 0)).ToString("N0"))đ</div>
             </div>
-
             <div class="cl-filter-bar">
-                <div class="cl-search-wrapper">
-                    <svg class="cl-search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a72d2d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                    <input type="text" id="clSearch" class="cl-input" placeholder="Tìm theo nội dung, đơn vị..." onkeyup="filterCL()">
-                </div>
-
-                <select id="clMonth" class="cl-select" onchange="filterCL()">
-                    <option value="">Tất cả tháng</option>
-                    @if (ViewBag.ThongKeThang != null)
-                    {
-                        foreach (var item in ViewBag.ThongKeThang)
-                        {
-                            <option value="Tháng @item.Thang">Tháng @item.Thang</option>
-                        }
-                    }
-                </select>
-
-                <select id="clUnit" class="cl-select" onchange="filterCL()">
-                    <option value="">Tất cả đơn vị</option>
-                    @if (ViewBag.ListNhomDonVi != null)
-                    {
-                        foreach (var name in ViewBag.ListNhomDonVi)
-                        {
-                            <option value="@name">@name</option>
-                        }
-                    }
-                </select>
+                <div class="cl-search-wrapper"><input type="text" id="clSearch" class="cl-input" placeholder="Tìm theo nội dung, đơn vị..." onkeyup="filterCL()"></div>
+                <select id="clMonth" class="cl-select" onchange="filterCL()"><option value="">Tất cả tháng</option></select>
+                <select id="clUnit" class="cl-select" onchange="filterCL()"><option value="">Tất cả đơn vị</option></select>
             </div>
-
-            <div class="cl-table-wrapper">
+            <div class="table-responsive cl-table-wrapper">
                 <table class="cl-table" id="clTable">
-                    <thead>
-                        <tr>
-                            <th width="90">Tháng</th>
-                            <th width="220">Đơn vị ủng hộ</th>
-                            <th>Nội dung chăm lo</th>
-                            <th width="70" style="text-align:center;">SL</th>
-                            <th width="140" style="text-align:right;">Kinh phí</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th width="80">Tháng</th><th width="180">Đơn vị</th><th>Nội dung</th><th width="60">SL</th><th width="120">Kinh phí</th></tr></thead>
                     <tbody>
                         @if (ViewBag.DanhSachChamLo != null)
                         {
                             foreach (var item in ViewBag.DanhSachChamLo)
                             {
                                 <tr>
-                                    <td style="color: #c43232; font-weight: bold;">Tháng @item.Thang</td>
-                                    <td>
-                                        <div style="font-weight: bold; color: #333; font-size: 0.95rem;">@item.DonViUngHo</div>
-                                        <span class="cl-tag-sm">@item.PhanLoaiDonVi</span>
-                                    </td>
-                                    <td style="font-size: 0.9rem; line-height: 1.5; color: #444;">@item.NoiDung</td>
+                                    <td style="color: #c43232; font-weight: bold; white-space: nowrap;">Tháng @item.Thang</td>
+                                    <td><div style="font-weight: bold; color: #333;">@item.DonViUngHo</div><span class="cl-tag-sm">@item.PhanLoaiDonVi</span></td>
+                                    <td style="min-width: 200px;">@item.NoiDung</td>
                                     <td style="text-align:center;">@item.SoLuongHo</td>
-                                    <td style="text-align:right; color: #c43232; font-weight: bold;">@item.KinhPhi.ToString("N0")đ</td>
+                                    <td style="text-align:right; color: #c43232; font-weight: bold; white-space: nowrap;">@item.KinhPhi.ToString("N0")đ</td>
                                 </tr>
                             }
                         }
                     </tbody>
                 </table>
             </div>
-
-            <div style="font-size: 0.85rem; color: #666; margin-top: 15px; line-height: 1.5;">
-                Nguồn: Sổ theo dõi chăm lo thường xuyên — Ban Thường trực UBMTTQ VN. Số liệu tổng hợp theo từng tháng; con số "lượt hộ" là số tổng kết do Ban Thường trực chốt.
-            </div>
         </div>
 
-        <!-- ==============================================
-             KHU VỰC 4: BẢN ĐỒ CÔNG TÁC AN SINH (GIAO DIỆN HOÀN THIỆN)
-             ============================================== -->
+        <!-- KHU VỰC 4: BẢN ĐỒ CÔNG TÁC AN SINH -->
         <div class="map-container-wrapper">
-            <!-- HEADER -->
             <div class="map-header-row">
                 <div>
-                    <h1 class="map-title">Bản đồ công tác an sinh</h1>
-                    <p class="map-desc">Theo dõi các điểm hỗ trợ, hoạt động chăm lo và chương trình thiện nguyện. Người xem có thể lọc theo đơn vị thực hiện, tìm nhanh theo tên điểm hỗ trợ và bấm vào từng địa điểm để xem thông tin chi tiết.</p>
+                    <h1 class="map-title" style="font-size: 1.8rem;">Bản đồ công tác an sinh</h1>
+                    <p class="map-desc" style="font-size: 0.9rem;">Theo dõi các điểm hỗ trợ, hoạt động chăm lo trên địa bàn xã Phú Hòa Đông. Lọc theo đơn vị, tìm nhanh tên điểm hỗ trợ.</p>
                 </div>
                 <div class="map-stats-group">
-                    <div class="map-stat-box">
-                        <div class="map-stat-label">Tổng địa điểm</div>
-                        <div class="map-stat-value">@(ViewBag.TongDiaDiem ?? 0)</div>
-                    </div>
-                    <div class="map-stat-box">
-                        <div class="map-stat-label">Đang hiển thị</div>
-                        <div class="map-stat-value" id="hienThiCount">@(ViewBag.TongDiaDiem ?? 0)</div>
-                    </div>
-                    <div class="map-stat-box">
-                        <div class="map-stat-label">Nhóm đơn vị</div>
-                        <div class="map-stat-value">@(ViewBag.NhomDonVi ?? 0)</div>
-                    </div>
+                    <div class="map-stat-box"><div class="map-stat-label">Tổng địa điểm</div><div class="map-stat-value">@(ViewBag.TongDiaDiem ?? 0)</div></div>
+                    <div class="map-stat-box"><div class="map-stat-label">Đang hiển thị</div><div class="map-stat-value" id="hienThiCount">@(ViewBag.TongDiaDiem ?? 0)</div></div>
+                    <div class="map-stat-box"><div class="map-stat-label">Nhóm đơn vị</div><div class="map-stat-value">@(ViewBag.NhomDonVi ?? 0)</div></div>
                 </div>
             </div>
 
-            <!-- TÌM KIẾM & BỘ LỌC -->
             <div class="map-search-bar">
                 <div class="search-input-wrap">
-                    <svg xmlns="http://www.w3.org/2003/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="searchInput" class="map-search-input" placeholder="Tìm theo tên địa điểm, nội dung hoặc đơn vị thực hiện..." onkeyup="applyFilters()">
+                    <input type="text" id="searchInput" class="map-search-input" placeholder="Tìm tên địa điểm, nội dung..." onkeyup="applyFilters()">
                 </div>
-                <button class="btn-clear-filter" onclick="clearFilters()">Bỏ chọn bộ lọc</button>
+                <button class="btn-clear-filter" onclick="clearFilters()">Bỏ chọn</button>
             </div>
 
-            <!-- THẺ HƯỚNG DẪN -->
             <div class="info-tags-row">
-                <span class="info-tag"><span class="red-dot"></span> Có thể bấm vào marker trên bản đồ để xem chi tiết</span>
-                <span class="info-tag"><span class="red-dot"></span> Danh sách bên phải tự động đồng bộ theo bộ lọc và ô tìm kiếm</span>
+                <span class="info-tag"><span class="red-dot"></span> Bấm vào marker để xem chi tiết</span>
             </div>
 
-            <!-- TAGS LỌC -->
-            <div class="filter-chips" id="filterContainer">
-                <!-- Javascript sẽ tự động sinh các nút lọc ở đây dựa trên dữ liệu -->
+            <div class="filter-chips" id="filterContainer"></div>
+
+            <!-- NÚT CHUYỂN ĐỔI BẢN ĐỒ / DANH SÁCH (CHỈ HIỆN TRÊN MOBILE) -->
+            <div class="mobile-map-tabs">
+                <button class="m-tab-btn active" id="btnShowMap" onclick="switchMobileTab('map')">Bản đồ</button>
+                <button class="m-tab-btn" id="btnShowList" onclick="switchMobileTab('list')">Danh sách <span class="m-badge" id="mListCountBadge">@(ViewBag.TongDiaDiem ?? 0)</span></button>
             </div>
 
-            <!-- NỘI DUNG CHÍNH (BẢN ĐỒ + DANH SÁCH) -->
-            <div class="map-content-row">
-                <!-- Cột Bản đồ -->
-                <div class="map-col">
-                    <div id="leafletMap"></div>
-                </div>
-
-                <!-- Cột Danh sách -->
+            <div class="map-content-row" id="mapContentRow">
+                <div class="map-col"><div id="leafletMap"></div></div>
                 <div class="list-col">
                     <div class="list-header">
                         <h4>Danh sách điểm hỗ trợ</h4>
-                        <div style="background: #fdf0ea; color: var(--map-red); padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold;" id="listCountBadge">
-                            @(ViewBag.TongDiaDiem ?? 0)
+                        <div id="listCountBadge" style="background: #fdf0ea; color: var(--map-red); padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 0.8rem;">@(ViewBag.TongDiaDiem ?? 0)</div>
+                    </div>
+                    <div class="list-wrapper" id="listWrapper"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KHU VỰC 5: NGƯỜI DÂN CẦN TRỢ GIÚP -->
+        <div class="help-section" id="nhu-cau-tro-giup">
+            <div class="asxh-row">
+                <div class="asxh-col-6">
+                    <h2 class="help-title">Người dân cần trợ giúp</h2>
+                    <p class="help-desc">Nếu bạn hoặc người thân đang gặp khó khăn, vui lòng để lại thông tin tại đây. Mọi thông tin gửi đến sẽ được Ủy ban MTTQ Việt Nam xã Phú Hòa Đông tiếp nhận, xem xét và hỗ trợ kịp thời.</p>
+                </div>
+                <div class="asxh-col-6">
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div style="background:#d4edda; color:#155724; padding:15px; border-radius:12px; margin-bottom:20px;">@TempData["SuccessMessage"]</div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div style="background:#f8d7da; color:#721c24; padding:15px; border-radius:12px; margin-bottom:20px;">@TempData["ErrorMessage"]</div>
+                    }
+                    <form action="@Url.Action("GuiYeuCauTroGiup", "CongThongTinAnSXH")" method="post">
+                        @Html.AntiForgeryToken()
+                        <div class="asxh-row">
+                            <div class="asxh-col-6 form-group"><label class="form-label">Họ tên *</label><input type="text" name="HoTen" class="form-control" required></div>
+                            <div class="asxh-col-6 form-group"><label class="form-label">Điện thoại *</label><input type="text" name="SoDienThoai" class="form-control" required></div>
                         </div>
-                    </div>
-                    <div class="list-wrapper" id="listWrapper">
-                        <!-- Javascript sẽ đổ card danh sách vào đây -->
-                    </div>
+                        <div class="form-group"><label class="form-label">Mức độ ưu tiên</label><select name="MucDoUuTien" class="form-select"><option value="Bình thường">Bình thường</option><option value="Khẩn cấp">Khẩn cấp</option></select></div>
+                        <div class="form-group"><label class="form-label">Địa chỉ *</label><input type="text" name="DiaChi" class="form-control" required></div>
+                        <div class="form-group"><label class="form-label">Nội dung *</label><textarea name="NoiDung" class="form-control" rows="4" required placeholder="Mô tả hoàn cảnh..."></textarea></div>
+                        <button type="submit" class="btn-submit">Gửi thông tin trợ giúp</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -1329,115 +1305,69 @@
     </div>
 </div>
 
-<!-- ==============================================
-     MODAL HTML (Hiển thị chi tiết Bản đồ)
-     ============================================== -->
+<!-- HTML Modal -->
 <div class="custom-modal-overlay" id="mapModal" onclick="closeModal(event)">
     <div class="custom-modal-content" onclick="event.stopPropagation()">
-        <button class="btn-close-modal" onclick="closeModal()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
+        <button class="btn-close-modal" onclick="closeModal()">X</button>
         <div class="modal-title" id="mTitle">TÊN CHƯƠNG TRÌNH</div>
-        <div class="modal-meta"><strong>Ngày thực hiện:</strong> <span id="mDate"></span></div>
+        <div class="modal-meta"><strong>Ngày:</strong> <span id="mDate"></span></div>
         <div class="modal-meta"><strong>Đơn vị:</strong> <span id="mUnit"></span></div>
-        <img src="" id="mImage" class="modal-image" alt="Hình ảnh thực tế" style="display:none;" />
+        <img src="" id="mImage" class="modal-image" style="display:none;" />
         <div class="modal-desc" id="mDesc"></div>
     </div>
 </div>
 
-<!-- ==============================================
-     CÁC ĐOẠN SCRIPT XỬ LÝ (GỘP CHUNG)
-     ============================================== -->
+<!-- JAVASCRIPT GỘP CHUNG -->
 <script>
-    // 1. SCRIPT LỌC BẢNG CHĂM LO (Khu vực 3)
+    // 1. CHĂM LO FILTER
     function filterCL() {
         var input = document.getElementById("clSearch").value.toLowerCase();
-        var month = document.getElementById("clMonth").value;
-        var unit = document.getElementById("clUnit").value;
         var table = document.getElementById("clTable");
         var tr = table.getElementsByTagName("tr");
-
         for (var i = 1; i < tr.length; i++) {
             var rowText = tr[i].innerText.toLowerCase();
-            var rowMonth = tr[i].getElementsByTagName("td")[0].innerText;
-            var rowUnitTag = tr[i].getElementsByTagName("td")[1].innerText;
-
-            var matchInput = rowText.indexOf(input) > -1;
-            var matchMonth = month === "" || rowMonth.indexOf(month) > -1;
-            var matchUnit = unit === "" || rowUnitTag.indexOf(unit) > -1;
-
-            if (matchInput && matchMonth && matchUnit) {
-                tr[i].style.display = "";
-            } else {
-                tr[i].style.display = "none";
-            }
+            tr[i].style.display = rowText.indexOf(input) > -1 ? "" : "none";
         }
     }
 
-    // 2. SCRIPT PHÂN TRANG NGẦM CHO BẢNG ỦNG HỘ
+    // 2. PHÂN TRANG AJAX
     document.addEventListener('click', function(e) {
         var link = e.target.closest('.ajax-page-link');
         if (link) {
             e.preventDefault();
             var page = link.getAttribute('data-page');
-            var container = document.getElementById('vung-chua-bang-danh-sach');
-
-            container.style.opacity = '0.5';
-            container.style.transition = 'opacity 0.3s ease';
-
             fetch('/CongThongTinAnSXH/GetDanhSachUngHoPartial?page=' + page)
-                .then(response => response.text())
-                .then(html => {
-                    container.innerHTML = html;
-                    container.style.opacity = '1';
-                })
-                .catch(err => {
-                    console.error('Lỗi khi tải trang:', err);
-                    container.style.opacity = '1';
-                });
+                .then(res => res.text())
+                .then(html => document.getElementById('vung-chua-bang-danh-sach').innerHTML = html);
         }
     });
 
-    // 3. SCRIPT XỬ LÝ BẢN ĐỒ VÀ MODAL (Khu vực 4)
+    // 3. LEAFLET MAP & BỘ LỌC
     const rawData = @Html.Raw(ViewBag.MapDataJson ?? "[]");
     let currentData = [...rawData];
     let activeFilter = "";
 
-    // Tọa độ trung tâm (Mặc định Tân Định)
     const map = L.map('leafletMap').setView([10.7915, 106.6896], 15);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
     let markersLayer = L.layerGroup().addTo(map);
 
-    // Lấy Ranh Giới
     fetch('https://nominatim.openstreetmap.org/lookup?osm_ids=R19260505&polygon_geojson=1&format=json')
         .then(res => res.json())
         .then(data => {
             if (data && data.length > 0 && data[0].geojson) {
                 const boundaryLayer = L.geoJSON(data[0].geojson, {
-                    style: {
-                        color: "#e63946",
-                        weight: 3,
-                        fillColor: "#e63946",
-                        fillOpacity: 0.1,
-                        dashArray: ''
-                    },
+                    style: { color: "#e63946", weight: 3, fillColor: "#e63946", fillOpacity: 0.1 },
                     interactive: false
                 }).addTo(map);
                 map.fitBounds(boundaryLayer.getBounds());
             }
-        })
-        .catch(err => console.error("Lỗi tải ranh giới:", err));
+        });
 
-    // CẤU HÌNH LOGO CHO CÁC ĐƠN VỊ
     const unitLogos = {
-        "Đoàn Thanh Niên": "https://upload.wikimedia.org/wikipedia/vi/thumb/6/69/Huy_hi%E1%BB%87u_%C4%90o%C3%A0n_Thanh_ni%C3%AAn_C%E1%BB%99ng_s%E1%BA%A3n_H%E1%BB%93_Ch%C3%AD_Minh.svg/1200px-Huy_hi%E1%BB%87u_%C4%90o%C3%A0n_Thanh_ni%C3%AAn_C%E1%BB%99ng_s%E1%BA%A3n_H%E1%BB%93_Ch%C3%AD_Minh.svg.png",
-        "Hội LHPN": "https://upload.wikimedia.org/wikipedia/vi/6/62/Huy_hi%E1%BB%87u_H%E1%BB%99i_Li%C3%AAn_hi%E1%BB%87p_Ph%E1%BB%A5_n%E1%BB%AF_Vi%E1%BB%87t_Nam.png",
-        "Mặt trận Tổ quốc": "https://upload.wikimedia.org/wikipedia/vi/thumb/b/b5/Mat_tran_To_quoc_Viet_Nam.svg/1200px-Mat_tran_To_quoc_Viet_Nam.svg.png",
-        "Default": "https://cdn-icons-png.flaticon.com/512/1076/1076928.png"
+        "Đoàn Thanh Niên": "/images/logo-doan.png",
+        "Hội LHPN": "/images/logo-hoi-lhpn.jpg",
+        "Mặt trận Tổ quốc": "https://upload.wikimedia.org/wikipedia/vi/thumb/b/b5/Mat_tran_To_quoc_Viet_Nam.svg/120px-Mat_tran_To_quoc_Viet_Nam.svg.png",
+        "Default": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
     };
 
     function getLogoUrl(unitName) {
@@ -1445,25 +1375,17 @@
         let name = unitName.toLowerCase();
         if (name.includes("đoàn") || name.includes("thanh niên")) return unitLogos["Đoàn Thanh Niên"];
         if (name.includes("phụ nữ") || name.includes("lhpn")) return unitLogos["Hội LHPN"];
-        if (name.includes("mặt trận") || name.includes("tổ quốc") || name.includes("mttq")) return unitLogos["Mặt trận Tổ quốc"];
+        if (name.includes("mặt trận") || name.includes("tổ quốc")) return unitLogos["Mặt trận Tổ quốc"];
         return unitLogos["Default"];
     }
 
-    // ==== HÀM MỞ VÀ ĐÓNG MODAL ====
     function openModal(item) {
         document.getElementById('mTitle').innerText = item.ten;
         document.getElementById('mDate').innerText = item.ngay;
         document.getElementById('mUnit').innerText = item.phanLoai;
         document.getElementById('mDesc').innerText = item.moTa;
-
         const imgEl = document.getElementById('mImage');
-        if (item.hinhAnh) {
-            imgEl.src = item.hinhAnh;
-            imgEl.style.display = 'block';
-        } else {
-            imgEl.style.display = 'none';
-        }
-
+        if (item.hinhAnh) { imgEl.src = item.hinhAnh; imgEl.style.display = 'block'; } else { imgEl.style.display = 'none'; }
         document.getElementById('mapModal').classList.add('active');
     }
 
@@ -1472,35 +1394,20 @@
         document.getElementById('mapModal').classList.remove('active');
     }
 
-    function init() {
-        const units = [...new Set(rawData.map(item => item.phanLoai))];
-        renderFilterChips(units);
-        updateView();
-    }
-
     function renderMap(data) {
         markersLayer.clearLayers();
         data.forEach(item => {
             if (item.viDo && item.kinhDo) {
                 const logoUrl = getLogoUrl(item.phanLoai);
-
-                // Icon HTML tùy chỉnh: Vòng tròn trắng chứa Logo
                 const customIcon = L.divIcon({
                     className: 'custom-div-icon',
                     html: `<div style='background-color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid #eaeaea; box-shadow: 0 4px 10px rgba(0,0,0,0.3); overflow: hidden;'>
-                                       <img src='${logoUrl}' style='width: 28px; height: 28px; object-fit: contain;' onerror="this.src='${unitLogos["Default"]}'" alt='Logo' />
-                                   </div>`,
-                    iconSize: [40, 40],
-                    iconAnchor: [20, 20]
+                                   <img src='${logoUrl}' style='width: 28px; height: 28px; object-fit: contain;' onerror="this.onerror=null; this.src='${unitLogos["Default"]}';" alt='Logo' />
+                               </div>`,
+                    iconSize: [40, 40], iconAnchor: [20, 20]
                 });
-
                 const marker = L.marker([item.viDo, item.kinhDo], { icon: customIcon }).addTo(markersLayer);
-
-                // Mở modal thay vì popup
-                marker.on('click', function() {
-                    openModal(item);
-                    map.flyTo([item.viDo, item.kinhDo], 17, { duration: 1 });
-                });
+                marker.on('click', () => { openModal(item); map.flyTo([item.viDo, item.kinhDo], 17, { duration: 1 }); });
             }
         });
     }
@@ -1508,37 +1415,19 @@
     function renderList(data) {
         const wrapper = document.getElementById('listWrapper');
         wrapper.innerHTML = "";
-
-        if (data.length === 0) {
-            wrapper.innerHTML = "<p style='text-align:center; color:#999; margin-top:20px;'>Không tìm thấy kết quả phù hợp.</p>";
-            return;
-        }
-
         data.forEach(item => {
             const card = document.createElement('div');
             card.className = "map-card";
-
-            const shortDesc = item.moTa.length > 80 ? item.moTa.substring(0, 80) + '...' : item.moTa;
-
-            card.innerHTML = `
-                        <h5 class="card-title">${item.ten}</h5>
-                        <div class="card-meta">
-                            <span style="display:flex; align-items:center; gap:5px; color: #777;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                ${item.ngay}
-                            </span>
-                            <span class="unit-badge">${item.phanLoai}</span>
-                        </div>
-                        <div class="card-desc">${shortDesc}</div>
-                    `;
-
+            card.innerHTML = `<h5 class="card-title">${item.ten}</h5>
+                                  <div class="card-meta"><span style="color:#777;">📅 ${item.ngay}</span> <span class="unit-badge">${item.phanLoai}</span></div>
+                                  <div class="card-desc">${item.moTa.length > 80 ? item.moTa.substring(0, 80) + '...' : item.moTa}</div>`;
             card.onclick = () => {
                 openModal(item);
-                if (item.viDo && item.kinhDo) {
+                if (item.viDo) {
                     map.flyTo([item.viDo, item.kinhDo], 17, { duration: 1 });
+                    if (window.innerWidth <= 992) switchMobileTab('map');
                 }
             };
-
             wrapper.appendChild(card);
         });
     }
@@ -1546,21 +1435,14 @@
     function renderFilterChips(units) {
         const container = document.getElementById('filterContainer');
         container.innerHTML = "";
-
         units.forEach(unit => {
-            const logoUrl = getLogoUrl(unit);
             const chip = document.createElement('div');
             chip.className = "chip";
-            chip.innerHTML = `<img src="${logoUrl}" onerror="this.src='${unitLogos["Default"]}'" alt="logo" /> ${unit}`;
-
+            chip.innerHTML = `<img src="${getLogoUrl(unit)}" onerror="this.onerror=null; this.src='${unitLogos["Default"]}';" /> ${unit}`;
             chip.onclick = () => {
                 document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-                if (activeFilter === unit) {
-                    activeFilter = "";
-                } else {
-                    activeFilter = unit;
-                    chip.classList.add('active');
-                }
+                activeFilter = activeFilter === unit ? "" : unit;
+                if (activeFilter) chip.classList.add('active');
                 applyFilters();
             };
             container.appendChild(chip);
@@ -1570,39 +1452,44 @@
     function applyFilters() {
         const searchText = document.getElementById('searchInput').value.toLowerCase();
         currentData = rawData.filter(item => {
-            const matchSearch = item.ten.toLowerCase().includes(searchText)
-                || item.phanLoai.toLowerCase().includes(searchText)
-                || item.moTa.toLowerCase().includes(searchText);
-
+            const matchSearch = item.ten.toLowerCase().includes(searchText) || item.phanLoai.toLowerCase().includes(searchText);
             const matchFilter = activeFilter === "" || item.phanLoai === activeFilter;
-
             return matchSearch && matchFilter;
         });
-        updateView();
-    }
-
-    function clearFilters() {
-        document.getElementById('searchInput').value = "";
-        activeFilter = "";
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        applyFilters();
-
-        fetch('https://nominatim.openstreetmap.org/lookup?osm_ids=R19260505&polygon_geojson=1&format=json')
-            .then(res => res.json())
-            .then(data => {
-                if (data && data.length > 0 && data[0].geojson) {
-                    const tempLayer = L.geoJSON(data[0].geojson);
-                    map.flyToBounds(tempLayer.getBounds(), { duration: 1.5 });
-                }
-            });
-    }
-
-    function updateView() {
         renderMap(currentData);
         renderList(currentData);
         document.getElementById('hienThiCount').innerText = currentData.length;
         document.getElementById('listCountBadge').innerText = currentData.length;
+        document.getElementById('mListCountBadge').innerText = currentData.length;
     }
 
+    function clearFilters() {
+        document.getElementById('searchInput').value = ""; activeFilter = "";
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        applyFilters(); map.setView([10.7915, 106.6896], 15);
+    }
+
+    // 4. JS XỬ LÝ CHUYỂN TAB MOBILE
+    function switchMobileTab(tab) {
+        const row = document.getElementById('mapContentRow');
+        const btnMap = document.getElementById('btnShowMap');
+        const btnList = document.getElementById('btnShowList');
+
+        if (tab === 'map') {
+            row.classList.remove('show-list');
+            btnMap.classList.add('active');
+            btnList.classList.remove('active');
+            setTimeout(() => { map.invalidateSize(); }, 100);
+        } else {
+            row.classList.add('show-list');
+            btnList.classList.add('active');
+            btnMap.classList.remove('active');
+        }
+    }
+
+    function init() {
+        renderFilterChips([...new Set(rawData.map(item => item.phanLoai))]);
+        applyFilters();
+    }
     init();
 </script>
