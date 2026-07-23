@@ -4,20 +4,28 @@
     ViewData["Title"] = "Thêm hoạt động chăm lo";
 }
 
-<div class="container mt-4">
-    <div class="card shadow-sm p-4" style="max-width: 700px; margin: 0 auto;">
-        <h4 class="mb-4 text-center">Ghi nhận hoạt động chăm lo mới</h4>
+<div class="admin-page-header">
+    <div>
+        <h2>Ghi nhận hoạt động chăm lo mới</h2>
+        <div class="subtitle">Nhập thông tin hoạt động chăm lo an sinh xã hội</div>
+    </div>
+    <a href="/admin/ketquachamlo" class="admin-btn admin-btn-ghost">
+        <i class="fas fa-arrow-left"></i> Quay lại
+    </a>
+</div>
 
+<div class="admin-card" style="max-width: 800px;">
+    <div class="admin-card-body">
         <form asp-action="Create" method="post">
-            <div class="row">
-                <div class="col-md-4 form-group mb-3">
-                    <label class="font-weight-bold">Tháng thực hiện</label>
-                    <input asp-for="Thang" type="number" min="1" max="12" class="form-control" placeholder="Ví dụ: 3" required />
-                    <span asp-validation-for="Thang" class="text-danger"></span>
+            <div class="admin-form-row">
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Tháng thực hiện <span class="required">*</span></label>
+                    <input asp-for="Thang" type="number" min="1" max="12" class="admin-form-control" placeholder="Ví dụ: 3" required />
+                    <span asp-validation-for="Thang" class="admin-form-error"></span>
                 </div>
-                <div class="col-md-8 form-group mb-3">
-                    <label class="font-weight-bold">Phân loại đơn vị</label>
-                    <select asp-for="PhanLoaiDonVi" class="form-control" required>
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Phân loại đơn vị <span class="required">*</span></label>
+                    <select asp-for="PhanLoaiDonVi" class="admin-form-control" required>
                         <option value="">-- Chọn nhóm phân loại --</option>
                         <option value="MTTQ xã">MTTQ xã</option>
                         <option value="Ban CTMT ấp">Ban CTMT ấp</option>
@@ -30,37 +38,41 @@
                         <option value="Hội Người cao tuổi">Hội Người cao tuổi</option>
                         <option value="Chưa ghi đơn vị">Chưa ghi đơn vị</option>
                     </select>
-                    <span asp-validation-for="PhanLoaiDonVi" class="text-danger"></span>
+                    <span asp-validation-for="PhanLoaiDonVi" class="admin-form-error"></span>
                 </div>
             </div>
 
-            <div class="form-group mb-3">
-                <label class="font-weight-bold">Tên đơn vị thực hiện chi tiết</label>
-                <input asp-for="DonViUngHo" class="form-control" placeholder="VD: Cty Jinwon, Chùa Hương..." required />
-                <span asp-validation-for="DonViUngHo" class="text-danger"></span>
+            <div class="admin-form-group">
+                <label class="admin-form-label">Tên đơn vị thực hiện chi tiết <span class="required">*</span></label>
+                <input asp-for="DonViUngHo" class="admin-form-control" placeholder="VD: Cty Jinwon, Chùa Hương..." required />
+                <span asp-validation-for="DonViUngHo" class="admin-form-error"></span>
             </div>
 
-            <div class="form-group mb-3">
-                <label class="font-weight-bold">Nội dung chăm lo</label>
-                <textarea asp-for="NoiDung" class="form-control" rows="3" placeholder="Nhập chi tiết nội dung trao tặng..." required></textarea>
-                <span asp-validation-for="NoiDung" class="text-danger"></span>
+            <div class="admin-form-group">
+                <label class="admin-form-label">Nội dung chăm lo <span class="required">*</span></label>
+                <textarea asp-for="NoiDung" class="admin-form-control" rows="3" placeholder="Nhập chi tiết nội dung trao tặng..." required></textarea>
+                <span asp-validation-for="NoiDung" class="admin-form-error"></span>
             </div>
 
-            <div class="row">
-                <div class="col-md-4 form-group mb-4">
-                    <label class="font-weight-bold">Số lượng (hộ/phần)</label>
-                    <input asp-for="SoLuongHo" type="number" min="1" class="form-control" required />
-                    <span asp-validation-for="SoLuongHo" class="text-danger"></span>
+            <div class="admin-form-row">
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Số lượng (hộ/phần) <span class="required">*</span></label>
+                    <input asp-for="SoLuongHo" type="number" min="1" class="admin-form-control" required />
+                    <span asp-validation-for="SoLuongHo" class="admin-form-error"></span>
                 </div>
-                <div class="col-md-8 form-group mb-4">
-                    <label class="font-weight-bold">Tổng kinh phí (VNĐ)</label>
-                    <input asp-for="KinhPhi" type="number" min="0" class="form-control" placeholder="Ví dụ: 50000000" required />
-                    <span asp-validation-for="KinhPhi" class="text-danger"></span>
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Tổng kinh phí (VNĐ) <span class="required">*</span></label>
+                    <input asp-for="KinhPhi" type="number" min="0" class="admin-form-control" placeholder="Ví dụ: 50000000" required />
+                    <span asp-validation-for="KinhPhi" class="admin-form-error"></span>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-success w-100 mb-2">Lưu dữ liệu</button>
-            <a href="/admin/ketquachamlo" class="btn btn-secondary w-100">Quay lại danh sách</a>
+            <div class="admin-form-actions">
+                <button type="submit" class="admin-btn admin-btn-success">
+                    <i class="fas fa-save"></i> Lưu dữ liệu
+                </button>
+                <a href="/admin/ketquachamlo" class="admin-btn admin-btn-ghost">Quay lại danh sách</a>
+            </div>
         </form>
     </div>
 </div>

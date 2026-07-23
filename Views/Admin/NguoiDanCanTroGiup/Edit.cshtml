@@ -4,39 +4,74 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="container-fluid mt-4">
-    <div class="card shadow">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Chi tiết yêu cầu từ: @Model.HoTen</h6>
-        </div>
-        <div class="card-body">
-            <div class="row mb-3">
-                <div class="col-md-6"><p><strong>Số điện thoại:</strong> @Model.SoDienThoai</p></div>
-                <div class="col-md-6"><p><strong>Ngày gửi:</strong> @Model.NgayGui?.ToString("dd/MM/yyyy HH:mm")</p></div>
-                <div class="col-md-6"><p><strong>Mức độ:</strong> @Model.MucDoUuTien</p></div>
-                <div class="col-md-6"><p><strong>Địa chỉ:</strong> @Model.DiaChi</p></div>
-                <div class="col-md-12">
-                    <p><strong>Nội dung cần trợ giúp:</strong></p>
-                    <div class="p-3 bg-light border rounded">@Model.NoiDung</div>
+<div class="admin-page-header">
+    <div>
+        <h2>Chi tiết yêu cầu từ: @Model.HoTen</h2>
+        <div class="subtitle">Xem thông tin và cập nhật trạng thái xử lý</div>
+    </div>
+    <a href="@Url.Action("Index")" class="admin-btn admin-btn-ghost">
+        <i class="fas fa-arrow-left"></i> Quay lại
+    </a>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-body">
+        <div class="admin-detail-grid">
+            <div class="admin-detail-item">
+                <div class="admin-detail-label">Số điện thoại</div>
+                <div class="admin-detail-value"><strong>@Model.SoDienThoai</strong></div>
+            </div>
+            <div class="admin-detail-item">
+                <div class="admin-detail-label">Ngày gửi</div>
+                <div class="admin-detail-value">@Model.NgayGui?.ToString("dd/MM/yyyy HH:mm")</div>
+            </div>
+            <div class="admin-detail-item">
+                <div class="admin-detail-label">Mức độ ưu tiên</div>
+                <div class="admin-detail-value">
+                    @if (Model.MucDoUuTien == "Khẩn cấp")
+                    {
+                        <span class="admin-badge warning">Khẩn cấp</span>
+                    }
+                    else
+                    {
+                        <span class="admin-badge gray">Bình thường</span>
+                    }
                 </div>
             </div>
+            <div class="admin-detail-item">
+                <div class="admin-detail-label">Địa chỉ</div>
+                <div class="admin-detail-value">@Model.DiaChi</div>
+            </div>
+            <div class="admin-detail-item full-width">
+                <div class="admin-detail-label">Nội dung cần trợ giúp</div>
+                <div class="admin-detail-value" style="background:#f8f6f4;padding:16px;border-radius:8px;line-height:1.6;">
+                    @Model.NoiDung
+                </div>
+            </div>
+        </div>
 
-            <hr />
+        <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--admin-line);">
+            <h5 style="margin:0 0 16px;font-weight:600;color:var(--admin-ink);">Cập nhật trạng thái xử lý</h5>
+
             <form action="@Url.Action("Edit")" method="post">
                 @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="Id" />
 
-                <div class="form-group mb-3">
-                    <label class="font-weight-bold">Cập nhật Trạng thái xử lý:</label>
-                    <select asp-for="TrangThai" class="form-control" style="max-width: 300px;">
+                <div class="admin-form-group" style="max-width: 400px;">
+                    <label class="admin-form-label">Trạng thái</label>
+                    <select asp-for="TrangThai" class="admin-form-control">
                         <option value="Chưa xử lý">Chưa xử lý</option>
                         <option value="Đang xử lý">Đang xử lý</option>
                         <option value="Đã xử lý">Đã xử lý</option>
                     </select>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Lưu trạng thái</button>
-                <a href="@Url.Action("Index")" class="btn btn-secondary">Quay lại</a>
+                <div class="admin-form-actions">
+                    <button type="submit" class="admin-btn admin-btn-primary">
+                        <i class="fas fa-save"></i> Lưu trạng thái
+                    </button>
+                    <a href="@Url.Action("Index")" class="admin-btn admin-btn-ghost">Quay lại</a>
+                </div>
             </form>
         </div>
     </div>

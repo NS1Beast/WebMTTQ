@@ -1,25 +1,40 @@
 ﻿@model WebMTTQ.Models.SoDuQuyViNguoiNgheo
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml"; ViewData["Title"] = "Cập nhật số dư";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Cập nhật số dư quỹ";
 }
 
-<div class="container mt-4">
-    <div class="card shadow-sm p-4" style="max-width: 500px;">
-        <h4 class="mb-4 text-center">Nhập thông tin số dư quỹ mới</h4>
+<div class="admin-page-header">
+    <div>
+        <h2>Cập nhật số dư quỹ</h2>
+        <div class="subtitle">Chỉnh sửa thông tin số dư Quỹ "Vì người nghèo"</div>
+    </div>
+    <a href="/admin/soduquy" class="admin-btn admin-btn-ghost">
+        <i class="fas fa-arrow-left"></i> Quay lại
+    </a>
+</div>
 
-        <form asp-action="Create" method="post">
-            <div class="form-group mb-3">
-                <label class="font-weight-bold">Tiền mặt (VNĐ)</label>
-                <input asp-for="TienMat" type="number" class="form-control" required />
+<div class="admin-card" style="max-width: 600px;">
+    <div class="admin-card-body">
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="Id" />
+
+            <div class="admin-form-group">
+                <label class="admin-form-label">Tiền mặt (VNĐ) <span class="required">*</span></label>
+                <input asp-for="TienMat" type="number" class="admin-form-control" required />
             </div>
 
-            <div class="form-group mb-4">
-                <label class="font-weight-bold">Tiền gửi ngân hàng (VNĐ)</label>
-                <input asp-for="TienGuiNganHang" type="number" class="form-control" required />
+            <div class="admin-form-group">
+                <label class="admin-form-label">Tiền gửi ngân hàng (VNĐ) <span class="required">*</span></label>
+                <input asp-for="TienGuiNganHang" type="number" class="admin-form-control" required />
             </div>
 
-            <button type="submit" class="btn btn-success w-100 mb-2">Lưu dữ liệu</button>
-            <a href="/admin/soduquy" class="btn btn-secondary w-100">Quay lại</a>
+            <div class="admin-form-actions">
+                <button type="submit" class="admin-btn admin-btn-primary">
+                    <i class="fas fa-save"></i> Cập nhật dữ liệu
+                </button>
+                <a href="/admin/soduquy" class="admin-btn admin-btn-ghost">Hủy</a>
+            </div>
         </form>
     </div>
 </div>

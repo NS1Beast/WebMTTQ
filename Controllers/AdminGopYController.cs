@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WebMTTQ.Controllers
 {
-    public class AdminGopYController : Controller
+    public class AdminGopYController : BaseAdminController
     {
         private readonly DataMTTQContext _context; // Đổi WebMTTQContext thành tên DbContext của bạn
 

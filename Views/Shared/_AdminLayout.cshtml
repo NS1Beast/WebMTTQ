@@ -1,120 +1,133 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Quản trị</title>
-    <!-- Nhúng FontAwesome cho icon -->
+    <title>@ViewData["Title"] - Quản trị MTTQ</title>
+    <meta name="theme-color" content="#8b1a2b" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,700&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap&subset=vietnamese" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
-    <style>
-            body {
-                margin: 0;
-                font-family: Arial, sans-serif;
-                display: flex;
-                height: 100vh;
-            }
-            /* Cột Menu bên trái */
-            .sidebar {
-                width: 250px;
-                background-color: #2c3e50;
-                color: white;
-                display: flex;
-                flex-direction: column;
-            }
-
-                .sidebar h2 {
-                    text-align: center;
-                    padding: 20px 0;
-                    margin: 0;
-                    background-color: #1a252f;
-                }
-
-                .sidebar a {
-                    color: white;
-                    text-decoration: none;
-                    padding: 15px 20px;
-                    display: flex;
-                    align-items: center;
-                    gap: 10px;
-                    border-bottom: 1px solid #34495e;
-                    transition: 0.2s;
-                }
-
-                    .sidebar a:hover {
-                        background-color: #34495e;
-                    }
-
-                    /* Tùy chỉnh icon trong menu */
-                    .sidebar a i {
-                        width: 20px;
-                        text-align: center;
-                    }
-
-            /* Phần nội dung chính bên phải */
-            .main-content {
-                flex-grow: 1;
-                padding: 20px;
-                background-color: #f8f9fa;
-                overflow-y: auto;
-            }
-    </style>
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
 </head>
-<body>
+<body class="admin-body">
+    <div class="admin-layout">
 
-    <!-- Menu Trái -->
-    <div class="sidebar">
-        <h2>Admin Panel</h2>
+        <!-- Sidebar -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <div class="admin-sidebar-brand">
+                <h2>MTTQ Quản trị</h2>
+                <small>Phường Tân Định</small>
+            </div>
+            <nav class="admin-sidebar-nav">
+                <a href="/admin" class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Index" && ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "is-active" : "")">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
 
-        <a href="/admin">
-            <span>📊 Dashboard Tổng</span>
-        </a>
+                <div class="nav-sep"></div>
+                <div class="nav-label">Quản lý nội dung</div>
 
-        <a href="/admin/thongtinungho">
-            <span>💰 Thông tin ủng hộ</span>
-        </a>
+                <a href="/admin/thongtinungho" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminThongTin" ? "is-active" : "")">
+                    <i class="fas fa-university"></i>
+                    <span>Thông tin ủng hộ</span>
+                </a>
 
-        <a href="/admin/danhsachungho">
-            <span>📝 Danh sách ủng hộ</span>
-        </a>
+                <a href="/admin/danhsachungho" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminDanhSachUngHo" ? "is-active" : "")">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <span>Danh sách ủng hộ</span>
+                </a>
 
-        <a class="nav-link" href="/admin/soduquy">
-            <i class="fas fa-wallet"></i>
-            <span>Quản lý Số dư Quỹ</span>
-        </a>
+                <a href="/admin/soduquy" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSoDuQuy" ? "is-active" : "")">
+                    <i class="fas fa-wallet"></i>
+                    <span>Số dư Quỹ</span>
+                </a>
 
-        <a class="nav-link" href="/admin/ketquachamlo">
-            <i class="fas fa-hand-holding-heart"></i>
-            <span>Kết quả chăm lo</span>
-        </a>
+                <a href="/admin/ketquachamlo" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminKetQuaChamLo" ? "is-active" : "")">
+                    <i class="fas fa-hand-holding-heart"></i>
+                    <span>Kết quả chăm lo</span>
+                </a>
 
-        <a class="nav-link" href="/AdminDiaDiemBanDo/Index">
-            <i class="fas fa-map-marked-alt"></i>
-            <span>Quản lý Bản đồ An sinh</span>
-        </a>
+                <a href="/AdminDiaDiemBanDo/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminDiaDiemBanDo" ? "is-active" : "")">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <span>Bản đồ an sinh</span>
+                </a>
 
-        <a class="nav-link" href="/AdminNguoiDanCanTroGiup/Index">
-            <i class="fas fa-life-ring"></i>
-            <span>Yêu cầu trợ giúp</span>
-        </a>
+                <div class="nav-sep"></div>
+                <div class="nav-label">Tương tác</div>
 
-        <!-- NÚT MỚI THÊM: Hộp thư góp ý -->
-        <a class="nav-link" href="/AdminGopY/Index">
-            <i class="fas fa-envelope-open-text"></i>
-            <span>Hộp thư góp ý</span>
-        </a>
+                <a href="/AdminNguoiDanCanTroGiup/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminNguoiDanCanTroGiup" ? "is-active" : "")">
+                    <i class="fas fa-life-ring"></i>
+                    <span>Yêu cầu trợ giúp</span>
+                </a>
 
-        <a href="#">
-            <span>⚙️ Cài đặt hệ thống</span>
-        </a>
+                <a href="/AdminGopY/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminGopY" ? "is-active" : "")">
+                    <i class="fas fa-envelope-open-text"></i>
+                    <span>Hộp thư góp ý</span>
+                </a>
+
+                <div class="nav-sep"></div>
+
+                <a href="#" style="opacity:0.6;">
+                    <i class="fas fa-cog"></i>
+                    <span>Cài đặt hệ thống</span>
+                </a>
+
+                <a href="/" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.06);">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Về trang chủ</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <div class="admin-topbar-title">
+                    <button class="admin-toggle-sidebar" id="adminToggleSidebar" type="button" aria-label="Toggle menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <i class="fas fa-shield-alt"></i>
+                    <span>@ViewData["Title"]</span>
+                </div>
+                <div class="admin-topbar-right">
+                    <span style="display:flex;align-items:center;gap:8px;">
+                        <i class="fas fa-user-circle" style="font-size:1.1rem;color:var(--admin-gold-dark);"></i>
+                        <span>@(Context.Session.GetString("AdminHoTen") ?? "Admin")</span>
+                    </span>
+                    <a href="/Auth/Logout" style="color:var(--admin-muted);" title="Đăng xuất">
+                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    </a>
+                    <span style="width:1px;height:20px;background:var(--admin-line);"></span>
+                    <a href="/"><i class="fas fa-external-link-alt"></i> Xem trang chủ</a>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                @RenderBody()
+            </div>
+        </main>
     </div>
 
-    <!-- Nội dung chính -->
-    <div class="main-content">
-        @RenderBody() <!-- Code của các trang Index, Create, Edit sẽ được nhúng vào đây -->
-    </div>
+    <script>
+        // Toggle sidebar trên mobile
+        document.getElementById('adminToggleSidebar').addEventListener('click', function() {
+            document.getElementById('adminSidebar').classList.toggle('is-open');
+        });
 
-    <!-- Cho phép Layout nhận Script từ các trang con -->
+        // Đóng sidebar khi click ra ngoài (mobile)
+        document.addEventListener('click', function(e) {
+            var sidebar = document.getElementById('adminSidebar');
+            var toggle = document.getElementById('adminToggleSidebar');
+            if (window.innerWidth <= 900) {
+                if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                    sidebar.classList.remove('is-open');
+                }
+            }
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

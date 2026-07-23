@@ -1,109 +1,70 @@
 ﻿@model IEnumerable<WebMTTQ.Models.DiaDiemBanDo>
 @{
     ViewData["Title"] = "Quản lý Bản đồ An sinh";
-    // Đổi tên Layout dưới đây cho đúng với tên file layout admin của bạn (ví dụ: _AdminLayout.cshtml)
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<style>
-    .admin-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .btn {
-        padding: 8px 15px;
-        text-decoration: none;
-        border-radius: 5px;
-        font-weight: bold;
-        cursor: pointer;
-        border: none;
-        display: inline-block;
-    }
-
-    .btn-primary {
-        background-color: #3498db;
-        color: white;
-    }
-
-    .btn-success {
-        background-color: #2ecc71;
-        color: white;
-    }
-
-    .btn-warning {
-        background-color: #f1c40f;
-        color: black;
-    }
-
-    .btn-danger {
-        background-color: #e74c3c;
-        color: white;
-    }
-
-    .table {
-        width: 100%;
-        border-collapse: collapse;
-        background: white;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-        .table th, .table td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-
-        .table th {
-            background-color: #f4f6f7;
-        }
-</style>
-
-<div class="admin-header">
-    <h2>Danh sách Điểm Hỗ Trợ / Chăm Lo</h2>
-    <a href="/AdminDiaDiemBanDo/Create" class="btn btn-success">+ Thêm địa điểm mới</a>
+<div class="admin-page-header">
+    <div>
+        <h2>Danh sách Điểm Hỗ Trợ / Chăm Lo</h2>
+        <div class="subtitle">Quản lý các địa điểm an sinh xã hội trên bản đồ</div>
+    </div>
+    <a href="/AdminDiaDiemBanDo/Create" class="admin-btn admin-btn-success">
+        <i class="fas fa-plus"></i> Thêm địa điểm mới
+    </a>
 </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Tên chương trình/địa điểm</th>
-            <th>Đơn vị</th>
-            <th>Ngày thực hiện</th>
-            <th>Tọa độ (Vĩ độ, Kinh độ)</th>
-            <th style="width: 150px;">Thao tác</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Any())
-        {
-            foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.IddiaDiem</td>
-                    <td><strong>@item.TenDiaDiem</strong></td>
-                    <td>@item.PhanLoaiBanDo</td>
-                    <td>@(item.NgayThucHien.HasValue ? item.NgayThucHien.Value.ToString("dd/MM/yyyy") : "")</td>
-                    <td><small>@item.ViDo, @item.KinhDo</small></td>
-                    <td>
-                        <a href="/AdminDiaDiemBanDo/Edit/@item.IddiaDiem" class="btn btn-warning" style="padding: 5px 10px; font-size: 0.9em;">Sửa</a>
-
-                        <!-- Form Xóa Mềm -->
-                        <form asp-action="Delete" asp-route-id="@item.IddiaDiem" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa điểm này không?');">
-                            <button type="submit" class="btn btn-danger" style="padding: 5px 10px; font-size: 0.9em;">Xóa</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="6" style="text-align:center;">Chưa có dữ liệu.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+<div class="admin-card">
+    <div class="admin-card-body p-0">
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên chương trình/địa điểm</th>
+                        <th>Đơn vị</th>
+                        <th>Ngày thực hiện</th>
+                        <th>Tọa độ</th>
+                        <th class="cell-actions">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.IddiaDiem</td>
+                                <td><strong>@item.TenDiaDiem</strong></td>
+                                <td><span class="admin-badge blue">@item.PhanLoaiBanDo</span></td>
+                                <td>@(item.NgayThucHien.HasValue ? item.NgayThucHien.Value.ToString("dd/MM/yyyy") : "")</td>
+                                <td><span style="font-size:0.8rem;color:var(--admin-muted);">@item.ViDo, @item.KinhDo</span></td>
+                                <td class="cell-actions">
+                                    <a href="/AdminDiaDiemBanDo/Edit/@item.IddiaDiem" class="admin-btn admin-btn-warning admin-btn-sm">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@item.IddiaDiem" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa điểm này không?');">
+                                        <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6">
+                                <div class="admin-empty">
+                                    <i class="fas fa-map-marked-alt"></i>
+                                    <p>Chưa có dữ liệu địa điểm nào.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

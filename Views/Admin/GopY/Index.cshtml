@@ -2,160 +2,92 @@
 
 @{
     ViewData["Title"] = "Quản lý Hộp Thư Góp Ý";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Kiểm tra tên layout Admin của bạn
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<style>
-    .admin-card {
-        background: #fff;
-        border-radius: 12px;
-        padding: 25px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        margin-bottom: 30px;
-    }
+<div class="admin-page-header">
+    <div>
+        <h2>Hộp thư góp ý</h2>
+        <div class="subtitle">Tiếp nhận và xử lý các ý kiến đóng góp từ người dân</div>
+    </div>
+</div>
 
-    .admin-title {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 20px;
-        border-bottom: 2px solid #eee;
-        padding-bottom: 15px;
-    }
-
-    .table-custom {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-        .table-custom th {
-            background-color: #f8f9fa;
-            color: #444;
-            font-weight: bold;
-            padding: 15px;
-            text-align: left;
-            border-bottom: 2px solid #ddd;
-        }
-
-        .table-custom td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            color: #555;
-            vertical-align: middle;
-        }
-
-        .table-custom tr:hover {
-            background-color: #fcfcfc;
-        }
-
-    .badge {
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: bold;
-        display: inline-block;
-    }
-
-    .badge-pending {
-        background-color: #fff3cd;
-        color: #856404;
-    }
-
-    .badge-processing {
-        background-color: #cce5ff;
-        color: #856404;
-    }
-
-    .badge-success {
-        background-color: #d4edda;
-        color: #155724;
-    }
-
-    .btn-action {
-        padding: 8px 15px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        font-weight: bold;
-        text-decoration: none;
-        color: white;
-        background-color: #17a2b8;
-        display: inline-block;
-        transition: 0.2s;
-    }
-
-        .btn-action:hover {
-            background-color: #138496;
-            color: white;
-        }
-</style>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="admin-alert admin-alert-success">
+        <i class="fas fa-check-circle"></i>
+        @TempData["SuccessMessage"]
+    </div>
+}
 
 <div class="admin-card">
-    <h2 class="admin-title">Quản lý Hộp Thư Góp Ý</h2>
-
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-            @TempData["SuccessMessage"]
-        </div>
-    }
-
-    <div style="overflow-x: auto;">
-        <table class="table-custom">
-            <thead>
-                <tr>
-                    <th width="50">#</th>
-                    <th width="150">Ngày gửi</th>
-                    <th width="180">Người gửi</th>
-                    <th width="150">Lĩnh vực</th>
-                    <th>Tiêu đề</th>
-                    <th width="120">Trạng thái</th>
-                    <th width="120">Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model != null && Model.Any())
-                {
-                    int stt = 1;
-                    foreach (var item in Model)
+    <div class="admin-card-body p-0">
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th width="50">#</th>
+                        <th width="140">Ngày gửi</th>
+                        <th width="160">Người gửi</th>
+                        <th width="130">Lĩnh vực</th>
+                        <th>Tiêu đề</th>
+                        <th width="110">Trạng thái</th>
+                        <th width="120" class="cell-actions">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        int stt = 1;
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@stt</td>
+                                <td>@(item.NgayGui?.ToString("dd/MM/yyyy HH:mm"))</td>
+                                <td>
+                                    <strong>@item.HoTen</strong><br />
+                                    <span style="font-size:0.78rem;color:var(--admin-muted);">@item.SoDienThoai</span>
+                                </td>
+                                <td>
+                                    <span class="admin-badge gray" style="font-size:0.72rem;">@item.LinhVuc</span>
+                                </td>
+                                <td>@item.TieuDe</td>
+                                <td>
+                                    @if (item.TrangThai == "Đã xử lý")
+                                    {
+                                        <span class="admin-badge green">Đã xử lý</span>
+                                    }
+                                    else if (item.TrangThai == "Đang xử lý")
+                                    {
+                                        <span class="admin-badge info">Đang xử lý</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="admin-badge warning">Chưa xử lý</span>
+                                    }
+                                </td>
+                                <td class="cell-actions">
+                                    <a href="@Url.Action("Details", "AdminGopY", new { id = item.IdgopY })" class="admin-btn admin-btn-primary admin-btn-sm">
+                                        <i class="fas fa-eye"></i> Xem
+                                    </a>
+                                </td>
+                            </tr>
+                            stt++;
+                        }
+                    }
+                    else
                     {
                         <tr>
-                            <td>@stt</td>
-                            <td>@(item.NgayGui?.ToString("dd/MM/yyyy HH:mm"))</td>
-                            <td>
-                                <strong>@item.HoTen</strong><br />
-                                <span style="font-size: 0.85rem; color: #888;">@item.SoDienThoai</span>
-                            </td>
-                            <td><span style="background: #f0f0f0; padding: 4px 10px; border-radius: 10px; font-size: 0.8rem;">@item.LinhVuc</span></td>
-                            <td>@item.TieuDe</td>
-                            <td>
-                                @if (item.TrangThai == "Đã xử lý")
-                                {
-                                    <span class="badge badge-success">Đã xử lý</span>
-                                }
-                                else if (item.TrangThai == "Đang xử lý")
-                                {
-                                    <span class="badge badge-processing">Đang xử lý</span>
-                                }
-                                else
-                                {
-                                    <span class="badge badge-pending">Chưa xử lý</span>
-                                }
-                            </td>
-                            <td>
-                                <!-- Sử dụng Url.Action chỉ định rõ Controller AdminGopY -->
-                                <a href="@Url.Action("Details", "AdminGopY", new { id = item.IdgopY })" class="btn-action">Xem & Xử lý</a>
+                            <td colspan="7">
+                                <div class="admin-empty">
+                                    <i class="fas fa-envelope-open-text"></i>
+                                    <p>Chưa có dữ liệu góp ý nào.</p>
+                                </div>
                             </td>
                         </tr>
-                        stt++;
                     }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="7" style="text-align: center; font-style: italic; color: #999; padding: 30px;">Chưa có dữ liệu góp ý nào.</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

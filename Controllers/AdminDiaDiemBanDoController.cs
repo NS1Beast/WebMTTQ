@@ -10,7 +10,7 @@ using System;
 namespace WebMTTQ.Controllers
 {
     // Đảm bảo có xác thực [Authorize(Roles = "Admin")] nếu hệ thống bạn có
-    public class AdminDiaDiemBanDoController : Controller
+    public class AdminDiaDiemBanDoController : BaseAdminController
     {
         private readonly DataMTTQContext _context;
         private readonly IMemoryCache _cache; // Thêm biến _cache

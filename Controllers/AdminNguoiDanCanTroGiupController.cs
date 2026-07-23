@@ -7,7 +7,7 @@ using WebMTTQ.Models;
 namespace WebMTTQ.Controllers
 {
     // [Authorize(Roles = "Admin")] // Bỏ comment nếu hệ thống có phân quyền
-    public class AdminNguoiDanCanTroGiupController : Controller
+    public class AdminNguoiDanCanTroGiupController : BaseAdminController
     {
         private readonly DataMTTQContext _context;
 

@@ -1,41 +1,63 @@
 ﻿@model IEnumerable<WebMTTQ.Models.DanhSachUngHo>
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    ViewData["Title"] = "Quản lý Danh sách ủng hộ";
+    ViewData["Title"] = "Danh sách ủng hộ";
 }
 
-<div class="container mt-4">
-    <h2>Danh sách ủng hộ</h2>
-    <a href="/admin/danhsachungho/Create" class="btn btn-primary mb-3">Thêm mới lượt ủng hộ</a>
+<div class="admin-page-header">
+    <div>
+        <h2>Danh sách ủng hộ</h2>
+        <div class="subtitle">Quản lý các lượt ủng hộ từ tổ chức, cá nhân</div>
+    </div>
+    <a href="/admin/danhsachungho/Create" class="admin-btn admin-btn-primary">
+        <i class="fas fa-plus"></i> Thêm lượt ủng hộ
+    </a>
+</div>
 
-    <table class="table table-bordered table-hover bg-white">
-        <thead class="thead-dark">
-            <tr>
-                <th>Đơn vị / Cá nhân</th>
-                <th>Thời gian</th>
-                <th>Giá trị ủng hộ</th>
-                <th>Thao tác</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.TenNguoiUngHo</td>
-                    <td>@item.NgayUngHo.ToString("dd/MM/yyyy")</td>
-                    <!-- Định dạng hiển thị tiền VNĐ (VD: 5.000.000) -->
-                    <td class="text-danger font-weight-bold">@item.SoTien.ToString("N0") đ</td>
-                    <td>
-                        <!-- Nút Sửa -->
-                        <a href="/admin/danhsachungho/Edit/@item.Id" class="btn btn-warning btn-sm">Sửa</a>
-
-                        <!-- Nút Xóa (giữ nguyên của bạn) -->
-                        <form action="/admin/danhsachungho/Delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?');">
-                            <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<div class="admin-card">
+    <div class="admin-card-body p-0">
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Đơn vị / Cá nhân</th>
+                        <th>Thời gian</th>
+                        <th class="cell-right">Giá trị ủng hộ</th>
+                        <th class="cell-actions">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.TenNguoiUngHo</strong></td>
+                            <td>@item.NgayUngHo.ToString("dd/MM/yyyy")</td>
+                            <td class="cell-right"><span class="admin-money red">@item.SoTien.ToString("N0") đ</span></td>
+                            <td class="cell-actions">
+                                <a href="/admin/danhsachungho/Edit/@item.Id" class="admin-btn admin-btn-warning admin-btn-sm">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </a>
+                                <form action="/admin/danhsachungho/Delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?');">
+                                    <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
+                                        <i class="fas fa-trash"></i> Xóa
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="4">
+                                <div class="admin-empty">
+                                    <i class="fas fa-inbox"></i>
+                                    <p>Chưa có dữ liệu ủng hộ nào.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>

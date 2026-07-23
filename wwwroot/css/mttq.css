@@ -214,7 +214,11 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
   background: transparent;
 }
 
-.m26-search { position: relative; flex-shrink: 0; }
+.m26-search {
+    position: relative;
+    flex-shrink: 0;
+    margin-left: auto;
+}
 .m26-search-btn {
   width: 30px; height: 30px; border-radius: var(--radius-sm);
   display: grid; place-items: center;

@@ -8,7 +8,7 @@ using WebMTTQ.Models;
 namespace WebMTTQ.Controllers
 {
     [Route("admin/soduquy")]
-    public class AdminSoDuQuyController : Controller
+    public class AdminSoDuQuyController : BaseAdminController
     {
         private readonly DataMTTQContext _context;
 

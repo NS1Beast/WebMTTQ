@@ -3,7 +3,7 @@
 namespace WebMTTQ.Controllers
 {
     [Route("admin")]
-    public class AdminController : Controller
+public class AdminController : BaseAdminController
     {
         [Route("")]
         [Route("Index")]

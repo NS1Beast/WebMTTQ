@@ -6,7 +6,7 @@ namespace WebMTTQ.Controllers
 {
     // 1. Ép hệ thống nhận URL này
     [Route("admin/thongtinungho")]
-    public class AdminThongTinController : Controller
+    public class AdminThongTinController : BaseAdminController
     {
         private readonly DataMTTQContext _context;
 

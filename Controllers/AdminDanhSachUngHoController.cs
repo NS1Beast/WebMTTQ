@@ -7,7 +7,7 @@ using System.Linq;
 namespace WebMTTQ.Controllers
 {
     [Route("admin/danhsachungho")]
-    public class AdminDanhSachUngHoController : Controller
+    public class AdminDanhSachUngHoController : BaseAdminController
     {
         private readonly DataMTTQContext _context;
 

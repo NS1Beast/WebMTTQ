@@ -1,0 +1,327 @@
+@model WebMTTQ.Models.LoginViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng nhập - Quản trị MTTQ</title>
+    <meta name="theme-color" content="#8b1a2b" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,700&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap&subset=vietnamese" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #2d1215 0%, #1a0304 50%, #1e1a1d 100%);
+            font-family: "Be Vietnam Pro", system-ui, sans-serif;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            left: -20%;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(232,184,75,0.06) 0%, transparent 70%);
+        }
+        body::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            right: -20%;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(139,26,43,0.15) 0%, transparent 70%);
+        }
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+            z-index: 1;
+        }
+        .login-brand {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .login-brand .logo-wrap {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 16px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .login-brand .logo-wrap img {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+        }
+        .login-brand h1 {
+            font-family: "Playfair Display", Georgia, serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #e8b84b;
+            margin: 0 0 4px;
+            letter-spacing: 0.02em;
+        }
+        .login-brand p {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.78rem;
+            margin: 0;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .login-card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 36px 32px 32px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+        }
+        .login-card .login-icon {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .login-card .login-icon i {
+            font-size: 2.2rem;
+            color: var(--admin-gold);
+            opacity: 0.7;
+        }
+        .login-card .login-title {
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+            margin: 0 0 6px;
+        }
+        .login-card .login-subtitle {
+            text-align: center;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.4);
+            margin: 0 0 28px;
+        }
+        .login-card .form-group {
+            margin-bottom: 18px;
+        }
+        .login-card .form-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .login-card .form-group .input-wrap {
+            position: relative;
+        }
+        .login-card .form-group .input-wrap i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.3);
+            font-size: 0.95rem;
+            pointer-events: none;
+        }
+        .login-card .form-group input {
+            width: 100%;
+            padding: 12px 14px 12px 42px;
+            background: rgba(255,255,255,0.06);
+            border: 1.5px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            font-family: "Be Vietnam Pro", system-ui, sans-serif;
+            font-size: 0.9rem;
+            color: #fff;
+            outline: none;
+            transition: all 0.25s ease;
+            box-sizing: border-box;
+        }
+        .login-card .form-group input::placeholder {
+            color: rgba(255,255,255,0.25);
+        }
+        .login-card .form-group input:focus {
+            border-color: #e8b84b;
+            background: rgba(255,255,255,0.09);
+            box-shadow: 0 0 0 3px rgba(232,184,75,0.12);
+        }
+        .login-card .form-group input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 30px rgba(30,26,29,0.95) inset !important;
+            -webkit-text-fill-color: #fff !important;
+        }
+        .login-card .btn-login {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #8b1a2b, #a31f34);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-family: "Be Vietnam Pro", system-ui, sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(139,26,43,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .login-card .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(139,26,43,0.4);
+        }
+        .login-card .btn-login:active {
+            transform: translateY(0);
+        }
+        .login-card .btn-login i {
+            font-size: 0.9rem;
+        }
+        .login-card .login-error {
+            background: rgba(239,68,68,0.12);
+            border: 1px solid rgba(239,68,68,0.2);
+            color: #fca5a5;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .login-card .login-error i {
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .login-card .validation-summary {
+            margin-bottom: 20px;
+        }
+        .login-card .validation-summary ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .login-card .validation-summary li {
+            background: rgba(239,68,68,0.12);
+            border: 1px solid rgba(239,68,68,0.2);
+            color: #fca5a5;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .login-card .validation-summary li::before {
+            content: '\f071';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+        }
+        .login-footer {
+            text-align: center;
+            margin-top: 24px;
+        }
+        .login-footer a {
+            color: rgba(255,255,255,0.4);
+            font-size: 0.78rem;
+            text-decoration: none;
+            transition: color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .login-footer a:hover {
+            color: rgba(255,255,255,0.7);
+        }
+
+        @@media (max-width: 480px) {
+            .login-card {
+                padding: 28px 20px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-brand">
+            <div class="logo-wrap">
+                <img src="https://mttq.phuhoadong.vn/apps/uploads/2025/11/cropped-favicon-270x270.png" alt="Biểu trưng MTTQ" />
+            </div>
+            <h1>MTTQ Quản trị</h1>
+            <p>Phường Tân Định</p>
+        </div>
+
+        <div class="login-card">
+            <div class="login-icon">
+                <i class="fas fa-shield-halved"></i>
+            </div>
+            <div class="login-title">Đăng nhập hệ thống</div>
+            <div class="login-subtitle">Vui lòng nhập thông tin tài khoản quản trị</div>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="validation-summary">
+                    @Html.ValidationSummary(true, "", new { @class = "" })
+                </div>
+            }
+
+            <form asp-action="Login" method="post">
+                <div class="form-group">
+                    <label for="TenDangNhap">Tên đăng nhập</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-user"></i>
+                        <input asp-for="TenDangNhap" class="form-control" placeholder="Nhập tên đăng nhập" autocomplete="username" autofocus />
+                    </div>
+                    <span asp-validation-for="TenDangNhap" style="color:#fca5a5;font-size:0.75rem;margin-top:4px;display:block;"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="MatKhau">Mật khẩu</label>
+                    <div class="input-wrap">
+                        <i class="fas fa-lock"></i>
+                        <input asp-for="MatKhau" class="form-control" placeholder="Nhập mật khẩu" autocomplete="current-password" />
+                    </div>
+                    <span asp-validation-for="MatKhau" style="color:#fca5a5;font-size:0.75rem;margin-top:4px;display:block;"></span>
+                </div>
+
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-right-to-bracket"></i>
+                    Đăng nhập
+                </button>
+            </form>
+        </div>
+
+        <div class="login-footer">
+            <a href="/">
+                <i class="fas fa-arrow-left"></i>
+                Về trang chủ
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.1.0/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>
