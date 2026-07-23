@@ -1,0 +1,43 @@
+﻿@model WebMTTQ.Models.DanhSachUngHo
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Chỉnh sửa";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm p-4" style="max-width: 600px;">
+        <h3 class="mb-4">Chỉnh sửa thông tin ủng hộ</h3>
+
+        <form asp-action="Edit" method="post">
+            <!-- Thẻ ẩn để lưu trữ Id của bản ghi đang sửa -->
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group mb-3">
+                <label class="font-weight-bold">Đơn vị / Cá nhân</label>
+                <input asp-for="TenNguoiUngHo" class="form-control" required />
+                <span asp-validation-for="TenNguoiUngHo" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label class="font-weight-bold">Thời gian</label>
+                <input asp-for="NgayUngHo" type="date" class="form-control" required />
+                <span asp-validation-for="NgayUngHo" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="font-weight-bold">Giá trị ủng hộ (VNĐ)</label>
+                <input asp-for="SoTien" type="number" class="form-control" required />
+                <span asp-validation-for="SoTien" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Cập nhật dữ liệu</button>
+            <a href="/admin/danhsachungho" class="btn btn-secondary">Quay lại</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

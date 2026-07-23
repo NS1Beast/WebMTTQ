@@ -207,6 +207,42 @@
         margin-top: 5px;
         margin-bottom: 15px;
     }
+    /* CSS CHO PHÂN TRANG */
+    .asxh-pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 25px;
+        padding-bottom: 10px;
+    }
+
+    .asxh-page-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #555;
+        font-weight: bold;
+        font-size: 0.95rem;
+        background-color: white;
+        transition: all 0.2s ease;
+    }
+
+        .asxh-page-link:hover {
+            border-color: var(--mttq-red);
+            color: var(--mttq-red);
+        }
+
+        .asxh-page-link.active {
+            background-color: var(--mttq-red);
+            color: white;
+            border-color: var(--mttq-red);
+            box-shadow: 0 4px 10px rgba(179, 38, 36, 0.3);
+        }
 </style>
 
 <div class="asxh-wrapper">
@@ -314,76 +350,118 @@
                         <div class="asxh-col-6">
                             <div class="stat-box-solid">
                                 <div style="font-size: 0.8rem; color: #ddd; font-weight: bold; margin-bottom: 5px;">TỔNG GIÁ TRỊ TIẾP NHẬN</div>
-                                <div style="font-size: 2.2rem; font-weight: bold;">256M</div>
+
+                                <!-- Hiển thị tiền chính xác tới từng đồng, ví dụ: 256.000.000đ -->
+                                <div style="font-size: 2.2rem; font-weight: bold;">
+                                    @(((decimal)(ViewBag.TongTien ?? 0)).ToString("N0"))<span style="font-size: 1.2rem; font-weight: normal; margin-left: 3px;">đ</span>
+                                </div>
                             </div>
                         </div>
                         <div class="asxh-col-6">
                             <div class="stat-box-solid">
                                 <div style="font-size: 0.8rem; color: #ddd; font-weight: bold; margin-bottom: 5px;">LƯỢT ỦNG HỘ GHI NHẬN</div>
-                                <div style="font-size: 2.2rem; font-weight: bold;">60</div>
+
+                                <!-- Hiển thị số lượt động -->
+                                <div style="font-size: 2.2rem; font-weight: bold;">
+                                    @(ViewBag.TongSoLuot ?? 0)
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div style="text-align: center; margin-top: 15px; font-size: 0.8rem; color: #999; font-style: italic;">* Số liệu cập nhật đến ngày 30/6/2026</div>
-                </div>
+                    <!-- Mình sửa nhẹ dòng ghi chú tĩnh thành động luôn cho chuẩn -->
+                    <div style="text-align: center; margin-top: 15px; font-size: 0.8rem; color: #999; font-style: italic;">
+                        * Số liệu được hệ thống ghi nhận và cập nhật tự động
+                    </div>
+                    <div style="text-align: center; margin-top: 15px; font-size: 0.8rem; color: #999; font-style: italic;">
+                        * Số liệu cập nhật đến ngày @ViewBag.NgayCapNhat
+                    </div>
 
                 <div class="asxh-card" style="margin-bottom: 24px;">
                     <h3 class="asxh-font-serif" style="font-size: 1.6rem; font-weight: bold; margin-top: 0; text-align: center; margin-bottom: 20px;">Công khai số dư Quỹ "Vì người nghèo"</h3>
-                    <div style="text-align: center; margin-bottom: 25px;">
-                        <span class="asxh-badge-light">Số dư đến ngày 30/6/2026</span>
-                    </div>
 
-                    <div class="asxh-row" style="margin-bottom: 20px;">
-                        <div class="asxh-col-4" style="width: 33.33%;">
-                            <div class="stat-box-outline">
-                                <div style="font-size: 0.8rem; font-weight: bold; color: #888; margin-bottom: 10px;">TIỀN MẶT</div>
-                                <div class="val-red" style="font-size: 1.15rem;">100.481.379đ</div>
+                    @if (ViewBag.SoDuQuy != null)
+                    {
+                        <div style="text-align: center; margin-bottom: 25px;">
+                            <span class="asxh-badge-light">Số dư đến ngày @ViewBag.SoDuQuy.NgayCapNhat.ToString("dd/M/yyyy")</span>
+                        </div>
+
+                        <div class="asxh-row" style="margin-bottom: 20px;">
+                            <div class="asxh-col-4" style="width: 33.33%;">
+                                <div class="stat-box-outline">
+                                    <div style="font-size: 0.8rem; font-weight: bold; color: #888; margin-bottom: 10px;">TIỀN MẶT</div>
+                                    <div class="val-red" style="font-size: 1.15rem;">@ViewBag.SoDuQuy.TienMat.ToString("N0")đ</div>
+                                </div>
+                            </div>
+                            <div class="asxh-col-4" style="width: 33.33%;">
+                                <div class="stat-box-outline">
+                                    <div style="font-size: 0.8rem; font-weight: bold; color: #888; margin-bottom: 10px;">TIỀN GỬI NGÂN HÀNG</div>
+                                    <div class="val-red" style="font-size: 1.15rem;">@ViewBag.SoDuQuy.TienGuiNganHang.ToString("N0")đ</div>
+                                </div>
+                            </div>
+                            <div class="asxh-col-4" style="width: 33.33%;">
+                                <div class="stat-box-solid" style="padding: 20px; text-align: center;">
+                                    <div style="font-size: 0.8rem; color: #ddd; font-weight: bold; margin-bottom: 10px;">TỔNG TỒN QUỸ</div>
+                                    <div style="font-size: 1.15rem; font-weight: bold; color: white;">@ViewBag.SoDuQuy.TongTonQuy.ToString("N0")đ</div>
+                                </div>
                             </div>
                         </div>
-                        <div class="asxh-col-4" style="width: 33.33%;">
-                            <div class="stat-box-outline">
-                                <div style="font-size: 0.8rem; font-weight: bold; color: #888; margin-bottom: 10px;">TIỀN GỬI NGÂN HÀNG</div>
-                                <div class="val-red" style="font-size: 1.15rem;">182.121.174đ</div>
-                            </div>
-                        </div>
-                        <div class="asxh-col-4" style="width: 33.33%;">
-                            <div class="stat-box-solid" style="padding: 20px; text-align: center;">
-                                <div style="font-size: 0.8rem; color: #ddd; font-weight: bold; margin-bottom: 10px;">TỔNG TỒN QUỸ</div>
-                                <div style="font-size: 1.15rem; font-weight: bold; color: white;">282.602.553đ</div>
-                            </div>
-                        </div>
-                    </div>
+                    }
+                    else
+                    {
+                        <p class="text-center text-muted" style="font-style: italic;">Đang cập nhật số liệu mới nhất...</p>
+                    }
+
                     <p style="font-size: 0.8rem; color: #999; font-style: italic; text-align: center; margin: 0;">
                         Nguồn: Ban Thường trực Ủy ban MTTQ Việt Nam xã Phú Hòa Đông. Quỹ "Vì người nghèo" được quản lý công khai, minh bạch; sử dụng chăm lo hộ nghèo, hộ cận nghèo, hộ có hoàn cảnh khó khăn trên địa bàn xã.
                     </p>
                 </div>
 
-                <div class="asxh-card" id="danh-sach-ung-ho">
-                    <h3 class="asxh-font-serif" style="font-size: 1.6rem; font-weight: bold; margin-top: 0; margin-bottom: 10px;">Danh sách ủng hộ</h3>
-                    <div style="text-align: center; font-size: 0.8rem; color: #999; font-style: italic; margin-bottom: 20px;">* Số liệu cập nhật đến ngày 30/6/2026</div>
+                    <div class="asxh-card" id="danh-sach-ung-ho">
+                        <h3 class="asxh-font-serif" style="font-size: 1.6rem; font-weight: bold; margin-top: 0; margin-bottom: 10px;">Danh sách ủng hộ</h3>
 
-                    <div style="background-color: #faf6f0; border-radius: 12px; padding: 15px;">
-                        <table class="asxh-table">
-                            <thead>
-                                <tr>
-                                    <th class="text-left">ĐƠN VỊ / CÁ NHÂN</th>
-                                    <th>THỜI GIAN</th>
-                                    <th class="text-right">GIÁ TRỊ ỦNG HỘ</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td class="text-left">Thầy Thiện Xuân – Tự viện Linh Thứu</td><td>21/04/2026</td><td class="text-right val-red">5.000.000đ</td></tr>
-                                <tr><td class="text-left">Cty TNHH Thuc pham Tan Phu Hoa</td><td>14/02/2026</td><td class="text-right val-red">2.000.000đ</td></tr>
-                                <tr><td class="text-left">Phan Van Ut</td><td>07/02/2026</td><td class="text-right val-red">5.000.000đ</td></tr>
-                                <tr><td class="text-left">Agribank tai tro</td><td>04/02/2026</td><td class="text-right val-red">50.000.000đ</td></tr>
-                                <tr><td class="text-left" style="border-bottom: none;">Cty TNHH Jin Won Viet Nam</td><td style="border-bottom: none;">03/02/2026</td><td class="text-right val-red" style="border-bottom: none;">50.000.000đ</td></tr>
-                            </tbody>
-                        </table>
+                        <!-- Tìm dòng này và sửa lại -->
+                        <div style="text-align: center; font-size: 0.8rem; color: #999; font-style: italic; margin-bottom: 20px;">
+                            * Số liệu cập nhật đến ngày @ViewBag.NgayCapNhat
+                        </div>
+
+                        <div style="background-color: #faf6f0; border-radius: 12px; padding: 15px;">
+                            <div id="vung-chua-bang-danh-sach">
+                                <partial name="_DanhSachUngHoTable" />
+                            </div>
+                        </div>
                     </div>
-                </div>
 
             </div>
         </div>
 
     </div>
 </div>
+<!-- BẮT ĐẦU JAVASCRIPT XỬ LÝ PHÂN TRANG NGẦM -->
+<script>
+    document.addEventListener('click', function(e) {
+        // Nếu người dùng bấm vào các nút phân trang có class 'ajax-page-link'
+        var link = e.target.closest('.ajax-page-link');
+        if (link) {
+            e.preventDefault();
+            var page = link.getAttribute('data-page');
+            var container = document.getElementById('vung-chua-bang-danh-sach');
+
+            // 1. Tạo hiệu ứng mờ đi một chút để báo hiệu đang tải
+            container.style.opacity = '0.5';
+            container.style.transition = 'opacity 0.3s ease';
+
+            // 2. Gọi API ngầm lấy bảng dữ liệu của trang mới
+            fetch('/CongThongTinAnSXH/GetDanhSachUngHoPartial?page=' + page)
+                .then(response => response.text())
+                .then(html => {
+                    // 3. Đắp mã HTML mới vào bảng và cho sáng lên lại
+                    container.innerHTML = html;
+                    container.style.opacity = '1';
+                })
+                .catch(err => {
+                    console.error('Lỗi khi tải trang:', err);
+                    container.style.opacity = '1';
+                });
+        }
+    });
+</script>

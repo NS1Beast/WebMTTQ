@@ -1,0 +1,55 @@
+﻿<table class="asxh-table">
+    <thead>
+        <tr>
+            <th class="text-left">ĐƠN VỊ / CÁ NHÂN</th>
+            <th>THỜI GIAN</th>
+            <th class="text-right">GIÁ TRỊ ỦNG HỘ</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (ViewBag.DanhSachNguoiUngHo != null)
+        {
+            foreach (var item in ViewBag.DanhSachNguoiUngHo)
+            {
+                <tr>
+                    <td class="text-left">@item.TenNguoiUngHo</td>
+                    <td>@item.NgayUngHo.ToString("dd/MM/yyyy")</td>
+                    <td class="text-right val-red">@item.SoTien.ToString("N0")đ</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3" class="text-center" style="color: #888; font-style: italic;">
+                    Chưa có dữ liệu ủng hộ nào được ghi nhận.
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (ViewBag.TotalPages > 1)
+{
+    <div class="asxh-pagination">
+        <!-- Nút Lùi (<) -->
+        @if (ViewBag.CurrentPage > 1)
+        {
+            <a href="javascript:void(0)" data-page="@(ViewBag.CurrentPage - 1)" class="asxh-page-link ajax-page-link">&laquo;</a>
+        }
+
+        <!-- Số trang -->
+        @for (int i = 1; i <= ViewBag.TotalPages; i++)
+        {
+            <a href="javascript:void(0)" data-page="@i" class="asxh-page-link ajax-page-link @(i == ViewBag.CurrentPage ? "active" : "")">
+                @i
+            </a>
+        }
+
+        <!-- Nút Tiến (>) -->
+        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+        {
+            <a href="javascript:void(0)" data-page="@(ViewBag.CurrentPage + 1)" class="asxh-page-link ajax-page-link">&raquo;</a>
+        }
+    </div>
+}

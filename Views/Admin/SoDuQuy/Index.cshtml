@@ -1,0 +1,41 @@
+﻿@model IEnumerable<WebMTTQ.Models.SoDuQuyViNguoiNgheo>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; ViewData["Title"] = "Quản lý Số dư Quỹ";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Lịch sử Số dư Quỹ "Vì người nghèo"</h3>
+        <a href="/admin/soduquy/Create" class="btn btn-primary">Cập nhật số dư mới</a>
+    </div>
+
+    <table class="table table-bordered table-hover bg-white shadow-sm">
+        <thead class="thead-light">
+            <tr>
+                <th>Ngày cập nhật</th>
+                <th>Tiền mặt</th>
+                <th>Tiền gửi Ngân hàng</th>
+                <th>Tổng tồn quỹ</th>
+                <th width="150">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <!-- Bôi đậm dòng mới nhất để admin dễ nhận biết -->
+                <tr class="@(item == Model.First() ? "font-weight-bold bg-light" : "")">
+                    <td>@item.NgayCapNhat.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td class="text-success">@item.TienMat.ToString("N0")đ</td>
+                    <td class="text-info">@item.TienGuiNganHang.ToString("N0")đ</td>
+                    <td class="text-danger">@item.TongTonQuy.ToString("N0")đ</td>
+                    <td>
+                        <a href="/admin/soduquy/Edit/@item.Id" class="btn btn-warning btn-sm">Sửa</a>
+                        <form action="/admin/soduquy/Delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Xóa bản ghi này?');">
+                            <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

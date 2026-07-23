@@ -1,0 +1,41 @@
+﻿@model IEnumerable<WebMTTQ.Models.DanhSachUngHo>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Quản lý Danh sách ủng hộ";
+}
+
+<div class="container mt-4">
+    <h2>Danh sách ủng hộ</h2>
+    <a href="/admin/danhsachungho/Create" class="btn btn-primary mb-3">Thêm mới lượt ủng hộ</a>
+
+    <table class="table table-bordered table-hover bg-white">
+        <thead class="thead-dark">
+            <tr>
+                <th>Đơn vị / Cá nhân</th>
+                <th>Thời gian</th>
+                <th>Giá trị ủng hộ</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.TenNguoiUngHo</td>
+                    <td>@item.NgayUngHo.ToString("dd/MM/yyyy")</td>
+                    <!-- Định dạng hiển thị tiền VNĐ (VD: 5.000.000) -->
+                    <td class="text-danger font-weight-bold">@item.SoTien.ToString("N0") đ</td>
+                    <td>
+                        <!-- Nút Sửa -->
+                        <a href="/admin/danhsachungho/Edit/@item.Id" class="btn btn-warning btn-sm">Sửa</a>
+
+                        <!-- Nút Xóa (giữ nguyên của bạn) -->
+                        <form action="/admin/danhsachungho/Delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?');">
+                            <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
