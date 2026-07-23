@@ -1,0 +1,59 @@
+﻿@model IEnumerable<WebMTTQ.Models.KetQuaChamLo>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Quản lý kết quả chăm lo";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="font-weight-bold">Lịch sử Chăm lo An sinh Xã hội</h3>
+        <a href="/admin/ketquachamlo/Create" class="btn btn-primary"><i class="fas fa-plus"></i> Thêm hoạt động mới</a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <table class="table table-hover table-bordered mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th width="80" class="text-center">Tháng</th>
+                        <th>Đơn vị thực hiện</th>
+                        <th>Nội dung</th>
+                        <th width="80" class="text-center">SL</th>
+                        <th width="130" class="text-right">Kinh phí</th>
+                        <th width="140" class="text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="text-center font-weight-bold text-danger">T. @item.Thang</td>
+                                <td>
+                                    <div class="font-weight-bold">@item.DonViUngHo</div>
+                                    <small class="text-muted">Nhóm: @item.PhanLoaiDonVi</small>
+                                </td>
+                                <td>@item.NoiDung</td>
+                                <td class="text-center">@item.SoLuongHo</td>
+                                <td class="text-right font-weight-bold text-danger">@item.KinhPhi.ToString("N0")đ</td>
+                                <td class="text-center">
+                                    <a href="/admin/ketquachamlo/Edit/@item.Id" class="btn btn-warning btn-sm">Sửa</a>
+                                    <form action="/admin/ketquachamlo/Delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa hoạt động này?');">
+                                        <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted font-italic">Chưa có dữ liệu chăm lo nào.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -20,7 +20,7 @@ namespace WebMTTQ.Controllers
         [Route("Index")]
         public async Task<IActionResult> Index()
         {
-            var list = await _context.ThongTinNhanUngHos.ToListAsync();
+            var list = await _context.ThongTinNhanUngHos.AsNoTracking().ToListAsync();
             return View("~/Views/Admin/ThongTinUngHo/Index.cshtml", list);
         }
 

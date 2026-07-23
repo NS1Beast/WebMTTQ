@@ -7,12 +7,12 @@ using WebMTTQ.Models;
 
 namespace WebMTTQ.Controllers
 {
-    [Route("admin/soduquy")]
-    public class AdminSoDuQuyController : Controller
+    [Route("admin/ketquachamlo")]
+    public class AdminKetQuaChamLoController : Controller
     {
         private readonly DataMTTQContext _context;
 
-        public AdminSoDuQuyController(DataMTTQContext context)
+        public AdminKetQuaChamLoController(DataMTTQContext context)
         {
             _context = context;
         }
@@ -20,61 +20,58 @@ namespace WebMTTQ.Controllers
         [Route("")]
         public async Task<IActionResult> Index()
         {
-            // Sắp xếp ngày mới nhất lên đầu
             // Thêm AsNoTracking
-            var list = await _context.SoDuQuyViNguoiNgheos.AsNoTracking().OrderByDescending(x => x.NgayCapNhat).ToListAsync();
-            return View("~/Views/Admin/SoDuQuy/Index.cshtml", list);
+            var list = await _context.KetQuaChamLos.AsNoTracking().OrderByDescending(x => x.Thang).ThenByDescending(x => x.Id).ToListAsync();
+            return View("~/Views/Admin/KetQuaChamLo/Index.cshtml", list);
         }
 
         [Route("Create")]
-        public IActionResult Create() => View("~/Views/Admin/SoDuQuy/Create.cshtml");
+        public IActionResult Create() => View("~/Views/Admin/KetQuaChamLo/Create.cshtml");
 
         [HttpPost("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(SoDuQuyViNguoiNgheo model)
+        public async Task<IActionResult> Create(KetQuaChamLo model)
         {
             if (ModelState.IsValid)
             {
-                // Tự động gán ngày hiện tại
                 model.NgayCapNhat = DateTime.Now;
-                _context.SoDuQuyViNguoiNgheos.Add(model);
+                _context.KetQuaChamLos.Add(model);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View("~/Views/Admin/SoDuQuy/Create.cshtml", model);
+            return View("~/Views/Admin/KetQuaChamLo/Create.cshtml", model);
         }
 
         [Route("Edit/{id}")]
         public async Task<IActionResult> Edit(int id)
         {
-            var item = await _context.SoDuQuyViNguoiNgheos.FindAsync(id);
+            var item = await _context.KetQuaChamLos.FindAsync(id);
             if (item == null) return NotFound();
-            return View("~/Views/Admin/SoDuQuy/Edit.cshtml", item);
+            return View("~/Views/Admin/KetQuaChamLo/Edit.cshtml", item);
         }
 
         [HttpPost("Edit/{id}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, SoDuQuyViNguoiNgheo model)
+        public async Task<IActionResult> Edit(int id, KetQuaChamLo model)
         {
             if (id != model.Id) return NotFound();
             if (ModelState.IsValid)
             {
-                // Tự động cập nhật ngày hiện tại khi sửa
                 model.NgayCapNhat = DateTime.Now;
                 _context.Update(model);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View("~/Views/Admin/SoDuQuy/Edit.cshtml", model);
+            return View("~/Views/Admin/KetQuaChamLo/Edit.cshtml", model);
         }
 
         [HttpPost("Delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var item = await _context.SoDuQuyViNguoiNgheos.FindAsync(id);
+            var item = await _context.KetQuaChamLos.FindAsync(id);
             if (item != null)
             {
-                _context.SoDuQuyViNguoiNgheos.Remove(item);
+                _context.KetQuaChamLos.Remove(item);
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));

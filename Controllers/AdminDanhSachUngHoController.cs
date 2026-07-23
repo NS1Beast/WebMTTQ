@@ -21,7 +21,7 @@ namespace WebMTTQ.Controllers
         public async Task<IActionResult> Index()
         {
             // Sắp xếp ngày mới nhất lên đầu
-            var list = await _context.DanhSachUngHos.OrderByDescending(x => x.NgayUngHo).ToListAsync();
+            var list = await _context.DanhSachUngHos.AsNoTracking().OrderByDescending(x => x.NgayUngHo).ToListAsync();
             return View("~/Views/Admin/DanhSachUngHo/Index.cshtml", list);
         }
 

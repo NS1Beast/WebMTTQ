@@ -3,7 +3,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<WebMTTQ.Models.DataMTTQContext>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+builder.Services.AddMemoryCache(); // Thêm dòng này để bật bộ nhớ đệm
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
