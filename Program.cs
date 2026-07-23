@@ -1,6 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using WebMTTQ.Models;
+
 var builder = WebApplication.CreateBuilder(args);
-// Dán dòng này vào để hệ thống nhận diện được DataMTTQContext
-builder.Services.AddDbContext<WebMTTQ.Models.DataMTTQContext>();
+
+// 1. Đọc chuỗi kết nối từ appsettings.json
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// 2. Cấu hình DataMTTQContext
+builder.Services.AddDbContext<DataMTTQContext>(options =>
+    options.UseSqlServer(connectionString));
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddMemoryCache(); // Thêm dòng này để bật bộ nhớ đệm
@@ -16,15 +25,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
 app.UseAuthorization();
-
 app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();
