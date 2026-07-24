@@ -37,6 +37,8 @@ namespace WebMTTQ.Controllers
                 model.NgayCapNhat = DateTime.Now;
                 _context.KetQuaChamLos.Add(model);
                 await _context.SaveChangesAsync();
+                // THÊM DÒNG NÀY 
+                TempData["SuccessMessage"] = "Thêm kết quả chăm lo thành công!";
                 return RedirectToAction(nameof(Index));
             }
             return View("~/Views/Admin/KetQuaChamLo/Create.cshtml", model);
@@ -60,6 +62,8 @@ namespace WebMTTQ.Controllers
                 model.NgayCapNhat = DateTime.Now;
                 _context.Update(model);
                 await _context.SaveChangesAsync();
+                // THÊM DÒNG NÀY
+                TempData["SuccessMessage"] = "Cập nhật kết quả chăm lo thành công!";
                 return RedirectToAction(nameof(Index));
             }
             return View("~/Views/Admin/KetQuaChamLo/Edit.cshtml", model);
@@ -73,6 +77,8 @@ namespace WebMTTQ.Controllers
             {
                 _context.KetQuaChamLos.Remove(item);
                 await _context.SaveChangesAsync();
+                // THÊM DÒNG NÀY TRONG KHỐI IF
+                TempData["SuccessMessage"] = "Đã xóa kết quả chăm lo thành công!";
             }
             return RedirectToAction(nameof(Index));
         }

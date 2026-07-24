@@ -39,6 +39,8 @@ namespace WebMTTQ.Controllers
             {
                 _context.Add(model);
                 await _context.SaveChangesAsync();
+                // THÊM DÒNG NÀY TRƯỚC KHI RETURN
+                TempData["SuccessMessage"] = "Thêm danh sách ủng hộ thành công!";
                 return RedirectToAction(nameof(Index));
             }
             return View("~/Views/Admin/DanhSachUngHo/Create.cshtml", model);
@@ -68,6 +70,8 @@ namespace WebMTTQ.Controllers
                 {
                     _context.Update(model);
                     await _context.SaveChangesAsync();
+                    // THÊM DÒNG NÀY SAU KHI LƯU THÀNH CÔNG
+                    TempData["SuccessMessage"] = "Cập nhật danh sách ủng hộ thành công!";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -89,6 +93,8 @@ namespace WebMTTQ.Controllers
             {
                 _context.DanhSachUngHos.Remove(item);
                 await _context.SaveChangesAsync();
+                // THÊM DÒNG NÀY VÀO TRONG KHỐI LỆNH IF
+                TempData["SuccessMessage"] = "Đã xóa bản ghi thành công!";
             }
             return RedirectToAction(nameof(Index));
         }

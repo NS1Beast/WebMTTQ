@@ -47,6 +47,8 @@ namespace WebMTTQ.Controllers
                 // Chỉ cho phép admin cập nhật trạng thái
                 existingItem.TrangThai = model.TrangThai;
                 await _context.SaveChangesAsync();
+                // THÊM DÒNG NÀY
+                TempData["SuccessMessage"] = "Cập nhật trạng thái xử lý thành công!";
                 return RedirectToAction(nameof(Index));
             }
             return View("~/Views/Admin/NguoiDanCanTroGiup/Edit.cshtml", model);
@@ -61,6 +63,8 @@ namespace WebMTTQ.Controllers
             {
                 item.DaXoa = true;
                 await _context.SaveChangesAsync();
+                // THÊM DÒNG NÀY
+                TempData["SuccessMessage"] = "Đã xóa yêu cầu trợ giúp thành công!";
             }
             return RedirectToAction(nameof(Index));
         }

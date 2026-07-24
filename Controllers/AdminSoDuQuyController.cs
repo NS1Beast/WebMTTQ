@@ -39,6 +39,8 @@ namespace WebMTTQ.Controllers
                 model.NgayCapNhat = DateTime.Now;
                 _context.SoDuQuyViNguoiNgheos.Add(model);
                 await _context.SaveChangesAsync();
+                // THÊM DÒNG NÀY
+                TempData["SuccessMessage"] = "Thêm số dư quỹ thành công!";
                 return RedirectToAction(nameof(Index));
             }
             return View("~/Views/Admin/SoDuQuy/Create.cshtml", model);
@@ -63,6 +65,8 @@ namespace WebMTTQ.Controllers
                 model.NgayCapNhat = DateTime.Now;
                 _context.Update(model);
                 await _context.SaveChangesAsync();
+                // THÊM DÒNG NÀY
+                TempData["SuccessMessage"] = "Cập nhật số dư quỹ thành công!";
                 return RedirectToAction(nameof(Index));
             }
             return View("~/Views/Admin/SoDuQuy/Edit.cshtml", model);
@@ -76,6 +80,8 @@ namespace WebMTTQ.Controllers
             {
                 _context.SoDuQuyViNguoiNgheos.Remove(item);
                 await _context.SaveChangesAsync();
+                // THÊM DÒNG NÀY TRONG KHỐI IF
+                TempData["SuccessMessage"] = "Đã xóa số dư quỹ thành công!";
             }
             return RedirectToAction(nameof(Index));
         }

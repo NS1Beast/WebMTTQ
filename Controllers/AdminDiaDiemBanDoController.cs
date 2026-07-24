@@ -73,6 +73,9 @@ namespace WebMTTQ.Controllers
                 // ---> QUAN TRỌNG: XÓA CACHE BẢN ĐỒ NGAY SAU KHI THÊM THÀNH CÔNG <---
                 _cache.Remove("BanDoData");
 
+                // THÊM DÒNG NÀY
+                TempData["SuccessMessage"] = "Thêm địa điểm bản đồ thành công!";
+
                 return RedirectToAction(nameof(Index));
             }
             return View("~/Views/Admin/DiaDiemBanDo/Create.cshtml", model);
@@ -89,9 +92,11 @@ namespace WebMTTQ.Controllers
             {
                 item.DaXoa = true; // Xóa mềm
                 await _context.SaveChangesAsync();
-
                 // ---> QUAN TRỌNG: XÓA CACHE BẢN ĐỒ NGAY SAU KHI XÓA THÀNH CÔNG <---
                 _cache.Remove("BanDoData");
+
+                // THÊM DÒNG NÀY
+                TempData["SuccessMessage"] = "Đã xóa địa điểm thành công!";
             }
             return RedirectToAction(nameof(Index));
         }
@@ -143,9 +148,11 @@ namespace WebMTTQ.Controllers
                 model.DaXoa = false;
                 _context.Update(model);
                 await _context.SaveChangesAsync();
-
                 // ---> QUAN TRỌNG: XÓA CACHE BẢN ĐỒ NGAY SAU KHI SỬA THÀNH CÔNG <---
                 _cache.Remove("BanDoData");
+
+                // THÊM DÒNG NÀY
+                TempData["SuccessMessage"] = "Cập nhật địa điểm thành công!";
 
                 return RedirectToAction(nameof(Index));
             }
