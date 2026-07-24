@@ -7,6 +7,7 @@ public sealed class HomePageViewModel
     public IReadOnlyList<NewsCategoryBlock> Categories { get; init; } = [];
     public IReadOnlyList<TimelineItem> Timeline { get; init; } = [];
     public IReadOnlyList<StatItem> Stats { get; init; } = [];
+    public List<Banner> Banners { get; set; } = [];
 }
 
 public sealed class FeaturedNewsItem

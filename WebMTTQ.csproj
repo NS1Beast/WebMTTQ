@@ -20,6 +20,8 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
+    <Folder Include="wwwroot\uploads\banners\" />
+    <Folder Include="wwwroot\uploads\qrcodes\" />
   </ItemGroup>
 
 </Project>

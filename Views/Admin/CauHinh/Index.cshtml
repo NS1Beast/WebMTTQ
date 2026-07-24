@@ -1,0 +1,168 @@
+﻿@model WebMTTQ.Models.CauHinhViewModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Trỏ đúng layout Admin của bạn
+    ViewData["Title"] = "Cài đặt hệ thống";
+}
+
+<style>
+    .settings-section {
+        background: #fff;
+        border-radius: 12px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .settings-title {
+        font-size: 1.2rem;
+        color: #8b1a2b; /* Màu đỏ Admin */
+        margin-top: 0;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+        font-weight: bold;
+    }
+
+    /* CSS Cho nút Switch Bật/Tắt (Toggle) */
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 24px;
+    }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+    input:checked + .slider {
+        background-color: #dc3545; /* Đỏ khi bật bảo trì */
+    }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+</style>
+
+<div class="admin-page-header" style="margin-bottom: 20px;">
+    <div>
+        <h2>⚙️ Cài đặt hệ thống</h2>
+        <div class="subtitle">Cấu hình các thông tin chung của Website</div>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div style="background:#d4edda; color:#155724; padding:15px; border-radius:12px; margin-bottom:20px;">
+        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+    </div>
+}
+
+<form asp-action="Index" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="asxh-row">
+        <div class="asxh-col-8">
+            <div class="settings-section">
+                <h3 class="settings-title"><i class="fas fa-building"></i> Thông tin Cơ quan & Liên hệ</h3>
+
+                <div class="admin-form-group" style="margin-bottom: 15px;">
+                    <label class="admin-form-label">Tên Cơ quan / Tổ chức</label>
+                    <input asp-for="TenCoQuan" class="admin-form-control" placeholder="VD: Ủy ban MTTQ Việt Nam Phường Tân Định" />
+                </div>
+
+                <div class="admin-form-group" style="margin-bottom: 15px;">
+                    <label class="admin-form-label">Địa chỉ trụ sở</label>
+                    <input asp-for="DiaChi" class="admin-form-control" placeholder="VD: Số 123 Đường ABC, Phường..." />
+                </div>
+
+                <div class="asxh-row">
+                    <div class="asxh-col-6 form-group" style="margin-bottom: 15px;">
+                        <label class="admin-form-label">Số điện thoại đường dây nóng</label>
+                        <input asp-for="SoDienThoai" class="admin-form-control" placeholder="VD: 028.38123456" />
+                    </div>
+                    <div class="asxh-col-6 form-group" style="margin-bottom: 15px;">
+                        <label class="admin-form-label">Địa chỉ Email</label>
+                        <input asp-for="Email" type="email" class="admin-form-control" placeholder="VD: mttq.tandinh@gmail.com" />
+                    </div>
+                </div>
+
+                <div class="admin-form-group" style="margin-bottom: 15px;">
+                    <label class="admin-form-label">Giờ làm việc</label>
+                    <input asp-for="GioLamViec" class="admin-form-control" placeholder="VD: Thứ 2 - Thứ 6 (Sáng: 07:30 - 11:30 | Chiều: 13:00 - 17:00)" />
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3 class="settings-title"><i class="fas fa-share-alt"></i> Liên kết Mạng xã hội</h3>
+
+                <div class="admin-form-group" style="margin-bottom: 15px;">
+                    <label class="admin-form-label">Đường dẫn Fanpage Facebook</label>
+                    <div style="display:flex; align-items:center; gap: 10px;">
+                        <i class="fab fa-facebook" style="font-size: 24px; color: #1877F2;"></i>
+                        <input asp-for="LinkFacebook" class="admin-form-control" placeholder="Nhập link trang Facebook của Phường" style="flex:1;" />
+                    </div>
+                </div>
+
+                <div class="admin-form-group" style="margin-bottom: 15px;">
+                    <label class="admin-form-label">Đường dẫn Zalo OA</label>
+                    <div style="display:flex; align-items:center; gap: 10px;">
+                        <i class="fas fa-comment-dots" style="font-size: 24px; color: #0180C7;"></i>
+                        <input asp-for="LinkZalo" class="admin-form-control" placeholder="Nhập link Zalo Official Account" style="flex:1;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="asxh-col-4">
+            <div class="settings-section" style="background: #fffcfc; border: 1px solid #fbe2e2;">
+                <h3 class="settings-title"><i class="fas fa-exclamation-triangle"></i> Quản lý bảo trì</h3>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <div>
+                        <strong style="display: block; color: #333;">Bật chế độ bảo trì</strong>
+                        <span style="font-size: 0.85rem; color: #888;">Tạm khóa website đối với người dân.</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" asp-for="BaoTriHeThong">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div style="background: #fff3cd; color: #856404; padding: 12px; border-radius: 8px; font-size: 0.85rem;">
+                    <i class="fas fa-info-circle"></i> <b>Lưu ý:</b> Khi bật tính năng này, người dân truy cập vào trang chủ sẽ tự động bị chuyển hướng sang trang "Hệ thống đang nâng cấp". Chỉ Admin mới xem được trang quản trị.
+                </div>
+            </div>
+
+            <button type="submit" class="admin-btn admin-btn-success" style="width: 100%; padding: 15px; font-size: 1.1rem; border-radius: 12px; background: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);">
+                <i class="fas fa-save"></i> LƯU TẤT CẢ CÀI ĐẶT
+            </button>
+        </div>
+    </div>
+</form>

@@ -3,6 +3,104 @@
     ViewData["Title"] = "Trang chủ";
 }
 
+<style>
+    /* ================= CSS CHO BANNER CHẠY NGANG ================= */
+    .banner-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+        background: #f8f9fa;
+        border-bottom: 3px solid var(--m26-gold-dark, #C9942B);
+    }
+
+    .banner-track {
+        display: flex;
+        transition: transform 0.6s ease-in-out;
+        width: 100%;
+    }
+
+    .banner-slide {
+        min-width: 100%;
+        box-sizing: border-box;
+    }
+
+        /* MẶC ĐỊNH (MOBILE & TABLET): Hiển thị full 100% không cắt */
+        .banner-slide img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+    /* XỬ LÝ RIÊNG CHO MÁY TÍNH (Màn hình rộng từ 992px trở lên) */
+    @@media (min-width: 992px) {
+        .banner-slide img {
+            max-height: 100%; /* Giới hạn chiều cao không cho ảnh phình quá to */
+            object-fit: cover; /* Giữ tỷ lệ, lấp đầy khung hình */
+            object-position: center 100%; /* Ưu tiên lấy nét phần trên/giữa ảnh để không bị mất mặt người */
+        }
+    }
+
+    /* Nút điều hướng < > */
+    .banner-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(0, 0, 0, 0.4);
+        color: white;
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 24px;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s, transform 0.3s;
+        opacity: 0.7;
+    }
+
+        .banner-btn:hover {
+            background-color: rgba(201, 148, 43, 0.9);
+            opacity: 1;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+    .banner-prev {
+        left: 20px;
+    }
+
+    .banner-next {
+        right: 20px;
+    }
+
+    /* Nút click (Dots) ở dưới ảnh */
+    .banner-dots {
+        position: absolute;
+        bottom: 15px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .dot {
+        width: 12px;
+        height: 12px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .dot.active {
+            background: #F2C14E;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+</style>
+
 <section class="m26-hero" id="m26-hero">
     <div class="rays"></div>
     <div class="grain"></div>
@@ -99,6 +197,43 @@
     </div>
 </div>
 
+<!-- ================= KHU VỰC BANNER CHẠY NGANG ================= -->
+@if (Model.Banners != null && Model.Banners.Any())
+{
+    <div class="banner-wrapper" id="homeBanner">
+        <div class="banner-track">
+            @foreach (var item in Model.Banners)
+            {
+                <div class="banner-slide">
+                    @if (!string.IsNullOrEmpty(item.LienKet))
+                    {
+                        <a href="@item.LienKet">
+                            <img src="@item.HinhAnh" alt="@item.TieuDe" />
+                        </a>
+                    }
+                    else
+                    {
+                        <img src="@item.HinhAnh" alt="@item.TieuDe" />
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- Nút Trái / Phải -->
+        <button class="banner-btn banner-prev" onclick="moveBanner(-1)">&#10094;</button>
+        <button class="banner-btn banner-next" onclick="moveBanner(1)">&#10095;</button>
+
+        <!-- Dấu chấm tròn (Dots) -->
+        <div class="banner-dots">
+            @for (int i = 0; i < Model.Banners.Count; i++)
+            {
+                <span class="dot @(i == 0 ? "active" : "")" onclick="setBanner(@i)"></span>
+            }
+        </div>
+    </div>
+}
+<!-- ================= KẾT THÚC KHU VỰC BANNER ================= -->
+
 <div class="m26-body m26-body--home">
     <div style="display: flex; align-items: center; justify-content: center; padding: 6rem 1rem; min-height: 50vh;">
         <div class="wrap" style="text-align: center;">
@@ -116,3 +251,56 @@
         </div>
     </div>
 </div>
+
+<!-- JAVASCRIPT XỬ LÝ CHẠY ẢNH -->
+@section Scripts {
+    <script>
+        let currentBannerIndex = 0;
+        const bannerTrack = document.querySelector('.banner-track');
+        const slides = document.querySelectorAll('.banner-slide');
+        const dots = document.querySelectorAll('.dot');
+        const totalBanners = slides.length;
+        let slideInterval;
+
+        function updateBannerUI() {
+            // Dịch chuyển track theo chiều ngang
+            bannerTrack.style.transform = `translateX(-${currentBannerIndex * 100}%)`;
+
+            // Cập nhật dấu chấm tròn
+            dots.forEach(dot => dot.classList.remove('active'));
+            if (dots.length > 0) dots[currentBannerIndex].classList.add('active');
+        }
+
+        function moveBanner(step) {
+            currentBannerIndex += step;
+            if (currentBannerIndex < 0) {
+                currentBannerIndex = totalBanners - 1; // Quay lại ảnh cuối
+            } else if (currentBannerIndex >= totalBanners) {
+                currentBannerIndex = 0; // Quay về ảnh đầu
+            }
+            updateBannerUI();
+        }
+
+        function setBanner(index) {
+            currentBannerIndex = index;
+            updateBannerUI();
+        }
+
+        function startAutoPlay() {
+            // Chạy tự động mỗi 2 giây (2000 ms)
+            slideInterval = setInterval(() => {
+                moveBanner(1);
+            }, 2000);
+        }
+
+        // Bắt đầu chạy khi tải trang (nếu có banner)
+        if (totalBanners > 0) {
+            startAutoPlay();
+
+            // Tạm dừng khi đưa chuột vào khu vực ảnh
+            const bannerWrapper = document.getElementById('homeBanner');
+            bannerWrapper.addEventListener('mouseenter', () => clearInterval(slideInterval));
+            bannerWrapper.addEventListener('mouseleave', startAutoPlay);
+        }
+    </script>
+}

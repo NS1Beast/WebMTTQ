@@ -1,21 +1,28 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebMTTQ.Models;
+using Microsoft.AspNetCore.Hosting; // Bắt buộc thêm để lấy đường dẫn wwwroot
+using Microsoft.AspNetCore.Http; // Bắt buộc thêm để dùng IFormFile
+using System.IO;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace WebMTTQ.Controllers
 {
-    // 1. Ép hệ thống nhận URL này
     [Route("admin/thongtinungho")]
     public class AdminThongTinController : BaseAdminController
     {
         private readonly DataMTTQContext _context;
+        private readonly IWebHostEnvironment _env; // Khai báo biến môi trường
 
-        public AdminThongTinController(DataMTTQContext context)
+        // Tiêm IWebHostEnvironment vào constructor
+        public AdminThongTinController(DataMTTQContext context, IWebHostEnvironment env)
         {
             _context = context;
+            _env = env;
         }
 
-        // 2. Định tuyến cho trang danh sách
         [Route("")]
         [Route("Index")]
         public async Task<IActionResult> Index()
@@ -24,7 +31,6 @@ namespace WebMTTQ.Controllers
             return View("~/Views/Admin/ThongTinUngHo/Index.cshtml", list);
         }
 
-        // 3. Định tuyến cho trang Thêm mới
         [Route("Create")]
         public IActionResult Create()
         {
@@ -33,10 +39,29 @@ namespace WebMTTQ.Controllers
 
         [HttpPost("Create")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ThongTinNhanUngHo model)
+        // Thêm tham số IFormFile FileQr để nhận ảnh từ thẻ <input type="file" name="FileQr">
+        public async Task<IActionResult> Create(ThongTinNhanUngHo model, IFormFile FileQr)
         {
             if (ModelState.IsValid)
             {
+                // Xử lý lưu file ảnh nếu có tải lên
+                if (FileQr != null && FileQr.Length > 0)
+                {
+                    string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "qrcodes");
+                    if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(FileQr.FileName);
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await FileQr.CopyToAsync(fileStream);
+                    }
+
+                    // Gán đường dẫn vào Model để lưu vào SQL
+                    model.QrCodeUrl = "/uploads/qrcodes/" + uniqueFileName;
+                }
+
                 _context.Add(model);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -44,7 +69,6 @@ namespace WebMTTQ.Controllers
             return View("~/Views/Admin/ThongTinUngHo/Create.cshtml", model);
         }
 
-        // 4. Định tuyến cho trang Sửa
         [Route("Edit/{id?}")]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -58,7 +82,8 @@ namespace WebMTTQ.Controllers
 
         [HttpPost("Edit/{id}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, ThongTinNhanUngHo model)
+        // Thêm tham số IFormFile FileQr để xử lý cập nhật ảnh
+        public async Task<IActionResult> Edit(int id, ThongTinNhanUngHo model, IFormFile FileQr)
         {
             if (id != model.Id) return NotFound();
 
@@ -66,6 +91,24 @@ namespace WebMTTQ.Controllers
             {
                 try
                 {
+                    // Nếu người dùng chọn tải ảnh QR mới lên
+                    if (FileQr != null && FileQr.Length > 0)
+                    {
+                        string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "qrcodes");
+                        if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                        string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(FileQr.FileName);
+                        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await FileQr.CopyToAsync(fileStream);
+                        }
+
+                        model.QrCodeUrl = "/uploads/qrcodes/" + uniqueFileName; // Đổi sang ảnh mới
+                    }
+                    // Ghi chú: Nếu không up ảnh mới, model.QrCodeUrl sẽ tự động lấy giá trị cũ từ thẻ <input type="hidden"> ở View
+
                     _context.Update(model);
                     await _context.SaveChangesAsync();
                 }
@@ -79,7 +122,6 @@ namespace WebMTTQ.Controllers
             return View("~/Views/Admin/ThongTinUngHo/Edit.cshtml", model);
         }
 
-        // 5. Định tuyến cho Xóa
         [HttpPost("Delete/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

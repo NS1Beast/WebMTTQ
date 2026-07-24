@@ -6,10 +6,90 @@
     <title>@ViewData["Title"] - Quản trị MTTQ</title>
     <meta name="theme-color" content="#8b1a2b" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,700&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap&subset=vietnamese" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+
+    <!-- CỤM CSS CHO TOAST NOTIFICATION -->
+    <style>
+            .admin-toast-container {
+                position: fixed;
+                top: 80px; /* Cách header một chút */
+                right: 20px;
+                z-index: 9999;
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                pointer-events: none; /* Không chặn click chuột vào web */
+            }
+
+            .admin-toast {
+                min-width: 280px;
+                max-width: 400px;
+                background: white;
+                padding: 16px 20px;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                transform: translateX(120%); /* Ẩn ra ngoài màn hình */
+                animation: toastSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+                transition: all 0.5s ease-out;
+                pointer-events: auto;
+            }
+
+                .admin-toast.fade-out {
+                    transform: translateX(120%);
+                    opacity: 0;
+                }
+
+                .admin-toast.success {
+                    border-left: 5px solid #28a745;
+                }
+
+                    .admin-toast.success .toast-icon {
+                        color: #28a745;
+                        font-size: 1.5rem;
+                    }
+
+                .admin-toast.error {
+                    border-left: 5px solid #dc3545;
+                }
+
+                    .admin-toast.error .toast-icon {
+                        color: #dc3545;
+                        font-size: 1.5rem;
+                    }
+
+            .toast-content {
+                flex: 1;
+            }
+
+            .toast-title {
+                font-weight: 700;
+                font-size: 0.95rem;
+                color: #333;
+                margin-bottom: 2px;
+            }
+
+            .toast-message {
+                font-size: 0.85rem;
+                color: #666;
+                line-height: 1.4;
+            }
+
+            @@keyframes toastSlideIn {
+                from {
+                    transform: translateX(120%);
+                }
+
+                to {
+                    transform: translateX(0);
+                }
+            }
+    </style>
 </head>
 <body class="admin-body">
     <div class="admin-layout">
@@ -69,7 +149,11 @@
 
                 <div class="nav-sep"></div>
 
-                <a href="#" style="opacity:0.6;">
+                <a href="/AdminBanner/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminBanner" ? "is-active" : "")">
+                    <i class="fas fa-images"></i>
+                    <span>Quản lý Banner</span>
+                </a>
+                <a href="/AdminCauHinh/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminCauHinh" ? "is-active" : "")">
                     <i class="fas fa-cog"></i>
                     <span>Cài đặt hệ thống</span>
                 </a>
@@ -110,22 +194,64 @@
         </main>
     </div>
 
-    <script>
-        // Toggle sidebar trên mobile
-        document.getElementById('adminToggleSidebar').addEventListener('click', function() {
-            document.getElementById('adminSidebar').classList.toggle('is-open');
-        });
+    <!-- KHU VỰC RENDER TOAST THÔNG BÁO -->
+    <div class="admin-toast-container" id="adminToastContainer">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="admin-toast success">
+                <div class="toast-icon"><i class="fas fa-check-circle"></i></div>
+                <div class="toast-content">
+                    <div class="toast-title">Thành công</div>
+                    <div class="toast-message">@TempData["SuccessMessage"]</div>
+                </div>
+            </div>
+        }
 
-        // Đóng sidebar khi click ra ngoài (mobile)
-        document.addEventListener('click', function(e) {
-            var sidebar = document.getElementById('adminSidebar');
-            var toggle = document.getElementById('adminToggleSidebar');
-            if (window.innerWidth <= 900) {
-                if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
-                    sidebar.classList.remove('is-open');
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="admin-toast error">
+                <div class="toast-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="toast-content">
+                    <div class="toast-title">Có lỗi xảy ra</div>
+                    <div class="toast-message">@TempData["ErrorMessage"]</div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <script>
+            // Toggle sidebar trên mobile
+            document.getElementById('adminToggleSidebar').addEventListener('click', function() {
+                document.getElementById('adminSidebar').classList.toggle('is-open');
+            });
+
+            // Đóng sidebar khi click ra ngoài (mobile)
+            document.addEventListener('click', function(e) {
+                var sidebar = document.getElementById('adminSidebar');
+                var toggle = document.getElementById('adminToggleSidebar');
+                if (window.innerWidth <= 900) {
+                    if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                        sidebar.classList.remove('is-open');
+                    }
                 }
-            }
-        });
+            });
+
+            // HỆ THỐNG XỬ LÝ TOAST NOTIFICATION TỰ ĐỘNG ẨN
+            document.addEventListener("DOMContentLoaded", function() {
+                var toasts = document.querySelectorAll('.admin-toast');
+
+                toasts.forEach(function(toast) {
+                    // Đếm ngược 3 giây (3000ms) thì bắt đầu chạy animation biến mất
+                    setTimeout(function() {
+                        toast.classList.add('fade-out');
+
+                        // Chờ thêm 0.5s để animation chạy xong rồi xóa luôn thẻ div cho sạch HTML
+                        setTimeout(function() {
+                            toast.remove();
+                        }, 500);
+                    }, 3000);
+                });
+            });
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)

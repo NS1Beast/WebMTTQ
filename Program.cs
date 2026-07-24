@@ -5,11 +5,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // 1. Đọc chuỗi kết nối từ appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-// 2. Cấu hình DataMTTQContext
+// 2. Cấu hình DbContext với chuỗi kết nối
+// SỬA LẠI THÀNH NHƯ SAU TRONG PROGRAM.CS:
 builder.Services.AddDbContext<DataMTTQContext>(options =>
-    options.UseSqlServer(connectionString));
-
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddMemoryCache();

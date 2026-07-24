@@ -16,7 +16,8 @@
 
 <div class="admin-card" style="max-width: 800px;">
     <div class="admin-card-body">
-        <form asp-action="Create" method="post">
+        <!-- Đã thêm enctype để gửi file ảnh -->
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="admin-alert admin-alert-danger"></div>
 
             <div class="admin-form-row">
@@ -51,10 +52,15 @@
                 <span asp-validation-for="DonViThuHuong" class="admin-form-error"></span>
             </div>
 
+            <!-- Đã sửa thành nút Tải ảnh -->
             <div class="admin-form-group">
-                <label asp-for="QrCodeUrl" class="admin-form-label"></label>
-                <input asp-for="QrCodeUrl" class="admin-form-control" placeholder="Dán link ảnh QR code vào đây (nếu có)" />
-                <span asp-validation-for="QrCodeUrl" class="admin-form-error"></span>
+                <label class="admin-form-label">Tải lên Ảnh QR Code</label>
+                <input type="file" name="FileQr" id="FileQr" accept="image/*" class="admin-form-control" />
+
+                <div id="previewContainer" style="display:none; margin-top: 15px;">
+                    <p style="margin-bottom: 5px; font-size: 0.9rem; color: #666;">Ảnh xem trước:</p>
+                    <img id="imagePreview" src="" style="max-width: 200px; border-radius: 8px; border: 1px solid #ddd;" />
+                </div>
             </div>
 
             <div class="admin-form-group">
@@ -77,4 +83,17 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        document.getElementById('FileQr').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imagePreview').src = e.target.result;
+                    document.getElementById('previewContainer').style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
 }
