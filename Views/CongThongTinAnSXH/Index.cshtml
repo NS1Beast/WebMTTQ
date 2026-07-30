@@ -1499,6 +1499,8 @@
             </div>
         </div>
 
+        @if (ViewBag.HienThiBanDo == true)
+        {
         <div class="map-container-wrapper">
             <div class="map-header-row">
                 <div>
@@ -1545,6 +1547,7 @@
                 </div>
             </div>
         </div>
+        }
 
         <div class="help-section" id="nhu-cau-tro-giup">
             <div class="asxh-row">
@@ -1589,6 +1592,8 @@
         <div class="modal-desc" id="mDesc"></div>
     </div>
 </div>
+@if (ViewBag.HienThiBanDo == true)
+{
 <script type="application/json" id="mapDataJson">
     @Html.Raw(ViewBag.MapDataJson ?? "[]")
 </script>
@@ -1785,3 +1790,4 @@ let activeFilter = "";
     }
     init();
 </script>
+}

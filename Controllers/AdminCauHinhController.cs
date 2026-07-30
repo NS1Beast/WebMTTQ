@@ -1,48 +1,89 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 using System.Threading.Tasks;
 using WebMTTQ.Models;
-using Microsoft.EntityFrameworkCore;
+using WebMTTQ.Services;
 
 namespace WebMTTQ.Controllers
 {
-    // BỔ SUNG ROUTE Ở ĐÂY ĐỂ TRÁNH LỖI NOT FOUND 404
     [Route("AdminCauHinh")]
-    public class AdminCauHinhController : BaseAdminController // Nếu bạn không dùng BaseAdminController thì đổi thành Controller nhé
+    public class AdminCauHinhController : BaseAdminController
     {
-        private readonly DataMTTQContext _context;
+        private readonly ISystemSettingsService _settings;
 
-        public AdminCauHinhController(DataMTTQContext context)
+        public AdminCauHinhController(ISystemSettingsService settings)
         {
-            _context = context;
+            _settings = settings;
         }
 
-        // HÀM HIỂN THỊ TRANG CÀI ĐẶT
         [Route("")]
         [Route("Index")]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            // Lấy toàn bộ cấu hình từ DB lên
-            var configs = await _context.CauHinhHeThongs.ToListAsync();
-
-            // Gán dữ liệu
             var model = new CauHinhViewModel
             {
-                TenCoQuan = GetConfigValue(configs, "TenCoQuan"),
-                DiaChi = GetConfigValue(configs, "DiaChi"),
-                SoDienThoai = GetConfigValue(configs, "SoDienThoai"),
-                Email = GetConfigValue(configs, "Email"),
-                GioLamViec = GetConfigValue(configs, "GioLamViec"),
-                LinkFacebook = GetConfigValue(configs, "LinkFacebook"),
-                LinkZalo = GetConfigValue(configs, "LinkZalo"),
-                BaoTriHeThong = GetConfigValue(configs, "BaoTriHeThong") == "1"
+                // --- Organization Information ---
+                TenCoQuan = await _settings.GetValueAsync("TenCoQuan"),
+                DiaChi = await _settings.GetValueAsync("DiaChi"),
+                SoDienThoai = await _settings.GetValueAsync("SoDienThoai"),
+                Email = await _settings.GetValueAsync("Email"),
+                GioLamViec = await _settings.GetValueAsync("GioLamViec"),
+
+                // --- Social Links ---
+                LinkFacebook = await _settings.GetValueAsync("LinkFacebook"),
+                LinkZalo = await _settings.GetValueAsync("LinkZalo"),
+
+                // --- Maintenance Mode ---
+                BaoTriHeThong = await _settings.GetBooleanAsync("BaoTriHeThong"),
+
+                // --- Cloudflare R2 ---
+                CloudflareR2_Enabled = await _settings.GetBooleanAsync("CloudflareR2_Enabled"),
+                CloudflareR2_Endpoint = await _settings.GetValueAsync("CloudflareR2_Endpoint"),
+                CloudflareR2_BucketName = await _settings.GetValueAsync("CloudflareR2_BucketName"),
+                CloudflareR2_DefaultRegion = await _settings.GetValueAsync("CloudflareR2_DefaultRegion"),
+                CloudflareR2_FolderStructure = await _settings.GetValueAsync("CloudflareR2_FolderStructure"),
+                CloudflareR2_MaxUploadSize = await _settings.GetLongAsync("CloudflareR2_MaxUploadSize"),
+                CloudflareR2_AllowedExtensions = await _settings.GetValueAsync("CloudflareR2_AllowedExtensions"),
+                CloudflareR2_AutoImageOptimization = await _settings.GetBooleanAsync("CloudflareR2_AutoImageOptimization"),
+                CloudflareR2_AutoFileVersioning = await _settings.GetBooleanAsync("CloudflareR2_AutoFileVersioning"),
+                CloudflareR2_RecycleBin = await _settings.GetBooleanAsync("CloudflareR2_RecycleBin"),
+
+                // Display masked values for encrypted fields
+                CloudflareR2_AccessKey_Display = await _settings.ExistsAsync("CloudflareR2_AccessKey")
+                    ? "**************"
+                    : string.Empty,
+                CloudflareR2_SecretKey_Display = await _settings.ExistsAsync("CloudflareR2_SecretKey")
+                    ? "**************"
+                    : string.Empty,
+
+                // --- Folder Configuration ---
+                Folder_Documents = await _settings.GetValueAsync("Folder_Documents"),
+                Folder_Images = await _settings.GetValueAsync("Folder_Images"),
+                Folder_Avatars = await _settings.GetValueAsync("Folder_Avatars"),
+                Folder_NewsImages = await _settings.GetValueAsync("Folder_NewsImages"),
+                Folder_TempUpload = await _settings.GetValueAsync("Folder_TempUpload"),
+                Folder_Backup = await _settings.GetValueAsync("Folder_Backup"),
+                Folder_Export = await _settings.GetValueAsync("Folder_Export"),
+                Folder_Archive = await _settings.GetValueAsync("Folder_Archive"),
+
+                // --- Document Organization ---
+                DocOrg_SeparateBy = await _settings.GetValueAsync("DocOrg_SeparateBy"),
+
+                // --- Upload Rules ---
+                Upload_MaxImageSize = await _settings.GetLongAsync("Upload_MaxImageSize"),
+                Upload_MaxDocumentSize = await _settings.GetLongAsync("Upload_MaxDocumentSize"),
+                Upload_MaxTotalSize = await _settings.GetLongAsync("Upload_MaxTotalSize"),
+                Upload_AllowedImageExtensions = await _settings.GetValueAsync("Upload_AllowedImageExtensions"),
+                Upload_AllowedDocumentExtensions = await _settings.GetValueAsync("Upload_AllowedDocumentExtensions"),
+                Upload_AutoRenameDuplicate = await _settings.GetBooleanAsync("Upload_AutoRenameDuplicate"),
+                Upload_KeepOriginalFilename = await _settings.GetBooleanAsync("Upload_KeepOriginalFilename"),
+                Upload_GenerateGUIDFilename = await _settings.GetBooleanAsync("Upload_GenerateGUIDFilename"),
+                Upload_GenerateDateFilename = await _settings.GetBooleanAsync("Upload_GenerateDateFilename")
             };
 
             return View("~/Views/Admin/CauHinh/Index.cshtml", model);
         }
 
-        // HÀM XỬ LÝ KHI BẤM NÚT "LƯU TẤT CẢ CÀI ĐẶT"
         [Route("")]
         [Route("Index")]
         [HttpPost]
@@ -51,49 +92,71 @@ namespace WebMTTQ.Controllers
         {
             if (ModelState.IsValid)
             {
-                SetConfigValue("TenCoQuan", model.TenCoQuan, "Tên cơ quan / tổ chức");
-                SetConfigValue("DiaChi", model.DiaChi, "Địa chỉ trụ sở");
-                SetConfigValue("SoDienThoai", model.SoDienThoai, "Số điện thoại liên hệ đường dây nóng");
-                SetConfigValue("Email", model.Email, "Hộp thư điện tử tiếp nhận");
-                SetConfigValue("GioLamViec", model.GioLamViec, "Giờ làm việc hành chính");
-                SetConfigValue("LinkFacebook", model.LinkFacebook, "Đường dẫn Fanpage Facebook");
-                SetConfigValue("LinkZalo", model.LinkZalo, "Đường dẫn Zalo OA");
-                SetConfigValue("BaoTriHeThong", model.BaoTriHeThong ? "1" : "0", "Chế độ bảo trì hệ thống (1=Bật, 0=Tắt)");
+                // --- Organization Information ---
+                await _settings.SetValueAsync("TenCoQuan", model.TenCoQuan, "Tên cơ quan / tổ chức");
+                await _settings.SetValueAsync("DiaChi", model.DiaChi, "Địa chỉ trụ sở");
+                await _settings.SetValueAsync("SoDienThoai", model.SoDienThoai, "Số điện thoại liên hệ đường dây nóng");
+                await _settings.SetValueAsync("Email", model.Email, "Hộp thư điện tử tiếp nhận");
+                await _settings.SetValueAsync("GioLamViec", model.GioLamViec, "Giờ làm việc hành chính");
 
-                await _context.SaveChangesAsync();
+                // --- Social Links ---
+                await _settings.SetValueAsync("LinkFacebook", model.LinkFacebook, "Đường dẫn Fanpage Facebook");
+                await _settings.SetValueAsync("LinkZalo", model.LinkZalo, "Đường dẫn Zalo OA");
 
-                TempData["SuccessMessage"] = "Đã lưu cài đặt hệ thống thành công!";
+                // --- Maintenance Mode ---
+                await _settings.SetValueAsync("BaoTriHeThong", model.BaoTriHeThong ? "1" : "0", "Chế độ bảo trì hệ thống (1=Bật, 0=Tắt)");
+
+                // --- Cloudflare R2 ---
+                await _settings.SetValueAsync("CloudflareR2_Enabled", model.CloudflareR2_Enabled ? "1" : "0", "Bật tài khoản lưu trữ Cloudflare R2");
+                await _settings.SetValueAsync("CloudflareR2_Endpoint", model.CloudflareR2_Endpoint, "Endpoint Cloudflare R2");
+                await _settings.SetValueAsync("CloudflareR2_BucketName", model.CloudflareR2_BucketName, "Tên Bucket Cloudflare R2");
+                await _settings.SetValueAsync("CloudflareR2_DefaultRegion", model.CloudflareR2_DefaultRegion, "Vùng mặc định (optional)");
+                await _settings.SetValueAsync("CloudflareR2_FolderStructure", model.CloudflareR2_FolderStructure, "Cấu trúc thư mục gốc");
+                await _settings.SetValueAsync("CloudflareR2_MaxUploadSize", model.CloudflareR2_MaxUploadSize.ToString(), "Kích thước tải lên tối đa (bytes)");
+                await _settings.SetValueAsync("CloudflareR2_AllowedExtensions", model.CloudflareR2_AllowedExtensions, "Định dạng tập tin cho phép");
+                await _settings.SetValueAsync("CloudflareR2_AutoImageOptimization", model.CloudflareR2_AutoImageOptimization ? "1" : "0", "Tự động tối ưu hình ảnh");
+                await _settings.SetValueAsync("CloudflareR2_AutoFileVersioning", model.CloudflareR2_AutoFileVersioning ? "1" : "0", "Tự động đánh phiên bản tập tin");
+                await _settings.SetValueAsync("CloudflareR2_RecycleBin", model.CloudflareR2_RecycleBin ? "1" : "0", "Bật thùng rác");
+
+                // Encrypted fields - only update if a new value is provided
+                if (!string.IsNullOrEmpty(model.CloudflareR2_AccessKey))
+                {
+                    await _settings.SetEncryptedValueAsync("CloudflareR2_AccessKey", model.CloudflareR2_AccessKey, "Access Key Cloudflare R2 (mã hóa)");
+                }
+                if (!string.IsNullOrEmpty(model.CloudflareR2_SecretKey))
+                {
+                    await _settings.SetEncryptedValueAsync("CloudflareR2_SecretKey", model.CloudflareR2_SecretKey, "Secret Key Cloudflare R2 (mã hóa)");
+                }
+
+                // --- Folder Configuration ---
+                await _settings.SetValueAsync("Folder_Documents", model.Folder_Documents, "Thư mục lưu tài liệu");
+                await _settings.SetValueAsync("Folder_Images", model.Folder_Images, "Thư mục lưu hình ảnh");
+                await _settings.SetValueAsync("Folder_Avatars", model.Folder_Avatars, "Thư mục lưu avatar");
+                await _settings.SetValueAsync("Folder_NewsImages", model.Folder_NewsImages, "Thư mục lưu ảnh tin tức");
+                await _settings.SetValueAsync("Folder_TempUpload", model.Folder_TempUpload, "Thư mục tải lên tạm thời");
+                await _settings.SetValueAsync("Folder_Backup", model.Folder_Backup, "Thư mục sao lưu");
+                await _settings.SetValueAsync("Folder_Export", model.Folder_Export, "Thư mục xuất dữ liệu");
+                await _settings.SetValueAsync("Folder_Archive", model.Folder_Archive, "Thư mục lưu trữ");
+
+                // --- Document Organization ---
+                await _settings.SetValueAsync("DocOrg_SeparateBy", model.DocOrg_SeparateBy, "Phân loại thư mục theo (None, Year, Month, Department, DocumentCategory, Combination)");
+
+                // --- Upload Rules ---
+                await _settings.SetValueAsync("Upload_MaxImageSize", model.Upload_MaxImageSize.ToString(), "Kích thước tối đa tập tin hình ảnh (bytes)");
+                await _settings.SetValueAsync("Upload_MaxDocumentSize", model.Upload_MaxDocumentSize.ToString(), "Kích thước tối đa tập tin tài liệu (bytes)");
+                await _settings.SetValueAsync("Upload_MaxTotalSize", model.Upload_MaxTotalSize.ToString(), "Tổng kích thước tải lên tối đa (bytes)");
+                await _settings.SetValueAsync("Upload_AllowedImageExtensions", model.Upload_AllowedImageExtensions, "Định dạng hình ảnh cho phép (VD: .jpg,.png,.gif)");
+                await _settings.SetValueAsync("Upload_AllowedDocumentExtensions", model.Upload_AllowedDocumentExtensions, "Định dạng tài liệu cho phép (VD: .pdf,.docx,.xlsx)");
+                await _settings.SetValueAsync("Upload_AutoRenameDuplicate", model.Upload_AutoRenameDuplicate ? "1" : "0", "Tự động đổi tên khi trùng lặp");
+                await _settings.SetValueAsync("Upload_KeepOriginalFilename", model.Upload_KeepOriginalFilename ? "1" : "0", "Giữ nguyên tên tập tin gốc");
+                await _settings.SetValueAsync("Upload_GenerateGUIDFilename", model.Upload_GenerateGUIDFilename ? "1" : "0", "Tạo tên tập tin theo GUID");
+                await _settings.SetValueAsync("Upload_GenerateDateFilename", model.Upload_GenerateDateFilename ? "1" : "0", "Tạo tên tập tin theo ngày tháng");
+
+                TempData["SuccessMessage"] = "Đã lưu tất cả cài đặt hệ thống thành công!";
                 return RedirectToAction(nameof(Index));
             }
 
             return View("~/Views/Admin/CauHinh/Index.cshtml", model);
-        }
-
-        // --- CÁC HÀM HỖ TRỢ ĐỌC/GHI XUỐNG DATABASE ---
-        private string GetConfigValue(System.Collections.Generic.List<CauHinhHeThong> configs, string key)
-        {
-            return configs.FirstOrDefault(c => c.MaCauHinh == key)?.GiaTriCauHinh ?? "";
-        }
-
-        private void SetConfigValue(string  key, string ? value, string ? description)
-        {
-            var config = _context.CauHinhHeThongs.FirstOrDefault(c => c.MaCauHinh == key);
-            if (config == null)
-            {
-                // Chưa có key này -> Thêm mới
-                _context.CauHinhHeThongs.Add(new CauHinhHeThong
-                {
-                    MaCauHinh =  key,
-                    GiaTriCauHinh = value ?? "",
-                    MoTa = description
-                });
-            }
-            else
-            {
-                // Đã có -> Sửa đè giá trị
-                config.GiaTriCauHinh = value ?? "";
-                config.MoTa = description;
-            }
         }
     }
 }

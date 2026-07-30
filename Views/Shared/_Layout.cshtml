@@ -92,15 +92,24 @@
                         <a href="#" class="nav-link dropdown-toggle @(isNews ? "is-active" : "")" role="button" aria-expanded="false">Danh mục Tin tức</a>
                         <ul class="dropdown-menu">
                             <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Tin tức</a></li>
-                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Dân chủ – pháp luật</a></li>
-                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Giám sát và phản biện</a></li>
-                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Bảo vệ nền tảng tư tưởng của Đảng Cộng Sản Việt Nam</a></li>
-                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Hoạt động của các tổ chức thành viên</a></li>
-                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Tuyên truyền vận động nhân dân</a></li>
-                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Vận động và phong trào</a></li>
+                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Mặt trận Tổ quốc</a></li>
+                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Đoàn Thanh niên</a></li>
+                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Hội Liên hiệp Phụ nữ</a></li>
+                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Hội Cựu Chiến binh</a></li>
+                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Công đoàn</a></li>
+                           
                         </ul>
                     </li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="CongThongTinAnSXH" asp-action="Index">Cổng thông tin an sinh xã hội</a></li>
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle @(isNews ? "is-active" : "")" role="button" aria-expanded="false">An sinh xã hội</a>
+                        <ul class="dropdown-menu">
+                            <li class="nav-item"><a class="dropdown-item" asp-controller="CongThongTinAnSXH" asp-action="Index">Cổng thông tin an sinh xã hội</a></li>
+                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Quỹ “Vì người nghèo”</a></li>
+                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Quỹ “Vì biển đảo quê hương, vì tuyến đầu Tổ quốc”</a></li>
+                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Quỹ “Cứu trợ”</a></li>  
+                        </ul>
+                    </li>
+
                     <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="UnderConstruction">Văn bản và tài liệu</a></li>
                     <li class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" role="button" aria-expanded="false">Ứng dụng Bản Đồ</a>

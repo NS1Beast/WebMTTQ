@@ -130,16 +130,18 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
 }
 .m26-nav .nav-link::after {
   content: '';
-  position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
-  width: 0; height: 2px;
+  position: absolute; bottom: 2px; left: .35rem;
+  width: calc(100% - .7rem); height: 2px;
   background: var(--m26-gold);
   border-radius: 1px;
-  transition: width .3s var(--ease);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform .3s var(--ease);
 }
 .m26-nav .nav-link:hover::after,
 .m26-nav .nav-link.is-active::after,
-.m26-nav li:hover > .nav-link::after { width: 60%; }
-.m26-nav .dropdown-toggle::after {
+.m26-nav li:hover > .nav-link::after { transform: scaleX(1); }
+/*.m26-nav .dropdown-toggle::after {
   content: "";
   display: inline-block;
   width: 0; height: 0;
@@ -149,7 +151,7 @@ button { font: inherit; cursor: pointer; border: none; background: none; }
   border-right: 3px solid transparent;
   border-left: 3px solid transparent;
   transition: transform .3s var(--ease);
-}
+}*/
 .m26-nav li:hover > .dropdown-toggle::after,
 .m26-nav li:focus-within > .dropdown-toggle::after {
   transform: rotate(180deg);

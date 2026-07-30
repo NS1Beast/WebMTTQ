@@ -1,42 +1,582 @@
 ﻿@model WebMTTQ.Models.CauHinhViewModel
 @{
-    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Trỏ đúng layout Admin của bạn
-    ViewData["Title"] = "Cài đặt hệ thống";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Trung tâm cấu hình hệ thống";
 }
 
+<div class="admin-page-header" style="margin-bottom: 20px;">
+    <div>
+        <h2><i class="fas fa-cogs"></i> Trung tâm cấu hình hệ thống</h2>
+        <div class="subtitle">Quản lý tất cả cài đặt, dịch vụ bên ngoài và quy tắc tải lên</div>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="admin-alert admin-alert-success">
+        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+    </div>
+}
+
+<form asp-action="Index" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="settings-container">
+
+        <!-- ============================================ -->
+        <!-- SECTION 1: THÔNG TIN CƠ QUAN                 -->
+        <!-- ============================================ -->
+        <div class="settings-section">
+            <div class="settings-header" onclick="toggleSection(this)">
+                <div class="settings-header-left">
+                    <i class="fas fa-building"></i>
+                    <span>Thông tin cơ quan & Liên hệ</span>
+                </div>
+                <div class="settings-header-right">
+                    <span class="settings-badge">Thông tin chung</span>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="settings-body">
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Tên Cơ quan / Tổ chức</label>
+                    <input asp-for="TenCoQuan" class="admin-form-control" placeholder="VD: Ủy ban MTTQ Việt Nam Phường Tân Định" />
+                </div>
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Địa chỉ trụ sở</label>
+                    <input asp-for="DiaChi" class="admin-form-control" placeholder="VD: Số 123 Đường ABC, Phường..." />
+                </div>
+                <div class="admin-form-row">
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Số điện thoại đường dây nóng</label>
+                        <input asp-for="SoDienThoai" class="admin-form-control" placeholder="VD: 028.38123456" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Địa chỉ Email</label>
+                        <input asp-for="Email" type="email" class="admin-form-control" placeholder="VD: mttq.tandinh@gmail.com" />
+                    </div>
+                </div>
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Giờ làm việc</label>
+                    <input asp-for="GioLamViec" class="admin-form-control" placeholder="VD: Thứ 2 - Thứ 6 (Sáng: 07:30 - 11:30 | Chiều: 13:00 - 17:00)" />
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SECTION 2: LIÊN KẾT MẠNG XÃ HỘI              -->
+        <!-- ============================================ -->
+        <div class="settings-section">
+            <div class="settings-header" onclick="toggleSection(this)">
+                <div class="settings-header-left">
+                    <i class="fas fa-share-alt"></i>
+                    <span>Liên kết Mạng xã hội</span>
+                </div>
+                <div class="settings-header-right">
+                    <span class="settings-badge">Social</span>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="settings-body">
+                <div class="admin-form-group">
+                    <label class="admin-form-label">
+                        <i class="fab fa-facebook" style="color: #1877F2;"></i> Đường dẫn Fanpage Facebook
+                    </label>
+                    <input asp-for="LinkFacebook" class="admin-form-control" placeholder="Nhập link trang Facebook của Phường" />
+                </div>
+                <div class="admin-form-group">
+                    <label class="admin-form-label">
+                        <i class="fas fa-comment-dots" style="color: #0180C7;"></i> Đường dẫn Zalo OA
+                    </label>
+                    <input asp-for="LinkZalo" class="admin-form-control" placeholder="Nhập link Zalo Official Account" />
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SECTION 3: BẢO TRÌ HỆ THỐNG                  -->
+        <!-- ============================================ -->
+        <div class="settings-section" style="border-left: 4px solid #dc3545;">
+            <div class="settings-header" onclick="toggleSection(this)">
+                <div class="settings-header-left">
+                    <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>
+                    <span>Bảo trì hệ thống</span>
+                </div>
+                <div class="settings-header-right">
+                    <span class="settings-badge warning">Security</span>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="settings-body">
+                <div class="toggle-group">
+                    <div class="toggle-group-info">
+                        <strong>Bật chế độ bảo trì</strong>
+                        <span>Tạm khóa website đối với người dân. Chỉ Admin mới xem được trang quản trị.</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" asp-for="BaoTriHeThong">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="admin-alert admin-alert-warning" style="margin-top: 12px;">
+                    <i class="fas fa-info-circle"></i>
+                    <b>Lưu ý:</b> Khi bật tính năng này, người dân truy cập vào trang chủ sẽ tự động bị chuyển hướng sang trang "Hệ thống đang nâng cấp".
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SECTION 4: DỊCH VỤ BÊN NGOÀI - CLOUDFLARE R2 -->
+        <!-- ============================================ -->
+        <div class="settings-section">
+            <div class="settings-header" onclick="toggleSection(this)">
+                <div class="settings-header-left">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>Dịch vụ lưu trữ đám mây - Cloudflare R2</span>
+                </div>
+                <div class="settings-header-right">
+                    <span class="settings-badge blue">External Service</span>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="settings-body">
+                <!-- Enable Toggle -->
+                <div class="toggle-group" style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--admin-line);">
+                    <div class="toggle-group-info">
+                        <strong>Bật Cloudflare R2</strong>
+                        <span>Kích hoạt dịch vụ lưu trữ đám mây Cloudflare R2 cho hệ thống quản lý tài liệu.</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" asp-for="CloudflareR2_Enabled">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="admin-form-row">
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Endpoint</label>
+                        <input asp-for="CloudflareR2_Endpoint" class="admin-form-control" placeholder="VD: https://<accountid>.r2.cloudflarestorage.com" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Bucket Name</label>
+                        <input asp-for="CloudflareR2_BucketName" class="admin-form-control" placeholder="VD: mttq-documents" />
+                    </div>
+                </div>
+
+                <div class="admin-form-row">
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Access Key</label>
+                        <div class="password-field-wrapper">
+                            <input asp-for="CloudflareR2_AccessKey" type="password" class="admin-form-control" placeholder="@(Model.CloudflareR2_AccessKey_Display == "**************" ? "**************" : "Nhập Access Key")" autocomplete="off" />
+                            @if (Model.CloudflareR2_AccessKey_Display == "**************")
+                            {
+                                <span class="field-status configured">Đã cấu hình</span>
+                            }
+                        </div>
+                        <span class="admin-form-hint">Để trống nếu không muốn thay đổi giá trị hiện tại.</span>
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Secret Key</label>
+                        <div class="password-field-wrapper">
+                            <input asp-for="CloudflareR2_SecretKey" type="password" class="admin-form-control" placeholder="@(Model.CloudflareR2_SecretKey_Display == "**************" ? "**************" : "Nhập Secret Key")" autocomplete="off" />
+                            @if (Model.CloudflareR2_SecretKey_Display == "**************")
+                            {
+                                <span class="field-status configured">Đã cấu hình</span>
+                            }
+                        </div>
+                        <span class="admin-form-hint">Để trống nếu không muốn thay đổi giá trị hiện tại.</span>
+                    </div>
+                </div>
+
+                <div class="admin-form-row">
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Default Region <span style="color: #999;">(không bắt buộc)</span></label>
+                        <input asp-for="CloudflareR2_DefaultRegion" class="admin-form-control" placeholder="VD: auto, us-east-1" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Cấu trúc thư mục gốc</label>
+                        <input asp-for="CloudflareR2_FolderStructure" class="admin-form-control" placeholder="VD: mttq-uploads/" />
+                    </div>
+                </div>
+
+                <div class="admin-form-row">
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Kích thước tải lên tối đa (bytes)</label>
+                        <input asp-for="CloudflareR2_MaxUploadSize" type="number" class="admin-form-control" placeholder="VD: 104857600 (100MB)" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Định dạng tập tin cho phép</label>
+                        <input asp-for="CloudflareR2_AllowedExtensions" class="admin-form-control" placeholder="VD: .jpg,.jpeg,.png,.gif,.pdf,.docx" />
+                    </div>
+                </div>
+
+                <div class="toggle-group" style="margin-top: 10px;">
+                    <div class="toggle-group-info">
+                        <strong>Tự động tối ưu hình ảnh</strong>
+                        <span>Tự động nén và tối ưu hình ảnh khi tải lên.</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" asp-for="CloudflareR2_AutoImageOptimization">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-group">
+                    <div class="toggle-group-info">
+                        <strong>Tự động đánh phiên bản tập tin</strong>
+                        <span>Giữ lại các phiên bản cũ khi cập nhật tập tin.</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" asp-for="CloudflareR2_AutoFileVersioning">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-group">
+                    <div class="toggle-group-info">
+                        <strong>Bật thùng rác</strong>
+                        <span>Cho phép khôi phục tập tin đã xóa trong vòng 30 ngày.</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" asp-for="CloudflareR2_RecycleBin">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SECTION 5: CẤU HÌNH THƯ MỤC                  -->
+        <!-- ============================================ -->
+        <div class="settings-section">
+            <div class="settings-header" onclick="toggleSection(this)">
+                <div class="settings-header-left">
+                    <i class="fas fa-folder-open"></i>
+                    <span>Cấu hình thư mục</span>
+                </div>
+                <div class="settings-header-right">
+                    <span class="settings-badge green">Storage</span>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="settings-body">
+                <p style="color: var(--admin-muted); margin-bottom: 16px;">
+                    <i class="fas fa-info-circle"></i> Cấu hình các thư mục lưu trữ. Các dịch vụ tải lên sẽ sử dụng giá trị đã cấu hình ở đây.
+                </p>
+                <div class="admin-form-row">
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Thư mục tài liệu</label>
+                        <input asp-for="Folder_Documents" class="admin-form-control" placeholder="VD: documents/" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Thư mục hình ảnh</label>
+                        <input asp-for="Folder_Images" class="admin-form-control" placeholder="VD: images/" />
+                    </div>
+                </div>
+                <div class="admin-form-row">
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Thư mục Avatar</label>
+                        <input asp-for="Folder_Avatars" class="admin-form-control" placeholder="VD: avatars/" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Thư mục ảnh tin tức</label>
+                        <input asp-for="Folder_NewsImages" class="admin-form-control" placeholder="VD: news/" />
+                    </div>
+                </div>
+                <div class="admin-form-row">
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Thư mục tải lên tạm thời</label>
+                        <input asp-for="Folder_TempUpload" class="admin-form-control" placeholder="VD: temp/" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Thư mục sao lưu</label>
+                        <input asp-for="Folder_Backup" class="admin-form-control" placeholder="VD: backup/" />
+                    </div>
+                </div>
+                <div class="admin-form-row">
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Thư mục xuất dữ liệu</label>
+                        <input asp-for="Folder_Export" class="admin-form-control" placeholder="VD: export/" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Thư mục lưu trữ</label>
+                        <input asp-for="Folder_Archive" class="admin-form-control" placeholder="VD: archive/" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SECTION 6: TỔ CHỨC TÀI LIỆU                  -->
+        <!-- ============================================ -->
+        <div class="settings-section">
+            <div class="settings-header" onclick="toggleSection(this)">
+                <div class="settings-header-left">
+                    <i class="fas fa-sitemap"></i>
+                    <span>Tổ chức tài liệu</span>
+                </div>
+                <div class="settings-header-right">
+                    <span class="settings-badge purple">Organization</span>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="settings-body">
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Phân chia thư mục theo</label>
+                    <select asp-for="DocOrg_SeparateBy" class="admin-form-control">
+                        <option value="">-- Chọn phương thức --</option>
+                        <option value="None">Không phân chia</option>
+                        <option value="Year">Theo năm (VD: documents/2026/)</option>
+                        <option value="Month">Theo tháng (VD: documents/2026/07/)</option>
+                        <option value="Department">Theo phòng ban (VD: documents/Finance/)</option>
+                        <option value="DocumentCategory">Theo danh mục tài liệu (VD: documents/AnSinhXaHoi/)</option>
+                        <option value="Combination">Kết hợp (VD: documents/Finance/2026/)</option>
+                    </select>
+                    <span class="admin-form-hint">Cấu trúc thư mục sẽ tự động được tạo dựa trên lựa chọn này.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SECTION 7: QUY TẮC TẢI LÊN                   -->
+        <!-- ============================================ -->
+        <div class="settings-section">
+            <div class="settings-header" onclick="toggleSection(this)">
+                <div class="settings-header-left">
+                    <i class="fas fa-upload"></i>
+                    <span>Quy tắc tải lên</span>
+                </div>
+                <div class="settings-header-right">
+                    <span class="settings-badge">Upload Rules</span>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="settings-body">
+                <div class="admin-form-row">
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Kích thước tối đa hình ảnh (bytes)</label>
+                        <input asp-for="Upload_MaxImageSize" type="number" class="admin-form-control" placeholder="VD: 5242880 (5MB)" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Kích thước tối đa tài liệu (bytes)</label>
+                        <input asp-for="Upload_MaxDocumentSize" type="number" class="admin-form-control" placeholder="VD: 10485760 (10MB)" />
+                    </div>
+                </div>
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Tổng kích thước tải lên tối đa (bytes)</label>
+                    <input asp-for="Upload_MaxTotalSize" type="number" class="admin-form-control" placeholder="VD: 104857600 (100MB)" />
+                </div>
+                <div class="admin-form-row">
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Định dạng hình ảnh cho phép</label>
+                        <input asp-for="Upload_AllowedImageExtensions" class="admin-form-control" placeholder="VD: .jpg,.jpeg,.png,.gif,.webp" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Định dạng tài liệu cho phép</label>
+                        <input asp-for="Upload_AllowedDocumentExtensions" class="admin-form-control" placeholder="VD: .pdf,.docx,.xlsx,.pptx" />
+                    </div>
+                </div>
+
+                <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--admin-line);">
+                    <h4 style="margin: 0 0 12px; font-size: 0.9rem; color: var(--admin-ink);">Quy tắc đặt tên tập tin</h4>
+
+                    <div class="toggle-group">
+                        <div class="toggle-group-info">
+                            <strong>Tự động đổi tên khi trùng lặp</strong>
+                            <span>Thêm số thứ tự vào tên tập tin nếu đã tồn tại.</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" asp-for="Upload_AutoRenameDuplicate">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-group">
+                        <div class="toggle-group-info">
+                            <strong>Giữ nguyên tên tập tin gốc</strong>
+                            <span>Sử dụng tên gốc của tập tin khi tải lên.</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" asp-for="Upload_KeepOriginalFilename">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-group">
+                        <div class="toggle-group-info">
+                            <strong>Tạo tên tập tin theo GUID</strong>
+                            <span>Tạo tên duy nhất toàn cầu cho mỗi tập tin (VD: a1b2c3d4-e5f6-7890.pdf).</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" asp-for="Upload_GenerateGUIDFilename">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-group">
+                        <div class="toggle-group-info">
+                            <strong>Tạo tên tập tin theo ngày tháng</strong>
+                            <span>Tạo tên theo định dạng ngày tháng (VD: 20260730_143022.pdf).</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" asp-for="Upload_GenerateDateFilename">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SAVE BUTTON                                  -->
+        <!-- ============================================ -->
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+            <button type="submit" class="admin-btn admin-btn-success" style="padding: 14px 36px; font-size: 1rem; border-radius: 12px;">
+                <i class="fas fa-save"></i> LƯU TẤT CẢ CÀI ĐẶT
+            </button>
+        </div>
+
+    </div>
+</form>
+
 <style>
+    /* ===== SETTINGS CONTAINER ===== */
+    .settings-container {
+        max-width: 960px;
+    }
+
+    /* ===== SETTINGS SECTION ===== */
     .settings-section {
         background: #fff;
         border-radius: 12px;
-        padding: 30px;
-        margin-bottom: 30px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        margin-bottom: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        border: 1px solid #eae5e1;
+        overflow: hidden;
+        transition: box-shadow 0.2s ease;
+    }
+    .settings-section:hover {
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
     }
 
-    .settings-title {
-        font-size: 1.2rem;
-        color: #8b1a2b; /* Màu đỏ Admin */
-        margin-top: 0;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #eee;
-        font-weight: bold;
+    /* ===== SETTINGS HEADER ===== */
+    .settings-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 20px;
+        cursor: pointer;
+        user-select: none;
+        transition: background 0.2s ease;
+    }
+    .settings-header:hover {
+        background: #fcfaf9;
+    }
+    .settings-header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--admin-ink, #1e1a1d);
+    }
+    .settings-header-left i {
+        width: 20px;
+        text-align: center;
+        color: var(--admin-red, #8b1a2b);
+        font-size: 1.1rem;
+    }
+    .settings-header-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .settings-badge {
+        display: inline-flex;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        background: rgba(139, 26, 43, 0.08);
+        color: var(--admin-red, #8b1a2b);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .settings-badge.warning {
+        background: rgba(245, 158, 11, 0.12);
+        color: #b45309;
+    }
+    .settings-badge.blue {
+        background: rgba(59, 130, 246, 0.10);
+        color: #2563eb;
+    }
+    .settings-badge.green {
+        background: rgba(16, 185, 129, 0.10);
+        color: #059669;
+    }
+    .settings-badge.purple {
+        background: rgba(139, 92, 246, 0.10);
+        color: #7c3aed;
+    }
+    .settings-badge.gray {
+        background: #f0f0f0;
+        color: #6b7280;
+    }
+    .toggle-icon {
+        font-size: 0.85rem;
+        color: #b0a8a8;
+        transition: transform 0.25s ease;
+    }
+    .settings-header.collapsed .toggle-icon {
+        transform: rotate(-90deg);
     }
 
-    /* CSS Cho nút Switch Bật/Tắt (Toggle) */
+    /* ===== SETTINGS BODY ===== */
+    .settings-body {
+        padding: 0 20px 20px;
+    }
+    .settings-header.collapsed + .settings-body {
+        display: none;
+    }
+
+    /* ===== TOGGLE GROUP ===== */
+    .toggle-group {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        gap: 20px;
+    }
+    .toggle-group + .toggle-group {
+        border-top: 1px solid #f0ece8;
+    }
+    .toggle-group-info {
+        flex: 1;
+    }
+    .toggle-group-info strong {
+        display: block;
+        font-size: 0.85rem;
+        color: var(--admin-ink, #1e1a1d);
+        margin-bottom: 2px;
+    }
+    .toggle-group-info span {
+        font-size: 0.78rem;
+        color: var(--admin-muted, #7a6e72);
+    }
+
+    /* ===== SWITCH ===== */
     .switch {
         position: relative;
         display: inline-block;
         width: 50px;
         height: 24px;
+        flex-shrink: 0;
     }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
     .slider {
         position: absolute;
         cursor: pointer;
@@ -45,124 +585,75 @@
         right: 0;
         bottom: 0;
         background-color: #ccc;
-        transition: .4s;
+        transition: .3s;
         border-radius: 24px;
     }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .3s;
+        border-radius: 50%;
+    }
     input:checked + .slider {
-        background-color: #dc3545; /* Đỏ khi bật bảo trì */
+        background-color: #10b981;
+    }
+    input:checked + .slider:before {
+        transform: translateX(26px);
     }
 
-        input:checked + .slider:before {
-            transform: translateX(26px);
+    /* ===== PASSWORD FIELD ===== */
+    .password-field-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .password-field-wrapper .admin-form-control {
+        flex: 1;
+    }
+    .field-status.configured {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        background: rgba(16, 185, 129, 0.10);
+        color: #059669;
+        white-space: nowrap;
+    }
+    .field-status.configured::before {
+        content: "✓";
+        font-weight: 700;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @@media (max-width: 768px) {
+        .settings-container {
+            max-width: 100%;
         }
+        .settings-header {
+            padding: 14px 16px;
+        }
+        .settings-body {
+            padding: 0 16px 16px;
+        }
+        .settings-header-left {
+            font-size: 0.85rem;
+        }
+        .settings-badge {
+            display: none;
+        }
+    }
 </style>
 
-<div class="admin-page-header" style="margin-bottom: 20px;">
-    <div>
-        <h2>⚙️ Cài đặt hệ thống</h2>
-        <div class="subtitle">Cấu hình các thông tin chung của Website</div>
-    </div>
-</div>
-
-@if (TempData["SuccessMessage"] != null)
-{
-    <div style="background:#d4edda; color:#155724; padding:15px; border-radius:12px; margin-bottom:20px;">
-        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
-    </div>
-}
-
-<form asp-action="Index" method="post">
-    @Html.AntiForgeryToken()
-
-    <div class="asxh-row">
-        <div class="asxh-col-8">
-            <div class="settings-section">
-                <h3 class="settings-title"><i class="fas fa-building"></i> Thông tin Cơ quan & Liên hệ</h3>
-
-                <div class="admin-form-group" style="margin-bottom: 15px;">
-                    <label class="admin-form-label">Tên Cơ quan / Tổ chức</label>
-                    <input asp-for="TenCoQuan" class="admin-form-control" placeholder="VD: Ủy ban MTTQ Việt Nam Phường Tân Định" />
-                </div>
-
-                <div class="admin-form-group" style="margin-bottom: 15px;">
-                    <label class="admin-form-label">Địa chỉ trụ sở</label>
-                    <input asp-for="DiaChi" class="admin-form-control" placeholder="VD: Số 123 Đường ABC, Phường..." />
-                </div>
-
-                <div class="asxh-row">
-                    <div class="asxh-col-6 form-group" style="margin-bottom: 15px;">
-                        <label class="admin-form-label">Số điện thoại đường dây nóng</label>
-                        <input asp-for="SoDienThoai" class="admin-form-control" placeholder="VD: 028.38123456" />
-                    </div>
-                    <div class="asxh-col-6 form-group" style="margin-bottom: 15px;">
-                        <label class="admin-form-label">Địa chỉ Email</label>
-                        <input asp-for="Email" type="email" class="admin-form-control" placeholder="VD: mttq.tandinh@gmail.com" />
-                    </div>
-                </div>
-
-                <div class="admin-form-group" style="margin-bottom: 15px;">
-                    <label class="admin-form-label">Giờ làm việc</label>
-                    <input asp-for="GioLamViec" class="admin-form-control" placeholder="VD: Thứ 2 - Thứ 6 (Sáng: 07:30 - 11:30 | Chiều: 13:00 - 17:00)" />
-                </div>
-            </div>
-
-            <div class="settings-section">
-                <h3 class="settings-title"><i class="fas fa-share-alt"></i> Liên kết Mạng xã hội</h3>
-
-                <div class="admin-form-group" style="margin-bottom: 15px;">
-                    <label class="admin-form-label">Đường dẫn Fanpage Facebook</label>
-                    <div style="display:flex; align-items:center; gap: 10px;">
-                        <i class="fab fa-facebook" style="font-size: 24px; color: #1877F2;"></i>
-                        <input asp-for="LinkFacebook" class="admin-form-control" placeholder="Nhập link trang Facebook của Phường" style="flex:1;" />
-                    </div>
-                </div>
-
-                <div class="admin-form-group" style="margin-bottom: 15px;">
-                    <label class="admin-form-label">Đường dẫn Zalo OA</label>
-                    <div style="display:flex; align-items:center; gap: 10px;">
-                        <i class="fas fa-comment-dots" style="font-size: 24px; color: #0180C7;"></i>
-                        <input asp-for="LinkZalo" class="admin-form-control" placeholder="Nhập link Zalo Official Account" style="flex:1;" />
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="asxh-col-4">
-            <div class="settings-section" style="background: #fffcfc; border: 1px solid #fbe2e2;">
-                <h3 class="settings-title"><i class="fas fa-exclamation-triangle"></i> Quản lý bảo trì</h3>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <div>
-                        <strong style="display: block; color: #333;">Bật chế độ bảo trì</strong>
-                        <span style="font-size: 0.85rem; color: #888;">Tạm khóa website đối với người dân.</span>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" asp-for="BaoTriHeThong">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div style="background: #fff3cd; color: #856404; padding: 12px; border-radius: 8px; font-size: 0.85rem;">
-                    <i class="fas fa-info-circle"></i> <b>Lưu ý:</b> Khi bật tính năng này, người dân truy cập vào trang chủ sẽ tự động bị chuyển hướng sang trang "Hệ thống đang nâng cấp". Chỉ Admin mới xem được trang quản trị.
-                </div>
-            </div>
-
-            <button type="submit" class="admin-btn admin-btn-success" style="width: 100%; padding: 15px; font-size: 1.1rem; border-radius: 12px; background: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);">
-                <i class="fas fa-save"></i> LƯU TẤT CẢ CÀI ĐẶT
-            </button>
-        </div>
-    </div>
-</form>
+<script>
+    function toggleSection(header) {
+        header.classList.toggle('collapsed');
+    }
+</script>

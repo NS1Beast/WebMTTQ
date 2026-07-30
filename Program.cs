@@ -1,14 +1,23 @@
 using Microsoft.EntityFrameworkCore;
 using WebMTTQ.Models;
+using WebMTTQ.Services;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // 1. Đọc chuỗi kết nối từ appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 // 2. Cấu hình DbContext với chuỗi kết nối
-// SỬA LẠI THÀNH NHƯ SAU TRONG PROGRAM.CS:
 builder.Services.AddDbContext<DataMTTQContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// 3. Đăng ký Data Protection để mã hóa các giá trị nhạy cảm
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(builder.Environment.ContentRootPath, "Keys")));
+
+// 4. Đăng ký System Settings Service
+builder.Services.AddScoped<ISystemSettingsService, SystemSettingsService>();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddMemoryCache();
@@ -44,5 +53,12 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+// 5. Seed configuration keys at startup
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<DataMTTQContext>();
+    await SystemSettingsSeeder.SeedAsync(context);
+}
 
 app.Run();

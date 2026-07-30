@@ -113,41 +113,56 @@ namespace WebMTTQ.Controllers
                 ViewBag.DanhSachChamLo = chamLoData.DanhSachChamLo;
                 ViewBag.ListNhomDonVi = chamLoData.ListNhomDonVi;
 
-                // 6. TỐI ƯU BẢN ĐỒ (Dùng Cache cho JSON bản đồ để tải web nhanh hơn)
-                if (!_cache.TryGetValue("BanDoData", out BanDoCacheDto? banDoData) || banDoData == null)
+                // ===== TẠM ẨN BẢN ĐỒ: Để phát triển lại sau này =====
+                // Đặt flag false để ẩn bản đồ, khi cần hiện lại thì đổi thành true
+                ViewBag.HienThiBanDo = false;
+
+                if (ViewBag.HienThiBanDo == true)
                 {
-                    var rawData = await _context.DiaDiemBanDos
-                                                .AsNoTracking()
-                                                .Where(x => x.DaXoa != true)
-                                                .OrderByDescending(x => x.NgayThucHien)
-                                                .ToListAsync();
-
-                    var mapList = rawData.Select(x => new {
-                        id = x.IddiaDiem,
-                        ten = x.TenDiaDiem,
-                        phanLoai = x.PhanLoaiBanDo,
-                        viDo = x.ViDo,
-                        kinhDo = x.KinhDo,
-                        moTa = x.MoTaChiTiet ?? "",
-                        ngay = x.NgayThucHien.HasValue ? x.NgayThucHien.Value.ToString("dd/MM/yyyy") : "Đang cập nhật",
-                        diaChi = x.DiaChi ?? "",
-                        hinhAnh = x.HinhAnhThucTe != null ? "data:image/jpeg;base64," + Convert.ToBase64String(x.HinhAnhThucTe) : ""
-                    }).ToList();
-
-                    banDoData = new BanDoCacheDto
+                    // 6. TỐI ƯU BẢN ĐỒ (Dùng Cache cho JSON bản đồ để tải web nhanh hơn)
+                    if (!_cache.TryGetValue("BanDoData", out BanDoCacheDto? banDoData) || banDoData == null)
                     {
-                        TongDiaDiem = rawData.Count,
-                        NhomDonVi = rawData.Select(x => x.PhanLoaiBanDo).Distinct().Count(),
-                        DanhSachNhom = rawData.Select(x => x.PhanLoaiBanDo).Distinct().ToList(),
-                        MapDataJson = System.Text.Json.JsonSerializer.Serialize(mapList)
-                    };
-                    _cache.Set("BanDoData", banDoData, TimeSpan.FromMinutes(30)); // Đợi 30p mới query DB lại
-                }
+                        var rawData = await _context.DiaDiemBanDos
+                                                    .AsNoTracking()
+                                                    .Where(x => x.DaXoa != true)
+                                                    .OrderByDescending(x => x.NgayThucHien)
+                                                    .ToListAsync();
 
-                ViewBag.TongDiaDiem = banDoData.TongDiaDiem;
-                ViewBag.NhomDonVi = banDoData.NhomDonVi;
-                ViewBag.DanhSachNhom = banDoData.DanhSachNhom;
-                ViewBag.MapDataJson = banDoData.MapDataJson;
+                        var mapList = rawData.Select(x => new {
+                            id = x.IddiaDiem,
+                            ten = x.TenDiaDiem,
+                            phanLoai = x.PhanLoaiBanDo,
+                            viDo = x.ViDo,
+                            kinhDo = x.KinhDo,
+                            moTa = x.MoTaChiTiet ?? "",
+                            ngay = x.NgayThucHien.HasValue ? x.NgayThucHien.Value.ToString("dd/MM/yyyy") : "Đang cập nhật",
+                            diaChi = x.DiaChi ?? "",
+                            hinhAnh = x.HinhAnhThucTe != null ? "data:image/jpeg;base64," + Convert.ToBase64String(x.HinhAnhThucTe) : ""
+                        }).ToList();
+
+                        banDoData = new BanDoCacheDto
+                        {
+                            TongDiaDiem = rawData.Count,
+                            NhomDonVi = rawData.Select(x => x.PhanLoaiBanDo).Distinct().Count(),
+                            DanhSachNhom = rawData.Select(x => x.PhanLoaiBanDo).Distinct().ToList(),
+                            MapDataJson = System.Text.Json.JsonSerializer.Serialize(mapList)
+                        };
+                        _cache.Set("BanDoData", banDoData, TimeSpan.FromMinutes(30)); // Đợi 30p mới query DB lại
+                    }
+
+                    ViewBag.TongDiaDiem = banDoData.TongDiaDiem;
+                    ViewBag.NhomDonVi = banDoData.NhomDonVi;
+                    ViewBag.DanhSachNhom = banDoData.DanhSachNhom;
+                    ViewBag.MapDataJson = banDoData.MapDataJson;
+                }
+                else
+                {
+                    // Gán giá trị rỗng khi ẩn bản đồ
+                    ViewBag.TongDiaDiem = 0;
+                    ViewBag.NhomDonVi = 0;
+                    ViewBag.DanhSachNhom = new List<string>();
+                    ViewBag.MapDataJson = "[]";
+                }
             }
             catch (Exception ex)
             {
@@ -180,6 +195,7 @@ namespace WebMTTQ.Controllers
                 ViewBag.NhomDonVi = 0;
                 ViewBag.DanhSachNhom = new List<string>();
                 ViewBag.MapDataJson = "[]";
+                ViewBag.HienThiBanDo = false;
             }
 
             return View();
