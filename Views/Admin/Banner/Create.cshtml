@@ -5,18 +5,26 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<div class="admin-card" style="background:#fff; padding:30px; border-radius:12px; max-width: 800px; margin: 0 auto; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
-    <h2 style="margin-bottom: 25px; color: #333; border-bottom: 1px solid #eee; padding-bottom: 15px;">Thêm Banner Trang Chủ</h2>
+<div class="admin-card" style="background:#fff; padding:30px; border-radius:12px; max-width: 900px; margin: 0 auto; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+        <a href="@Url.Action("Index", "AdminBanner")" style="color: #666; text-decoration: none; font-size: 1.2rem;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 style="margin: 0; color: #333;">Thêm Banner Trang Chủ</h2>
+    </div>
 
-    <!-- THÊM enctype="multipart/form-data" ĐỂ UPLOAD FILE -->
     <form asp-action="Create" method="post" enctype="multipart/form-data">
-
-        <div style="margin-bottom: 20px;">
-            <label style="display: block; font-weight: bold; margin-bottom: 8px;">Tiêu đề Banner <span style="color:red;">*</span></label>
-            <input asp-for="TieuDe" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;" required placeholder="Nhập tiêu đề (vd: Chào mừng đại hội...)" />
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div>
+                <label style="display: block; font-weight: bold; margin-bottom: 8px;">Tiêu đề Banner <span style="color:red;">*</span></label>
+                <input asp-for="TieuDe" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;" required placeholder="Nhập tiêu đề (vd: Chào mừng đại hội...)" />
+            </div>
+            <div>
+                <label style="display: block; font-weight: bold; margin-bottom: 8px;">Mô tả / Chú thích</label>
+                <input asp-for="MoTa" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;" placeholder="Mô tả ngắn hiển thị trên banner..." />
+            </div>
         </div>
 
-        <!-- FILE UPLOAD THAY CHO TEXT -->
         <div style="margin-bottom: 20px;">
             <label style="display: block; font-weight: bold; margin-bottom: 8px;">Chọn Hình ảnh (Tối đa 3MB) <span style="color:red;">*</span></label>
             <input type="file" name="FileAnh" id="FileAnh" accept="image/*" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;" required />
@@ -33,7 +41,7 @@
             <input asp-for="LienKet" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;" placeholder="Nhập đường dẫn trang web muốn chuyển tới..." />
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
             <div>
                 <label style="display: block; font-weight: bold; margin-bottom: 8px;">Vị trí sắp xếp</label>
                 <input asp-for="ThuTu" type="number" value="1" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;" />
@@ -47,27 +55,58 @@
             </div>
         </div>
 
-        <div style="display: flex; gap: 15px;">
-            <button type="submit" style="background: #28a745; color: white; border: none; padding: 12px 25px; border-radius: 6px; font-weight: bold; cursor: pointer;">Lưu Banner</button>
+        <!-- Advanced Settings -->
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3 style="margin: 0 0 15px; font-size: 1rem; color: #555; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-sliders-h"></i> Cài đặt hiệu ứng nâng cao
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem;">Hiệu ứng chuyển</label>
+                    <select asp-for="HieuUng" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
+                        <option value="slide">Trượt ngang (Slide)</option>
+                        <option value="fade">Mờ dần (Fade)</option>
+                        <option value="zoom">Thu phóng (Zoom)</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem;">Tốc độ chuyển (ms)</label>
+                    <input asp-for="TocDo" type="number" min="200" step="100" value="600" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;" />
+                    <small style="color: #888;">Càng nhỏ càng nhanh</small>
+                </div>
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem;">Thời gian dừng (ms)</label>
+                    <input asp-for="ThoiGianDung" type="number" min="1000" step="500" value="5000" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;" />
+                    <small style="color: #888;">Thời gian hiển thị mỗi slide</small>
+                </div>
+            </div>
+            <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <label style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem;">Màu nền (khi ảnh chưa tải)</label>
+                    <input asp-for="MauNen" type="color" value="#1a1a2e" class="form-control" style="width: 100%; padding: 4px; border: 1px solid #ccc; border-radius: 6px; height: 40px;" />
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 15px; justify-content: flex-end;">
             <a href="@Url.Action("Index", "AdminBanner")" style="background: #6c757d; color: white; padding: 12px 25px; border-radius: 6px; text-decoration: none; font-weight: bold;">Hủy / Quay lại</a>
+            <button type="submit" style="background: #28a745; color: white; border: none; padding: 12px 25px; border-radius: 6px; font-weight: bold; cursor: pointer;">
+                <i class="fas fa-save"></i> Lưu Banner
+            </button>
         </div>
     </form>
 </div>
 
-<!-- JAVASCRIPT KIỂM TRA FILE VÀ XEM TRƯỚC -->
 <script>
     document.getElementById('FileAnh').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
-            // Kiểm tra dung lượng (3MB = 3 * 1024 * 1024)
             if (file.size > 3145728) {
                 alert('Dung lượng ảnh vượt quá 3MB. Vui lòng chọn ảnh nhẹ hơn.');
-                this.value = ''; // Reset input
+                this.value = '';
                 document.getElementById('previewContainer').style.display = 'none';
                 return;
             }
-
-            // Hiển thị ảnh xem trước
             const reader = new FileReader();
             reader.onload = function(e) {
                 document.getElementById('imagePreview').src = e.target.result;

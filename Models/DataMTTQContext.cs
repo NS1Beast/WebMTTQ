@@ -31,6 +31,8 @@ public partial class DataMTTQContext : DbContext
     public virtual DbSet<DonXinHoTro> DonXinHoTros { get; set; }
     public virtual DbSet<HopThuGopY> HopThuGopies { get; set; }
     public DbSet<Banner> Banners { get; set; }
+    public DbSet<TrangChuMuc> TrangChuMucs { get; set; }
+    public DbSet<TrangChuTinTuc> TrangChuTinTucs { get; set; }
     public virtual DbSet<KhoanDongGop> KhoanDongGops { get; set; }
     public virtual DbSet<LuotTraoTang> LuotTraoTangs { get; set; }
     public virtual DbSet<NguoiCanGiupDo> NguoiCanGiupDos { get; set; }

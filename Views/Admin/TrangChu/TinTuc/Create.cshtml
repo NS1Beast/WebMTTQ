@@ -1,0 +1,98 @@
+@model WebMTTQ.Models.TrangChuTinTuc
+
+@{
+    ViewData["Title"] = "Thêm tin tức - Trang chủ";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var sec = ViewBag.Section as WebMTTQ.Models.TrangChuMuc;
+}
+
+<div class="admin-card" style="background:#fff; padding:30px; border-radius:12px; max-width: 900px; margin: 0 auto; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+        <a href="@Url.Action("TinTucList", "AdminTrangChu", new { id = sec.Id })" style="color: #666; text-decoration: none; font-size: 1.2rem;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 style="margin: 0; color: #333; font-size: 1.4rem;">Thêm tin tức cho mục: @sec.TieuDe</h2>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <div asp-validation-summary="All"></div>
+        </div>
+    }
+
+    <form asp-action="TinTucCreate" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="sectionId" value="@sec.Id" />
+
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label asp-for="TieuDe" style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">Tiêu đề tin tức <span style="color:red;">*</span></label>
+            <input asp-for="TieuDe" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" placeholder="Nhập tiêu đề tin tức..." required />
+            <span asp-validation-for="TieuDe" style="color: #dc3545; font-size: 0.85rem;"></span>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label asp-for="TomTat" style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">Tóm tắt</label>
+            <textarea asp-for="TomTat" class="form-control" rows="3" style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" placeholder="Nhập tóm tắt ngắn gọn..."></textarea>
+            <span asp-validation-for="TomTat" style="color: #dc3545; font-size: 0.85rem;"></span>
+        </div>
+
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="form-group">
+                <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">Hình ảnh đại diện</label>
+                <input type="file" name="FileAnh" id="FileAnh" class="form-control" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: white;" />
+                <small style="color: #888;">Chấp nhận JPG, PNG, GIF. Tối đa 5MB.</small>
+                <div id="imagePreview" style="margin-top: 10px; display: none;">
+                    <img id="previewImg" src="#" alt="Preview" style="max-width: 200px; max-height: 120px; border-radius: 6px; border: 1px solid #ddd;" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="LienKet" style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">Liên kết</label>
+                <input asp-for="LienKet" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" placeholder="Nhập liên kết nếu có..." />
+                <span asp-validation-for="LienKet" style="color: #dc3545; font-size: 0.85rem;"></span>
+                <small style="color: #888;">Để trống nếu không cần liên kết.</small>
+            </div>
+        </div>
+
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div class="form-group">
+                <label asp-for="ThuTu" style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">Thứ tự hiển thị</label>
+                <input asp-for="ThuTu" class="form-control" type="number" min="0" value="0" style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" />
+                <small style="color: #888;">Số càng nhỏ hiển thị càng trước.</small>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="TrangThai" style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">Trạng thái</label>
+                <select asp-for="TrangThai" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: white;">
+                    <option value="true">Hiển thị</option>
+                    <option value="false">Ẩn</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid #eee; padding-top: 20px;">
+            <a href="@Url.Action("TinTucList", "AdminTrangChu", new { id = sec.Id })" class="btn" style="padding: 10px 24px; border: 1px solid #ddd; border-radius: 6px; text-decoration: none; color: #666; font-weight: 500;">Hủy</a>
+            <button type="submit" class="btn" style="padding: 10px 24px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                <i class="fas fa-save"></i> Lưu tin tức
+            </button>
+        </div>
+    </form>
+</div>
+@section Scripts {
+    <script>
+        document.getElementById('FileAnh').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('imagePreview').style.display = 'none';
+            }
+        });
+    </script>
+}

@@ -42,6 +42,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles(); // Phục vụ file tĩnh (bao gồm file upload runtime trong wwwroot/uploads)
 app.UseRouting();
 
 // Bắt buộc phải có UseSession() sau UseRouting() và trước UseAuthorization()

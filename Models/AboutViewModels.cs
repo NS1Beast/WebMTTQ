@@ -43,6 +43,13 @@ public sealed class AboutPageViewModel
     public string ShareTitle { get; init; } = "";
 }
 
+public sealed class StatItem
+{
+    public int Count { get; init; }
+    public string Suffix { get; init; } = "";
+    public string Label { get; init; } = "";
+}
+
 public sealed class TeamMember
 {
     public string Name { get; init; } = "";

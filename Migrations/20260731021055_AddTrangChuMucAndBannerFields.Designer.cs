@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebMTTQ.Models;
 
@@ -11,9 +12,11 @@ using WebMTTQ.Models;
 namespace WebMTTQ.Migrations
 {
     [DbContext(typeof(DataMTTQContext))]
-    partial class DataMTTQContextModelSnapshot : ModelSnapshot
+    [Migration("20260731021055_AddTrangChuMucAndBannerFields")]
+    partial class AddTrangChuMucAndBannerFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1195,50 +1198,6 @@ namespace WebMTTQ.Migrations
                     b.ToTable("TrangChuMuc");
                 });
 
-            modelBuilder.Entity("WebMTTQ.Models.TrangChuTinTuc", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("HinhAnh")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<int>("IdTrangChuMuc")
-                        .HasColumnType("int")
-                        .HasColumnName("IdTrangChuMuc");
-
-                    b.Property<string>("LienKet")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime>("NgayTao")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ThuTu")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TieuDe")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("TomTat")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TrangThai")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdTrangChuMuc");
-
-                    b.ToTable("TrangChuTinTuc");
-                });
-
             modelBuilder.Entity("WebMTTQ.Models.VaiTro", b =>
                 {
                     b.Property<int>("IdvaiTro")
@@ -1466,17 +1425,6 @@ namespace WebMTTQ.Migrations
                     b.Navigation("IdnguoiDungNavigation");
                 });
 
-            modelBuilder.Entity("WebMTTQ.Models.TrangChuTinTuc", b =>
-                {
-                    b.HasOne("WebMTTQ.Models.TrangChuMuc", "TrangChuMuc")
-                        .WithMany("TinTucs")
-                        .HasForeignKey("IdTrangChuMuc")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TrangChuMuc");
-                });
-
             modelBuilder.Entity("WebMTTQ.Models.VanBanTaiLieu", b =>
                 {
                     b.HasOne("WebMTTQ.Models.ChuyenMuc", "IdchuyenMucNavigation")
@@ -1538,11 +1486,6 @@ namespace WebMTTQ.Migrations
             modelBuilder.Entity("WebMTTQ.Models.NhaHaoTam", b =>
                 {
                     b.Navigation("KhoanDongGops");
-                });
-
-            modelBuilder.Entity("WebMTTQ.Models.TrangChuMuc", b =>
-                {
-                    b.Navigation("TinTucs");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.VaiTro", b =>

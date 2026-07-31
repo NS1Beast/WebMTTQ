@@ -4,107 +4,235 @@
 }
 
 <style>
-    /* ================= CSS CHO BANNER CHẠY NGANG ================= */
+    /* ================= BANNER SLIDER ================= */
     .banner-wrapper {
         position: relative;
         width: 100%;
-        max-width: 100%;
         overflow: hidden;
-        background: #f8f9fa;
-        border-bottom: 3px solid var(--m26-gold-dark, #C9942B);
+        background: var(--m26-ink, #1a1a2e);
     }
-
     .banner-track {
         display: flex;
-        transition: transform 0.6s ease-in-out;
         width: 100%;
+        will-change: transform;
     }
-
     .banner-slide {
         min-width: 100%;
-        box-sizing: border-box;
+        position: relative;
+        overflow: hidden;
     }
-
-        /* MẶC ĐỊNH (MOBILE & TABLET): Hiển thị full 100% không cắt */
-        .banner-slide img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
-    /* XỬ LÝ RIÊNG CHO MÁY TÍNH (Màn hình rộng từ 992px trở lên) */
-    @@media (min-width: 992px) {
-        .banner-slide img {
-            max-height: 100%; /* Giới hạn chiều cao không cho ảnh phình quá to */
-            object-fit: cover; /* Giữ tỷ lệ, lấp đầy khung hình */
-            object-position: center 100%; /* Ưu tiên lấy nét phần trên/giữa ảnh để không bị mất mặt người */
-        }
+    .banner-slide img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+        object-position: center;
+        transition: transform 8s ease-out;
     }
-
-    /* Nút điều hướng < > */
+    .banner-slide.zoom img { transform: scale(1.15); }
+    .banner-slide.zoom.active img { transform: scale(1); }
+    .banner-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 40px 30px 30px;
+        background: linear-gradient(transparent, rgba(0,0,0,0.7));
+        color: white;
+        z-index: 2;
+    }
+    .banner-overlay h3 {
+        margin: 0 0 6px;
+        font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+        font-weight: 700;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+    .banner-overlay p {
+        margin: 0;
+        font-size: clamp(0.85rem, 1.5vw, 1rem);
+        opacity: 0.9;
+        text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+        max-width: 600px;
+    }
     .banner-btn {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        background-color: rgba(0, 0, 0, 0.4);
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
         color: white;
-        border: none;
-        width: 50px;
-        height: 50px;
+        border: 1px solid rgba(255,255,255,0.2);
+        width: 48px;
+        height: 48px;
         border-radius: 50%;
         cursor: pointer;
-        font-size: 24px;
+        font-size: 20px;
         z-index: 10;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: background-color 0.3s, transform 0.3s;
-        opacity: 0.7;
+        transition: all 0.3s ease;
+        opacity: 0;
     }
-
-        .banner-btn:hover {
-            background-color: rgba(201, 148, 43, 0.9);
-            opacity: 1;
-            transform: translateY(-50%) scale(1.1);
-        }
-
-    .banner-prev {
-        left: 20px;
+    .banner-wrapper:hover .banner-btn { opacity: 1; }
+    .banner-btn:hover {
+        background: var(--m26-gold, #e8b84b);
+        border-color: var(--m26-gold, #e8b84b);
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 4px 20px rgba(232,184,75,0.4);
     }
-
-    .banner-next {
-        right: 20px;
-    }
-
-    /* Nút click (Dots) ở dưới ảnh */
+    .banner-prev { left: 20px; }
+    .banner-next { right: 20px; }
     .banner-dots {
         position: absolute;
         bottom: 15px;
         width: 100%;
         display: flex;
         justify-content: center;
-        gap: 8px;
+        gap: 10px;
+        z-index: 10;
     }
-
     .dot {
         width: 12px;
         height: 12px;
-        background: rgba(255, 255, 255, 0.5);
+        background: rgba(255,255,255,0.4);
         border-radius: 50%;
         cursor: pointer;
-        transition: 0.3s;
+        transition: all 0.4s ease;
+        border: 2px solid transparent;
+    }
+    .dot.active {
+        background: var(--m26-gold, #e8b84b);
+        border-color: rgba(255,255,255,0.6);
+        box-shadow: 0 0 12px rgba(232,184,75,0.5);
+        transform: scale(1.2);
+    }
+    .dot:hover { background: rgba(255,255,255,0.7); }
+    .banner-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        background: var(--m26-gold, #e8b84b);
+        z-index: 10;
+        transition: width 0.1s linear;
+        width: 0%;
     }
 
-        .dot.active {
-            background: #F2C14E;
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
-        }
+    /* ================= HOMEPAGE SECTIONS ================= */
+    .home-section { padding: 60px 0; position: relative; overflow: hidden; }
+    .home-section:nth-child(even) { background: #f8f6f4; }
+    .home-section:nth-child(odd) { background: #fff; }
+    .section-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    .section-header h2 {
+        font-family: var(--font-display, "Playfair Display", Georgia, serif);
+        font-size: clamp(1.5rem, 3vw, 2.2rem);
+        font-weight: 800;
+        color: var(--m26-red, #8b1a2b);
+        margin: 0 0 10px;
+        position: relative;
+        display: inline-block;
+    }
+    .section-header h2::after {
+        content: '';
+        display: block;
+        width: 60px;
+        height: 3px;
+        background: var(--m26-gold, #e8b84b);
+        margin: 12px auto 0;
+        border-radius: 2px;
+    }
+    .section-header p { color: #777; font-size: 1rem; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+
+    /* ================= NEWS CARD ================= */
+    .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+    .news-card {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        transition: all 0.4s ease;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+    .news-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(0,0,0,0.12); }
+    .news-card-img { width: 100%; height: 200px; object-fit: cover; transition: transform 0.6s ease; display: block; }
+    .news-card:hover .news-card-img { transform: scale(1.05); }
+    .news-card-img-wrap { overflow: hidden; }
+    .news-card-body { padding: 20px; }
+    .news-card-category {
+        display: inline-block;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        background: var(--m26-red, #8b1a2b);
+        color: #fff;
+        margin-bottom: 10px;
+    }
+    .news-card-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #222;
+        line-height: 1.4;
+        margin: 0 0 10px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .news-card-summary {
+        font-size: 0.85rem;
+        color: #666;
+        line-height: 1.4;
+        margin: 5px 0;
+    }
+    .news-card-date { font-size: 0.8rem; color: #999; display: flex; align-items: center; gap: 6px; }
+    .empty-state {
+        width: 100%;
+        text-align: center;
+        padding: 40px;
+        color: #999;
+    }
+
+    @@media (max-width: 768px) {
+        .home-section { padding: 40px 0; }
+        .news-grid { grid-template-columns: 1fr; }
+        .banner-overlay { padding: 20px 15px 15px; }
+        .banner-overlay h3 { font-size: 1rem; }
+        .banner-overlay p { font-size: 0.8rem; }
+        .banner-btn { width: 36px; height: 36px; font-size: 16px; }
+        .banner-prev { left: 10px; }
+        .banner-next { right: 10px; }
+    }
+
+    .banner-track.fade { transition: none; }
+    .banner-track.fade .banner-slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        opacity: 0;
+        transition: opacity 0.6s ease;
+        pointer-events: none;
+    }
+    .banner-track.fade .banner-slide.active {
+        opacity: 1;
+        pointer-events: auto;
+        position: relative;
+    }
 </style>
 
+<!-- ================= HERO SECTION ================= -->
 <section class="m26-hero" id="m26-hero">
-    <div class="rays"></div>
-    <div class="grain"></div>
-    <div class="spot" id="m26-spot"></div>
+    <div class="rays"></div><div class="grain"></div><div class="spot" id="m26-spot"></div>
     <div class="hero-dang" aria-hidden="true">
         <svg class="ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="none" stroke="#F2C14E" stroke-width="1" opacity=".45" /><circle cx="50" cy="50" r="43.5" fill="none" stroke="#F8DA86" stroke-width="2.2" stroke-dasharray="1 7" opacity=".65" /></svg>
         <img class="logo" src="https://mttq.phuhoadong.vn/apps/themes/mttq-2026/assets/images/logo-dang.png" alt="Đảng Cộng sản Việt Nam" />
@@ -114,24 +242,12 @@
             <span class="eyebrow on-dark">Mặt trận Tổ quốc Việt Nam</span>
             <h1 class="hl">
                 <span class="line"><span>Vì Nhân dân</span></span>
-                <span class="line">
-                    <span class="m26-rotor">
-                        <span class="track">
-                            <b>đoàn kết</b><b>phục vụ</b><b>đồng thuận</b><b>nghĩa tình</b><b>đoàn kết</b>
-                        </span>
-                    </span>
-                </span>
+                <span class="line"><span class="m26-rotor"><span class="track"><b>đoàn kết</b><b>phục vụ</b><b>đồng thuận</b><b>nghĩa tình</b><b>đoàn kết</b></span></span></span>
             </h1>
             <p class="lead">Cổng thông tin Ủy ban MTTQ Việt Nam Phường Tân Định — lắng nghe ý kiến Nhân dân, công khai hoạt động và kết nối các phong trào thi đua, an sinh xã hội tại địa phương.</p>
             <div class="cta-row">
-                <a class="btn btn-gold" asp-controller="GopY" asp-action="Index">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v12H7l-3 3V4Z" /></svg>
-                    Gửi phản ánh, kiến nghị
-                </a>
-                <a class="btn btn-line" asp-controller="Home" asp-action="UnderConstruction">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z" /><path d="M14 2v6h6" /></svg>
-                    Tra cứu văn bản
-                </a>
+                <a class="btn btn-gold" asp-controller="GopY" asp-action="Index"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v12H7l-3 3V4Z" /></svg> Gửi phản ánh, kiến nghị</a>
+                <a class="btn btn-line" asp-controller="Home" asp-action="UnderConstruction"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z" /><path d="M14 2v6h6" /></svg> Tra cứu văn bản</a>
             </div>
             <nav class="m26-quick" aria-label="Truy cập nhanh">
                 <a asp-controller="GopY" asp-action="Index"><span class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8px"><path d="M20 11.5a7.5 7.5 0 0 1-10.9 6.7L4.5 19.5l1.3-4.3A7.5 7.5 0 1 1 20 11.5Z" /><path d="M8.5 10.8h7M8.5 13.8h4.5" /></svg></span><span>Phản ánh</span></a>
@@ -158,24 +274,11 @@
                     <path id="m26petal" d="M0,0 C-26,-46 -15,-116 0,-148 C15,-116 26,-46 0,0 Z" />
                 </defs>
                 <g transform="translate(150,196)">
-                    <g fill="url(#m26lotusG2)" opacity=".92">
-                        <use href="#m26petal" transform="rotate(-64) scale(.8)" />
-                        <use href="#m26petal" transform="rotate(-40) scale(.9)" />
-                        <use href="#m26petal" transform="rotate(40) scale(.9)" />
-                        <use href="#m26petal" transform="rotate(64) scale(.8)" />
-                    </g>
-                    <g fill="url(#m26lotusG)" stroke="#B8862A" stroke-width="1.2" stroke-opacity=".45">
-                        <use href="#m26petal" transform="rotate(-50) scale(.9)" />
-                        <use href="#m26petal" transform="rotate(-25)" />
-                        <use href="#m26petal" />
-                        <use href="#m26petal" transform="rotate(25)" />
-                        <use href="#m26petal" transform="rotate(50) scale(.9)" />
-                    </g>
+                    <g fill="url(#m26lotusG2)" opacity=".92"><use href="#m26petal" transform="rotate(-64) scale(.8)" /><use href="#m26petal" transform="rotate(-40) scale(.9)" /><use href="#m26petal" transform="rotate(40) scale(.9)" /><use href="#m26petal" transform="rotate(64) scale(.8)" /></g>
+                    <g fill="url(#m26lotusG)" stroke="#B8862A" stroke-width="1.2" stroke-opacity=".45"><use href="#m26petal" transform="rotate(-50) scale(.9)" /><use href="#m26petal" transform="rotate(-25)" /><use href="#m26petal" /><use href="#m26petal" transform="rotate(25)" /><use href="#m26petal" transform="rotate(50) scale(.9)" /></g>
                 </g>
             </svg>
-            <div class="m26-medallion">
-                <img src="https://mttq.phuhoadong.vn/apps/uploads/2025/11/cropped-favicon-270x270.png" alt="Biểu trưng Mặt trận Tổ quốc Việt Nam" />
-            </div>
+            <div class="m26-medallion"><img src="https://mttq.phuhoadong.vn/apps/uploads/2025/11/cropped-favicon-270x270.png" alt="Biểu trưng Mặt trận Tổ quốc Việt Nam" /></div>
             <div class="m26-motes">
                 <span class="m26-mote" style="left:20%;top:66%;animation-delay:0s"></span>
                 <span class="m26-mote" style="left:80%;top:60%;animation-delay:1.3s"></span>
@@ -197,110 +300,239 @@
     </div>
 </div>
 
-<!-- ================= KHU VỰC BANNER CHẠY NGANG ================= -->
+<!-- ================= BANNER SLIDER ================= -->
 @if (Model.Banners != null && Model.Banners.Any())
 {
-    <div class="banner-wrapper" id="homeBanner">
-        <div class="banner-track">
+    var firstBanner = Model.Banners.First();
+    var hieuUng = firstBanner?.HieuUng ?? "slide";
+    var tocDo = firstBanner?.TocDo > 0 ? firstBanner.TocDo : 600;
+    var thoiGianDung = firstBanner?.ThoiGianDung > 0 ? firstBanner.ThoiGianDung : 5000;
+    var mauNen = firstBanner?.MauNen ?? "#1a1a2e";
+    <div class="banner-wrapper" id="homeBanner" style="background:@mauNen; height:clamp(300px, 45vw, 550px);">
+        <div class="banner-track @(hieuUng != "slide" ? hieuUng : "")" id="bannerTrack" style="height:100%;">
             @foreach (var item in Model.Banners)
             {
-                <div class="banner-slide">
+                <div class="banner-slide @(hieuUng == "zoom" ? "zoom" : "")" data-effect="@(item.HieuUng ?? hieuUng)" style="height:100%;">
                     @if (!string.IsNullOrEmpty(item.LienKet))
                     {
-                        <a href="@item.LienKet">
-                            <img src="@item.HinhAnh" alt="@item.TieuDe" />
-                        </a>
+                        <a href="@item.LienKet" style="display:block;height:100%;"><img src="@item.HinhAnh" alt="@item.TieuDe" loading="lazy" /></a>
                     }
                     else
                     {
-                        <img src="@item.HinhAnh" alt="@item.TieuDe" />
+                        <img src="@item.HinhAnh" alt="@item.TieuDe" loading="lazy" />
+                    }
+                    @if (!string.IsNullOrEmpty(item.TieuDe) || !string.IsNullOrEmpty(item.MoTa))
+                    {
+                        <div class="banner-overlay">
+                            @if (!string.IsNullOrEmpty(item.TieuDe)) { <h3>@item.TieuDe</h3> }
+                            @if (!string.IsNullOrEmpty(item.MoTa)) { <p>@item.MoTa</p> }
+                        </div>
                     }
                 </div>
             }
         </div>
-
-        <!-- Nút Trái / Phải -->
-        <button class="banner-btn banner-prev" onclick="moveBanner(-1)">&#10094;</button>
-        <button class="banner-btn banner-next" onclick="moveBanner(1)">&#10095;</button>
-
-        <!-- Dấu chấm tròn (Dots) -->
+        <button class="banner-btn banner-prev" onclick="moveBanner(-1)" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="banner-btn banner-next" onclick="moveBanner(1)" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><path d="M9 18l6-6-6-6"/></svg></button>
         <div class="banner-dots">
             @for (int i = 0; i < Model.Banners.Count; i++)
             {
                 <span class="dot @(i == 0 ? "active" : "")" onclick="setBanner(@i)"></span>
             }
         </div>
+        <div class="banner-progress" id="bannerProgress"></div>
     </div>
 }
-<!-- ================= KẾT THÚC KHU VỰC BANNER ================= -->
 
-<div class="m26-body m26-body--home">
-    <div style="display: flex; align-items: center; justify-content: center; padding: 6rem 1rem; min-height: 50vh;">
-        <div class="wrap" style="text-align: center;">
-            <div style="display: inline-flex; align-items: center; justify-content: center; width: 80px; height: 80px; border-radius: 50%; background: rgba(232, 184, 75, 0.15); color: var(--m26-gold-dark); margin-bottom: 1.5rem;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 40px; height: 40px;">
-                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
-                </svg>
+<!-- ================= HOMEPAGE SECTIONS (từ DB) ================= -->
+@if (Model.Sections != null && Model.Sections.Any())
+{
+    foreach (var sec in Model.Sections)
+    {
+        <div class="home-section" id="section-@sec.Id">
+            <div class="wrap">
+                <div class="section-header">
+                    <h2>@sec.TieuDe</h2>
+                    @if (!string.IsNullOrEmpty(sec.NoiDung))
+                    {
+                        <p>@sec.NoiDung</p>
+                    }
+                </div>
+                @switch (sec.Loai)
+                {
+                    case "tin-tuc":
+                        var sectionNewsItems = Model.SectionNews != null && Model.SectionNews.ContainsKey(sec.Id)
+                            ? Model.SectionNews[sec.Id]
+                            : new List<TrangChuTinTuc>();
+                        @if (sectionNewsItems.Any())
+                        {
+                            <div class="news-grid">
+                                @foreach (var news in sectionNewsItems)
+                                {
+                                    <a href="@(!string.IsNullOrEmpty(news.LienKet) ? news.LienKet : "#")" class="news-card">
+                                        <div class="news-card-img-wrap">
+                                        <img src="@news.HinhAnh" alt="@news.TieuDe" class="news-card-img" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22250%22 viewBox=%220 0 400 250%22%3E%3Crect fill=%22%238b1a2b%22 width=%22400%22 height=%22250%22/%3E%3Ctext fill=%22%23fff%22 font-family=%22Arial%22 font-size=%2216%22 text-anchor=%22middle%22 x=%22200%22 y=%22130%22%3EMTTQ%3C/text%3E%3C/svg%3E'" />
+                                        </div>
+                                        <div class="news-card-body">
+                                            <span class="news-card-category">@sec.TieuDe</span>
+                                            <h3 class="news-card-title">@news.TieuDe</h3>
+                                            @if (!string.IsNullOrEmpty(news.TomTat))
+                                            {
+                                                <p class="news-card-summary">@news.TomTat</p>
+                                            }
+                                            <div class="news-card-date"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> @news.NgayTao.ToString("dd/MM/yyyy")</div>
+                                        </div>
+                                    </a>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="empty-state">
+                                <i class="fas fa-inbox" style="font-size:2rem;opacity:0.3;"></i>
+                                <p>Chưa có tin tức nào trong mục này.</p>
+                            </div>
+                        }
+                        break;
+                    case "hinh-anh":
+                        @if (!string.IsNullOrEmpty(sec.HinhAnh))
+                        {
+                            <div style="display:flex;justify-content:center;">
+                                <img src="@sec.HinhAnh" alt="@sec.TieuDe" style="max-width:100%;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.1);" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22400%22 viewBox=%220 0 800 400%22%3E%3Crect fill=%22%23e8b84b%22 width=%22800%22 height=%22400%22/%3E%3Ctext fill=%22%23333%22 font-family=%22Arial%22 font-size=%2224%22 text-anchor=%22middle%22 x=%22400%22 y=%22215%22%3EMTTQ%3C/text%3E%3C/svg%3E';" />
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="empty-state">
+                                <i class="fas fa-image" style="font-size:2rem;opacity:0.3;"></i>
+                                <p>Chưa có hình ảnh cho mục này.</p>
+                            </div>
+                        }
+                        break;
+                    case "thong-tin":
+                    case "van-ban":
+                    case "lien-ket":
+                    case "video":
+                    default:
+                        <div style="display:flex;justify-content:center;">
+                            <div style="background:#fff;padding:30px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.06);max-width:800px;width:100%;border:1px solid rgba(0,0,0,0.04);">
+                                <div style="text-align:center;margin-bottom:15px;">
+                                    <div style="width:64px;height:64px;border-radius:50%;background:rgba(139,26,43,0.1);color:#8b1a2b;display:inline-flex;align-items:center;justify-content:center;font-size:1.5rem;">
+                                        <i class="fas fa-info-circle"></i>
+                                    </div>
+                                </div>
+                                <div style="color:#666;font-size:0.95rem;line-height:1.6;text-align:center;">
+                                    @if (!string.IsNullOrEmpty(sec.NoiDung))
+                                    {
+                                        @Html.Raw(sec.NoiDung)
+                                    }
+                                    else
+                                    {
+                                        <p>Nội dung đang được cập nhật...</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        break;
+                }
             </div>
-            <h2 style="font-family: var(--font-display); font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 800; color: var(--m26-red); margin: 0 0 1rem;">
-                Các tính năng đang được cập nhật
-            </h2>
-            <p style="color: var(--m26-muted); font-size: 1.05rem; max-width: 500px; margin: 0 auto 2rem; line-height: 1.6;">
-                Hệ thống đang trong quá trình xây dựng và hoàn thiện các chức năng bên dưới để phục vụ bà con tốt hơn. Vui lòng quay lại sau!
-            </p>
         </div>
-    </div>
-</div>
+    }
+}
 
-<!-- JAVASCRIPT XỬ LÝ CHẠY ẢNH -->
 @section Scripts {
     <script>
         let currentBannerIndex = 0;
-        const bannerTrack = document.querySelector('.banner-track');
+        const bannerTrack = document.getElementById('bannerTrack');
         const slides = document.querySelectorAll('.banner-slide');
         const dots = document.querySelectorAll('.dot');
+        const progressBar = document.getElementById('bannerProgress');
         const totalBanners = slides.length;
-        let slideInterval;
+        let slideInterval, progressInterval;
+        let isTransitioning = false;
+        const firstSlide = slides[0];
+        const defaultEffect = firstSlide?.dataset?.effect || 'slide';
+        const defaultSpeed = @(Model.Banners?.FirstOrDefault()?.TocDo ?? 600);
+        const defaultDelay = @(Model.Banners?.FirstOrDefault()?.ThoiGianDung ?? 5000);
+
+        function getSlideEffect(index) { return slides[index]?.dataset?.effect || defaultEffect; }
 
         function updateBannerUI() {
-            // Dịch chuyển track theo chiều ngang
-            bannerTrack.style.transform = `translateX(-${currentBannerIndex * 100}%)`;
-
-            // Cập nhật dấu chấm tròn
-            dots.forEach(dot => dot.classList.remove('active'));
+            isTransitioning = true;
+            const effect = getSlideEffect(currentBannerIndex);
+            slides.forEach(s => s.classList.remove('active'));
+            if (effect === 'fade') {
+                slides.forEach((slide, i) => {
+                    slide.style.opacity = i === currentBannerIndex ? '1' : '0';
+                    slide.style.position = i === currentBannerIndex ? 'relative' : 'absolute';
+                });
+                slides[currentBannerIndex].classList.add('active');
+            } else {
+                bannerTrack.style.transition = 'transform ' + defaultSpeed + 'ms cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                bannerTrack.style.transform = 'translateX(-' + (currentBannerIndex * 100) + '%)';
+                slides[currentBannerIndex].classList.add('active');
+            }
+            dots.forEach(d => d.classList.remove('active'));
             if (dots.length > 0) dots[currentBannerIndex].classList.add('active');
+            if (progressBar) {
+                progressBar.style.width = '0%';
+                clearInterval(progressInterval);
+                startProgress();
+            }
+            setTimeout(function() { isTransitioning = false; }, defaultSpeed);
+        }
+
+        function startProgress() {
+            if (!progressBar) return;
+            var width = 0;
+            var step = 100 / (defaultDelay / 50);
+            progressInterval = setInterval(function() {
+                width += step;
+                if (width >= 100) width = 0;
+                progressBar.style.width = Math.min(width, 100) + '%';
+            }, 50);
         }
 
         function moveBanner(step) {
+            if (isTransitioning) return;
             currentBannerIndex += step;
-            if (currentBannerIndex < 0) {
-                currentBannerIndex = totalBanners - 1; // Quay lại ảnh cuối
-            } else if (currentBannerIndex >= totalBanners) {
-                currentBannerIndex = 0; // Quay về ảnh đầu
-            }
+            if (currentBannerIndex < 0) currentBannerIndex = totalBanners - 1;
+            else if (currentBannerIndex >= totalBanners) currentBannerIndex = 0;
             updateBannerUI();
         }
 
         function setBanner(index) {
+            if (isTransitioning || index === currentBannerIndex) return;
             currentBannerIndex = index;
             updateBannerUI();
         }
 
         function startAutoPlay() {
-            // Chạy tự động mỗi 2 giây (2000 ms)
-            slideInterval = setInterval(() => {
-                moveBanner(1);
-            }, 2000);
+            if (slideInterval) clearInterval(slideInterval);
+            slideInterval = setInterval(function() { moveBanner(1); }, defaultDelay);
         }
 
-        // Bắt đầu chạy khi tải trang (nếu có banner)
         if (totalBanners > 0) {
-            startAutoPlay();
-
-            // Tạm dừng khi đưa chuột vào khu vực ảnh
-            const bannerWrapper = document.getElementById('homeBanner');
-            bannerWrapper.addEventListener('mouseenter', () => clearInterval(slideInterval));
-            bannerWrapper.addEventListener('mouseleave', startAutoPlay);
+            var effect = getSlideEffect(0);
+            if (effect === 'fade') {
+                bannerTrack.style.transform = 'none';
+                slides.forEach(function(slide, i) {
+                    slide.style.opacity = i === 0 ? '1' : '0';
+                    slide.style.position = i === 0 ? 'relative' : 'absolute';
+                    slide.style.width = '100%'; slide.style.height = '100%';
+                    slide.style.top = '0'; slide.style.left = '0';
+                });
+                slides[0].classList.add('active');
+            }
+            startAutoPlay(); startProgress();
+            var wrapper = document.getElementById('homeBanner');
+            wrapper.addEventListener('mouseenter', function() { clearInterval(slideInterval); clearInterval(progressInterval); });
+            wrapper.addEventListener('mouseleave', function() { startAutoPlay(); startProgress(); });
+            var touchStartX = 0;
+            wrapper.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+            wrapper.addEventListener('touchend', function(e) {
+                var diff = touchStartX - e.changedTouches[0].screenX;
+                if (Math.abs(diff) > 50) { if (diff > 0) moveBanner(1); else moveBanner(-1); }
+            }, { passive: true });
         }
     </script>
 }

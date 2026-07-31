@@ -112,9 +112,14 @@ namespace WebMTTQ.Controllers
 
                 // Cập nhật các thông tin văn bản
                 existingBanner.TieuDe = banner.TieuDe;
+                existingBanner.MoTa = banner.MoTa;
                 existingBanner.LienKet = banner.LienKet;
                 existingBanner.ThuTu = banner.ThuTu;
                 existingBanner.TrangThai = banner.TrangThai;
+                existingBanner.HieuUng = banner.HieuUng;
+                existingBanner.TocDo = banner.TocDo;
+                existingBanner.ThoiGianDung = banner.ThoiGianDung;
+                existingBanner.MauNen = banner.MauNen;
 
                 // Nếu người dùng có chọn ảnh mới
                 if (FileAnh != null && FileAnh.Length > 0)

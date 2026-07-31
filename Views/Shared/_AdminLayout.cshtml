@@ -109,6 +109,11 @@
                 <div class="nav-sep"></div>
                 <div class="nav-label">Quản lý nội dung</div>
 
+                <a href="/AdminTrangChu/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminTrangChu" ? "is-active" : "")">
+                    <i class="fas fa-home"></i>
+                    <span>Cài đặt Trang chủ</span>
+                </a>
+
                 <a href="/admin/thongtinungho" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminThongTin" ? "is-active" : "")">
                     <i class="fas fa-university"></i>
                     <span>Thông tin ủng hộ</span>

@@ -1,36 +1,53 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
-using System.Linq; // Thư viện cần thiết để dùng các hàm truy vấn như Where, OrderBy
 using WebMTTQ.Models;
 
 namespace WebMTTQ.Controllers
 {
     public class HomeController : Controller
     {
-        // 1. Khai báo biến để gọi Cơ sở dữ liệu
-        private readonly DataMTTQContext _context; // Lưu ý: Nếu tên context của bạn khác, hãy sửa lại cho đúng nhé
+        private readonly DataMTTQContext _context;
 
-        // 2. Tạo Constructor để tiêm DataMTTQContext vào Controller
         public HomeController(DataMTTQContext context)
         {
             _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            // 3. Lấy danh sách Banner từ SQL: Chỉ lấy những Banner đang bật (TrangThai == true) và sắp xếp theo thứ tự
-            var danhSachBanner = _context.Banners
-                                         .Where(b => b.TrangThai == true)
-                                         .OrderBy(b => b.ThuTu)
-                                         .ToList();
+            // Lấy danh sách Banner đang hoạt động
+            var danhSachBanner = await _context.Banners
+                .Where(b => b.TrangThai == true)
+                .OrderBy(b => b.ThuTu)
+                .ToListAsync();
 
-            // 4. Gắn dữ liệu vào ViewModel
+            // Lấy danh sách các mục Trang chủ đang hoạt động
+            var sections = await _context.TrangChuMucs
+                .Where(s => s.TrangThai == true)
+                .OrderBy(s => s.ThuTu)
+                .ThenByDescending(s => s.NgayTao)
+                .ToListAsync();
+
+            // Load TrangChuTinTuc items cho các mục loại "tin-tuc"
+            var sectionNews = new Dictionary<int, List<TrangChuTinTuc>>();
+            foreach (var sec in sections.Where(s => s.Loai == "tin-tuc" && s.TrangThai))
+            {
+                var tinTucs = await _context.TrangChuTinTucs
+                    .Where(t => t.IdTrangChuMuc == sec.Id && t.TrangThai)
+                    .OrderBy(t => t.ThuTu)
+                    .ThenByDescending(t => t.NgayTao)
+                    .ToListAsync();
+                sectionNews[sec.Id] = tinTucs;
+            }
+
             var model = new HomePageViewModel
             {
-                Banners = danhSachBanner
+                Banners = danhSachBanner,
+                Sections = sections,
+                SectionNews = sectionNews
             };
 
-            // 5. Trả Model chứa danh sách Banner về cho View hiển thị
             return View(model);
         }
 
