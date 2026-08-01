@@ -1,195 +1,461 @@
 @model WebMTTQ.Models.AboutPageViewModel
 @{
-    ViewData["Title"] = Model.PageTitle;
+    ViewData["Title"] = "Giới thiệu tổ chức";
     ViewData["IsAbout"] = true;
 }
 
-@section Head {
-    <link rel="stylesheet" href="~/css/about.css" asp-append-version="true" />
-}
+<style>
+    /* RESET & BASE */
+    .org-wrapper {
+        background: #fdfdfd;
+        padding-bottom: 0;
+        font-family: 'Be Vietnam Pro', sans-serif;
+    }
+    
+    /* HEADER SECTION */
+    .org-header {
+        text-align: center;
+        padding: 3rem 1rem 1.5rem;
+        background: #fff;
+    }
+    
+    .org-title {
+        font-family: 'Be Vietnam Pro', sans-serif;
+        font-weight: 800;
+        font-size: clamp(1.4rem, 3vw, 2.2rem);
+        line-height: 1.4;
+        margin-bottom: 1rem;
+        color: #1565c0;
+    }
+    
+    .org-title .text-red { color: #d32f2f; }
+    
+    .org-subtitle-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 5px;
+    }
+    
+    .org-line {
+        height: 2px;
+        background-color: #d32f2f;
+        width: 80px;
+        position: relative;
+    }
+    
+    .org-line::after {
+        content: '';
+        position: absolute;
+        width: 6px; height: 6px;
+        background: #d32f2f;
+        border-radius: 50%;
+        top: -2px;
+    }
+    
+    .org-line.left::after { right: 0; }
+    .org-line.right::after { left: 0; }
+    
+    .org-slogan-pill {
+        display: inline-block;
+        background: #1565c0;
+        color: white;
+        padding: 6px 30px;
+        border-radius: 30px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        letter-spacing: 1px;
+        margin: 1.5rem 0;
+        box-shadow: 0 4px 10px rgba(21, 101, 192, 0.3);
+    }
+    
+    .org-intro-text {
+        max-width: 950px;
+        margin: 0 auto;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        color: #333;
+        text-align: justify;
+    }
 
-<!-- Page Hero -->
-<section class="m26-phero m26-phero--about">
-    <div class="rays"></div>
-    <div class="wrap">
-        <nav class="m26-crumb" aria-label="Breadcrumb">
-            <a asp-controller="Home" asp-action="Index">Trang chủ</a>
-            <span class="sep">›</span><span>@Model.PageTitle</span>
-        </nav>
-        <span class="eyebrow on-dark">@Model.HeroEyebrow</span>
-        <h1>@Model.HeroTitle</h1>
-        <p class="p-sub">@Model.HeroSubtitle</p>
-    </div>
-</section>
+    /* TREE STRUCTURE (SƠ ĐỒ CÂY) */
+    .tree-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem 1rem 5rem;
+    }
 
-<div class="m26-body ab-body">
-    <div class="wrap">
+    /* Cấp 1: Chủ tịch MTTQ */
+    .tree-level-1 {
+        display: flex;
+        justify-content: center;
+        position: relative;
+        z-index: 10;
+    }
 
-        <!-- Dấu mốc thành lập -->
-        <section class="ab-sec ab-found">
-            <div class="ab-found-txt reveal">
-                <span class="eyebrow">@Model.FoundEyebrow</span>
-                <h2>@Model.FoundTitle</h2>
-                @Html.Raw(Model.FoundContent)
+    /* Đường nối dọc từ Chủ tịch xuống */
+    .tree-connector {
+        width: 2px;
+        height: 60px;
+        background-color: #d32f2f;
+        margin: 0 auto;
+    }
+
+    /* Cấp 2: 4 Thành viên */
+    .tree-level-2 {
+        display: flex;
+        justify-content: center;
+        gap: 25px;
+    }
+
+    .tree-item {
+        flex: 1;
+        position: relative;
+        padding-top: 40px;
+        max-width: 280px;
+    }
+
+    /* Đường kẻ ngang nối 4 thẻ */
+    .tree-item::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 2px;
+        background-color: #d32f2f;
+    }
+    .tree-item:first-child::before { width: 50%; left: 50%; }
+    .tree-item:last-child::before { width: 50%; right: 50%; }
+
+    /* Đường kẻ dọc cắm xuống từng thẻ */
+    .tree-item::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 50%;
+        width: 2px; height: 40px;
+        background-color: #d32f2f;
+        transform: translateX(-50%);
+    }
+
+    /* THIẾT KẾ THẺ ROOT (CHỦ TỊCH) NẰM NGANG NHƯ HÌNH MẪU */
+    .org-card-root {
+        display: flex;
+        align-items: center;
+        gap: 25px;
+        background: #fff;
+        border: 2px solid #d32f2f;
+        border-radius: 12px;
+        padding: 15px 30px;
+        max-width: 600px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .root-ava {
+        width: 110px; height: 110px;
+        flex-shrink: 0;
+    }
+
+    .root-info {
+        text-align: center;
+    }
+
+    .root-name {
+        background: #d32f2f;
+        color: #fff;
+        font-weight: 700;
+        padding: 6px 20px;
+        border-radius: 20px;
+        font-size: 1.1rem;
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+
+    .root-role { font-size: 0.95rem; color: #333; margin-bottom: 5px; }
+    .root-title { color: #d32f2f; font-weight: 800; font-size: 1.4rem; margin-bottom: 2px; text-transform: uppercase; }
+    .root-sub { font-size: 0.95rem; font-weight: 500; color: #444; }
+
+    /* THIẾT KẾ THẺ CẤP 2 (CARD) */
+    .org-card {
+        background: #fff;
+        border: 2px solid;
+        border-radius: 12px;
+        padding: 55px 15px 15px;
+        margin-top: 45px;
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 45px);
+        text-align: center;
+        transition: box-shadow 0.3s ease;
+        position: relative;
+        z-index: 5;
+    }
+
+    .org-card:hover {
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+    }
+
+    /* Avatar nổi lên trên mép thẻ */
+    .org-ava {
+        width: 90px; height: 90px;
+        border-radius: 50%;
+        background: #fff;
+        border: 2px solid;
+        position: absolute;
+        top: -45px; left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px;
+        z-index: 6;
+    }
+
+    .org-ava img, .org-ava svg, .root-ava svg, .root-ava img {
+        width: 100%; height: 100%;
+        border-radius: 50%;
+        object-fit: contain; /* Đổi thành contain để logo không bị cắt xén */
+        background-color: #fff;
+    }
+
+    .org-name {
+        color: #fff;
+        font-weight: 700;
+        padding: 6px 10px;
+        border-radius: 20px;
+        margin-bottom: 12px;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        display: inline-block;
+    }
+
+    .org-body {
+        flex-grow: 1;
+        font-size: 0.85rem;
+        color: #444;
+        text-align: left;
+        line-height: 1.5;
+    }
+
+    .role-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        margin-bottom: 8px;
+    }
+    
+    .role-row svg {
+        width: 12px; height: 12px;
+        margin-top: 4px;
+        flex-shrink: 0;
+    }
+
+    .org-footer {
+        border-top: 1px solid #eee;
+        padding-top: 12px;
+        margin-top: 15px;
+    }
+
+    .org-title-role {
+        font-weight: 800;
+        font-size: 1.1rem;
+        margin-bottom: 2px;
+        text-transform: uppercase;
+    }
+
+    .org-subtitle-role { font-size: 0.82rem; font-weight: 600; color: #555; }
+
+    /* MÀU SẮC THEO TỪNG TỔ CHỨC */
+    .card-pn { border-color: #e91e63; }
+    .card-pn .org-ava { border-color: #e91e63; }
+    .card-pn .org-name { background: #e91e63; }
+    .card-pn .role-row svg { color: #e91e63; }
+    .card-pn .org-title-role { color: #e91e63; }
+    
+    .card-cd { border-color: #1976d2; }
+    .card-cd .org-ava { border-color: #1976d2; }
+    .card-cd .org-name { background: #1976d2; }
+    .card-cd .role-row svg { color: #1976d2; }
+    .card-cd .org-title-role { color: #1976d2; }
+    
+    .card-ccb { border-color: #2e7d32; }
+    .card-ccb .org-ava { border-color: #2e7d32; }
+    .card-ccb .org-name { background: #2e7d32; }
+    .card-ccb .role-row svg { color: #2e7d32; }
+    .card-ccb .org-title-role { color: #2e7d32; }
+    
+    .card-dt { border-color: #0d47a1; }
+    .card-dt .org-ava { border-color: #0d47a1; }
+    .card-dt .org-name { background: #0d47a1; }
+    .card-dt .role-row svg { color: #0d47a1; }
+    .card-dt .org-title-role { color: #0d47a1; }
+
+    /* FOOTER BANNER */
+    .org-bottom-banner {
+        background: linear-gradient(90deg, #1565c0, #0d47a1);
+        color: white;
+        text-align: center;
+        padding: 15px 10px;
+        font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+        font-weight: 700;
+        font-style: italic;
+        font-family: 'Playfair Display', serif;
+        border-top: 4px solid #d32f2f;
+    }
+
+    /* RESPONSIVE TRÊN ĐIỆN THOẠI */
+    @@media (max-width: 900px) {
+        .org-card-root { flex-direction: column; padding: 20px; max-width: 350px; margin: 0 auto; text-align: center; }
+        .tree-level-2 { flex-direction: column; gap: 30px; align-items: center; }
+        .tree-item { width: 100%; max-width: 350px; padding-top: 0; }
+        .tree-connector { display: none; }
+        .tree-item::before, .tree-item::after { display: none !important; }
+        .org-card-root { margin-bottom: 20px; }
+    }
+</style>
+
+<div class="org-wrapper">
+    <!-- KHU VỰC TIÊU ĐỀ & GIỚI THIỆU -->
+    <section class="org-header">
+        <h1 class="org-title">
+            ỦY BAN MẶT TRẬN TỔ QUỐC VIỆT NAM PHƯỜNG<br/>
+            <div class="org-subtitle-row">
+                <div class="org-line left"></div>
+                <span style="font-style: italic; color: #1565c0;">và các </span> <span class="text-red">TỔ CHỨC CHÍNH TRỊ - XÃ HỘI</span>
+                <div class="org-line right"></div>
             </div>
-            <aside class="ab-seal reveal d2">
-                <span class="ab-seal-ring"></span>
-                <div class="ab-seal-body">
-                    <svg class="ab-seal-star" viewBox="0 0 100 100" fill="currentColor" aria-hidden="true"><polygon points="50,6 61,38 95,38 67,58 78,92 50,72 22,92 33,58 5,38 39,38"/></svg>
-                    <span class="k">Quyết định</span>
-                    <strong>@Model.FoundDecisionNumber</strong>
-                    <span class="d">@Model.FoundDecisionDate</span>
-                    <span class="d">@Model.FoundAnnounceDate</span>
+        </h1>
+        
+        <div class="org-slogan-pill">
+            ★ ĐOÀN KẾT – ĐỔI MỚI – VĂN MINH – NGHĨA TÌNH ★
+        </div>
+        
+        <p class="org-intro-text">
+            Ủy ban Mặt trận Tổ quốc Việt Nam phường và các tổ chức chính trị - xã hội là lực lượng nòng cốt trong việc xây dựng khối đại đoàn kết toàn dân tộc, phát huy quyền làm chủ của Nhân dân, đại diện, bảo vệ quyền và lợi ích hợp pháp, chính đáng của đoàn viên, hội viên và Nhân dân. Với mô hình hoạt động thống nhất, gồm Ủy ban MTTQ Việt Nam, Đoàn Thanh niên Cộng sản Hồ Chí Minh, Hội Liên hiệp Phụ nữ, Hội Nông dân và Hội Cựu chiến binh, các tổ chức luôn phối hợp chặt chẽ trong công tác tuyên truyền, vận động Nhân dân, thực hiện các phong trào thi đua yêu nước, các cuộc vận động, giám sát, phản biện xã hội và tham gia xây dựng Đảng, chính quyền trong sạch, vững mạnh. Ban Thường trực Ủy ban MTTQ Việt Nam phường Tân Định gồm:
+        </p>
+    </section>
+
+    <!-- KHU VỰC SƠ ĐỒ TỔ CHỨC -->
+    <section class="tree-container">
+        
+        <!-- LEVEL 1: CHỦ TỊCH MTTQ -->
+        <div class="tree-level-1">
+            <div class="org-card-root">
+                <div class="root-ava">
+                    <!-- LOGO MTTQ -->
+                    <img src="~/images/LogoGioiThieu/logoMTTQ.jpg" alt="Logo MTTQ" />
                 </div>
-            </aside>
-        </section>
-    </div>
+                <div class="root-info">
+                    <div class="root-name">Bà NGUYỄN ĐINH MINH PHƯƠNG</div>
+                    <div class="root-role">Ủy viên Ban Thường vụ Đảng ủy</div>
+                    <div class="root-title">CHỦ TỊCH</div>
+                    <div class="root-sub">Ủy ban Mặt trận Tổ quốc Việt Nam phường</div>
+                </div>
+            </div>
+        </div>
 
-    <!-- Con số -->
-    <section class="m26-stats ab-stats">
-        <div class="stars"></div>
-        <div class="wrap">
-            <div class="stats-head">
-                <span class="eyebrow on-dark" style="justify-content:center">Một tập thể — Một niềm tin</span>
-                <h2>Khối đại đoàn kết ở Phường Tân Định</h2>
-            </div>
-            <div class="grid ab-statgrid">
-                @{ var sd = 1; }
-                @foreach (var stat in Model.Stats)
-                {
-                    <div class="m26-stat reveal d@(sd)">
-                        <b data-count="@stat.Count" data-suffix="@stat.Suffix">0</b>
-                        <span>@stat.Label</span>
+        <!-- Cây nối dọc từ Chủ tịch xuống ngã 4 -->
+        <div class="tree-connector"></div>
+
+        <!-- LEVEL 2: 4 THÀNH VIÊN -->
+        <div class="tree-level-2">
+            
+            <!-- THẺ 1: PHỤ NỮ -->
+            <div class="tree-item">
+                <div class="org-card card-pn">
+                    <div class="org-ava">
+                        <!-- LOGO HỘI PHỤ NỮ -->
+                        <img src="~/images/LogoGioiThieu/logo-hoi-lhpn.jpg" alt="Logo Hội LHPN" />
                     </div>
-                    sd++;
-                }
+                    <div><span class="org-name">Bà PHAN THỊ NHƯ LINH</span></div>
+                    <div class="org-body">
+                        <div class="role-row">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            <span>Đảng ủy viên</span>
+                        </div>
+                        <div class="role-row">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            <span>Phó Chủ tịch Thường trực Ủy ban MTTQ Việt Nam phường</span>
+                        </div>
+                    </div>
+                    <div class="org-footer">
+                        <div class="org-title-role">CHỦ TỊCH</div>
+                        <div class="org-subtitle-role">Hội Liên hiệp Phụ nữ phường</div>
+                    </div>
+                </div>
             </div>
+
+            <!-- THẺ 2: CÔNG ĐOÀN -->
+            <div class="tree-item">
+                <div class="org-card card-cd">
+                    <div class="org-ava">
+                        <!-- LOGO CÔNG ĐOÀN -->
+                        <img src="~/images/LogoGioiThieu/logo_CDP.jpg" alt="Logo Công Đoàn" />
+                    </div>
+                    <div><span class="org-name">Bà HÀ THỊ THU ĐỊNH</span></div>
+                    <div class="org-body">
+                        <div class="role-row">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            <span>Đảng ủy viên</span>
+                        </div>
+                        <div class="role-row">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            <span>Phó Chủ tịch Ủy ban MTTQ Việt Nam phường</span>
+                        </div>
+                    </div>
+                    <div class="org-footer">
+                        <div class="org-title-role">CHỦ TỊCH</div>
+                        <div class="org-subtitle-role">Công đoàn phường</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- THẺ 3: CỰU CHIẾN BINH -->
+            <div class="tree-item">
+                <div class="org-card card-ccb">
+                    <div class="org-ava">
+                        <!-- LOGO CỰU CHIẾN BINH -->
+                        <img src="~/images/LogoGioiThieu/logo_hoiCuuchienbinh.jpg" alt="Logo Hội Cựu Chiến Binh" />
+                    </div>
+                    <div><span class="org-name">Ông TRẦN VĂN HÙNG</span></div>
+                    <div class="org-body">
+                        <div class="role-row">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            <span>Phó Chủ tịch Ủy ban MTTQ Việt Nam phường</span>
+                        </div>
+                    </div>
+                    <div class="org-footer">
+                        <div class="org-title-role">CHỦ TỊCH</div>
+                        <div class="org-subtitle-role">Hội Cựu chiến binh phường</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- THẺ 4: ĐOÀN THANH NIÊN -->
+            <div class="tree-item">
+                <div class="org-card card-dt">
+                    <div class="org-ava">
+                        <!-- LOGO ĐOÀN THANH NIÊN -->
+                        <img src="~/images/LogoGioiThieu/logoDoanTNCS.png" alt="Logo Đoàn TNCS HCM" />
+                    </div>
+                    <div><span class="org-name">Ông BÙI VIỆT HẢI</span></div>
+                    <div class="org-body">
+                        <div class="role-row">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                            <span>Phó Chủ tịch Ủy ban MTTQ Việt Nam phường</span>
+                        </div>
+                    </div>
+                    <div class="org-footer">
+                        <div class="org-title-role">BÍ THƯ</div>
+                        <div class="org-subtitle-role">Đoàn TNCS Hồ Chí Minh phường</div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 
-    <div class="wrap">
-        <!-- Ban Thường trực -->
-        <section class="ab-sec ab-team">
-            <div class="ab-head reveal">
-                <span class="eyebrow">@Model.TeamEyebrow</span>
-                <h2>@Model.TeamTitle</h2>
-            </div>
-
-            @if (Model.Chairman != null)
-            {
-                <div class="ab-lead reveal">
-                    <div class="ab-ava ab-ava-lead has-photo">
-                        <span class="ring"></span>
-                        @if (!string.IsNullOrEmpty(Model.Chairman.PhotoUrl))
-                        {
-                            <img class="pic js-ablb" src="@Model.Chairman.PhotoUrl" data-full="@Model.Chairman.PhotoFullUrl"
-                                 style="object-position:@Model.Chairman.PhotoPosition" alt="@Model.Chairman.Name" loading="lazy" />
-                        }
-                    </div>
-                    <div class="ab-lead-info">
-                        <span class="pill">@Model.Chairman.Pill</span>
-                        <h3>@Model.Chairman.Name</h3>
-                        <p class="role">@Model.Chairman.Role</p>
-                    </div>
-                </div>
-            }
-
-            <div class="ab-grid">
-                @{ var md = 1; }
-                @foreach (var member in Model.Members)
-                {
-                    <article class="ab-card reveal d@(md)">
-                        <div class="ab-ava has-photo">
-                            <span class="ring"></span>
-                            @if (!string.IsNullOrEmpty(member.PhotoUrl))
-                            {
-                                <img class="pic js-ablb" src="@member.PhotoUrl" data-full="@member.PhotoFullUrl"
-                                     style="object-position:@member.PhotoPosition" alt="@member.Name" loading="lazy" />
-                            }
-                        </div>
-                        <h4>@member.Name</h4>
-                        <p class="role">@member.Role</p>
-                    </article>
-                    md = md >= 4 ? 1 : md + 1;
-                }
-            </div>
-        </section>
-
-        <!-- Khoảnh khắc / Hình ảnh -->
-        @if (!string.IsNullOrEmpty(Model.GalleryImageUrl))
-        {
-            <section class="ab-sec ab-gallery-sec">
-                <div class="ab-head reveal">
-                    <span class="eyebrow">@Model.GalleryEyebrow</span>
-                    <h2>@Html.Raw(Model.GalleryTitle)</h2>
-                </div>
-                <div class="ab-gallery ab-gallery-single">
-                    <figure class="ab-photo wide reveal">
-                        <img src="@Model.GalleryImageUrl" alt="@Model.GalleryImageAlt" loading="lazy" />
-                        <span class="fr"></span>
-                    </figure>
-                </div>
-            </section>
-        }
-
-        <!-- CTA -->
-        <section class="ab-sec ab-cta reveal">
-            <h2>@Model.CtaTitle</h2>
-            <p>@Model.CtaText</p>
-            <div class="ab-cta-row">
-                <a class="ab-btn gold" href="@Model.CtaDocsUrl">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6z"/><path d="M14 2v6h6"/></svg>
-                    @Html.Raw(Model.CtaDocsLabel)
-                </a>
-                <a class="ab-btn ghost" href="@Model.CtaFeedbackUrl">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v12H7l-3 3V4Z"/></svg>
-                    @Html.Raw(Model.CtaFeedbackLabel)
-                </a>
-            </div>
-            <div class="ab-share">
-                <div class="m26-share">
-                    <a class="fb" target="_blank" rel="noopener"
-                       href="https://www.facebook.com/sharer/sharer.php?u=@Uri.EscapeDataString($"https://mttq.phuhoadong.vn{Model.ShareUrl}")"
-                       aria-label="Chia sẻ Facebook">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12Z"/></svg>
-                        <span>Chia sẻ Facebook</span>
-                    </a>
-                    <div class="zalo-share-button m26-zalo" data-href="https://mttq.phuhoadong.vn@(Model.ShareUrl)" data-oaid="84978279738049304" data-customize="true">
-                        <a class="zl" role="button" tabindex="0" aria-label="Chia sẻ Zalo">
-                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.9 3 3 6.5 3 10.9c0 2.4 1.2 4.5 3.1 6-.1.9-.5 2-1.4 3 1.6-.2 2.9-.8 3.8-1.4 1 .3 2.2.5 3.5.5 5.1 0 9-3.5 9-7.9S17.1 3 12 3Z"/></svg>
-                            <span>Chia sẻ Zalo</span>
-                        </a>
-                    </div>
-                    <button type="button" class="m26-native-share" data-url="https://mttq.phuhoadong.vn@(Model.ShareUrl)" data-title="@Model.PageTitle">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5 15.4 17.5M15.4 6.5 8.6 10.5"/></svg>
-                        <span>Chia sẻ liên kết</span>
-                    </button>
-                </div>
-            </div>
-        </section>
+    <!-- FOOTER CHÂN TRANG -->
+    <div class="org-bottom-banner">
+        Đoàn kết – Đổi mới – Văn minh – Nghĩa tình
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        // About page: lightbox for member photos
-        document.querySelectorAll('.js-ablb').forEach(function (img) {
-            img.addEventListener('click', function () {
-                var full = this.getAttribute('data-full');
-                if (!full) return;
-                if (typeof Swal !== 'undefined') {
-                    Swal.fire({
-                        imageUrl: full,
-                        imageAlt: this.alt,
-                        showConfirmButton: false,
-                        background: 'rgba(0,0,0,.92)',
-                        backdrop: 'rgba(0,0,0,.7)',
-                        width: 'auto',
-                        padding: 0,
-                        customClass: { popup: 'ab-lightbox' }
-                    });
-                }
-            });
-        });
-    </script>
-}

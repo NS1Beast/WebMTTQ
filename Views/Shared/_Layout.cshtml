@@ -87,7 +87,7 @@
 
                 <ul class="m26-nav">
                     <li class="nav-item"><a class="nav-link @(isHome ? "" : "")" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
-                    <li class="nav-item"><a class="nav-link @(isAbout ? "is-active" : "")" asp-controller="Home" asp-action="UnderConstruction">Giới thiệu</a></li>
+                    <li class="nav-item"><a class="nav-link @(isAbout ? "is-active" : "")" asp-controller="About" asp-action="Index">Giới thiệu</a></li>
                     <li class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle @(isNews ? "is-active" : "")" role="button" aria-expanded="false">Danh mục Tin tức</a>
                         <ul class="dropdown-menu">
@@ -102,15 +102,14 @@
                     <li class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle @(isNews ? "is-active" : "")" role="button" aria-expanded="false">An sinh xã hội</a>
                         <ul class="dropdown-menu">
-                            <li class="nav-item"><a class="dropdown-item" asp-controller="CongThongTinAnSXH" asp-action="Index">Cổng thông tin an sinh xã hội</a></li>
-                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Quỹ “Vì người nghèo”</a></li>
+                            <li class="nav-item"><a class="dropdown-item" asp-controller="CongThongTinAnSXH" asp-action="Index">Quỹ “Vì người nghèo”</a></li>
                             <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Quỹ “Vì biển đảo quê hương, vì tuyến đầu Tổ quốc”</a></li>
                             <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Quỹ “Cứu trợ”</a></li>  
                         </ul>
                     </li>
 
                     <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="UnderConstruction">Văn bản và tài liệu</a></li>
-                    <li class="nav-item dropdown">
+                    @* <li class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" role="button" aria-expanded="false">Ứng dụng Bản Đồ</a>
                         <ul class="dropdown-menu">
                             <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Bản đồ sinh hoạt hè</a></li>
@@ -118,7 +117,7 @@
                             <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Liên kết địa điểm</a></li>
                             <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Bản đồ bầu cử HĐND Xã 2026</a></li>
                         </ul>
-                    </li>
+                    </li> *@
                 </ul>
 
                 <div class="m26-search" id="m26-search">
@@ -154,7 +153,7 @@
                 <nav class="m26-drawer-nav">
                     <ul class="m26-mnav">
                         <li><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
-                        <li><a asp-controller="Home" asp-action="UnderConstruction">Giới thiệu</a></li>
+                        <li><a asp-controller="About" asp-action="Index">Giới thiệu</a></li>
                         <li><a asp-controller="CongThongTinAnSXH" asp-action="Index">Cổng an sinh xã hội</a></li>
                         <li><a asp-controller="Home" asp-action="UnderConstruction">Văn bản và tài liệu</a></li>
                         <li><a asp-controller="Home" asp-action="UnderConstruction">Tin tức</a></li>
@@ -189,7 +188,7 @@
                     </div>
                     <div class="col">
                         <h5>Liên kết</h5>
-                        <a asp-controller="Home" asp-action="UnderConstruction">Giới thiệu</a>
+                        <a asp-controller="About" asp-action="Index">Giới thiệu</a>
                         <a asp-controller="Home" asp-action="UnderConstruction">Văn bản - Tài liệu</a>
                         <a asp-controller="CongThongTinAnSXH" asp-action="Index">Tiếp nhận ủng hộ</a>
                     </div>
@@ -216,7 +215,7 @@
             <svg viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5" /><path d="M6 10v10h12V10" /><path d="M10 20v-5h4v5" /></svg>
             <span>Trang chủ</span>
         </a>
-        <a class="m26-bn-item @(isAbout ? "is-active" : "")" asp-controller="Home" asp-action="UnderConstruction" aria-current="@(isAbout ? "page" : null)">
+        <a class="m26-bn-item @(isAbout ? "is-active" : "")" asp-controller="About" asp-action="Index" aria-current="@(isAbout ? "page" : null)">
             <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.1" /><path d="M3.6 20a5.4 5.4 0 0 1 10.8 0" /><path d="M16 5.6a3 3 0 0 1 0 5.6" /><path d="M17.6 20a5 5 0 0 0-2.7-4.4" /></svg>
             <span>Giới thiệu</span>
         </a>
