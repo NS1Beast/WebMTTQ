@@ -10,8 +10,8 @@
 
 <style>
     /* =======================================
-               1. BIẾN MÀU SẮC & CƠ BẢN
-               ======================================= */
+                       1. BIẾN MÀU SẮC & CƠ BẢN
+                       ======================================= */
     :root {
         --mttq-red: #c43232;
         --mttq-red-dark: #8b1816;
@@ -76,8 +76,8 @@
     }
 
     /* =======================================
-               2. UI CHUNG & COMPONENTS
-               ======================================= */
+                       2. UI CHUNG & COMPONENTS
+                       ======================================= */
     .asxh-hero {
         background: linear-gradient(135deg, #b83434 0%, #d87233 100%);
         border-radius: 20px;
@@ -255,8 +255,8 @@
         }
 
     /* =======================================
-               3. CSS CHĂM LO (CL) - CHUẨN NHƯ ẢNH 2 & 3
-               ======================================= */
+                       3. CSS CHĂM LO (CL) - CHUẨN NHƯ ẢNH 2 & 3
+                       ======================================= */
     .cl-container {
         background-color: #fdf8f4;
         border-radius: 20px;
@@ -575,8 +575,8 @@
     }
 
     /* =======================================
-               4. CSS BẢN ĐỒ AN SINH
-               ======================================= */
+                       4. CSS BẢN ĐỒ AN SINH
+                       ======================================= */
     .map-container-wrapper {
         background: white;
         border-radius: 20px;
@@ -640,7 +640,7 @@
         color: var(--map-red);
     }
 
-    /* Tìm kiếm Bản đồ (Cập nhật chuẩn Ảnh 2) */
+    /* Tìm kiếm Bản đồ */
     .map-search-bar {
         display: flex;
         gap: 15px;
@@ -892,8 +892,8 @@
     }
 
     /* =======================================
-               5. CSS FORM TRỢ GIÚP
-               ======================================= */
+                       5. CSS FORM TRỢ GIÚP
+                       ======================================= */
     .help-section {
         background-color: white;
         border-radius: 20px;
@@ -963,8 +963,8 @@
         }
 
     /* =======================================
-               6. RESPONSIVE MOBILE
-               ======================================= */
+                       6. RESPONSIVE MOBILE
+                       ======================================= */
     @@media (max-width: 992px) {
         .asxh-container {
             padding: 0 10px;
@@ -1340,15 +1340,15 @@
                                 <div class="asxh-pagination">
                                     @if (ViewBag.CurrentPage > 1)
                                     {
-                                        <a href="javascript:void(0)" data-page="@(ViewBag.CurrentPage - 1)" class="asxh-page-link ajax-page-link">&laquo;</a>
+                                        <a href="javascript:void(0)" onclick="loadTrangDanhSach(@(ViewBag.CurrentPage - 1))" class="asxh-page-link">&laquo;</a>
                                     }
                                     @for (int i = 1; i <= ViewBag.TotalPages; i++)
                                     {
-                                        <a href="javascript:void(0)" data-page="@i" class="asxh-page-link ajax-page-link @(i == ViewBag.CurrentPage ? "active" : "")">@i</a>
+                                        <a href="javascript:void(0)" onclick="loadTrangDanhSach(@i)" class="asxh-page-link @(i == ViewBag.CurrentPage ? "active" : "")">@i</a>
                                     }
                                     @if (ViewBag.CurrentPage < ViewBag.TotalPages)
                                     {
-                                        <a href="javascript:void(0)" data-page="@(ViewBag.CurrentPage + 1)" class="asxh-page-link ajax-page-link">&raquo;</a>
+                                        <a href="javascript:void(0)" onclick="loadTrangDanhSach(@(ViewBag.CurrentPage + 1))" class="asxh-page-link">&raquo;</a>
                                     }
                                 </div>
                             }
@@ -1501,52 +1501,52 @@
 
         @if (ViewBag.HienThiBanDo == true)
         {
-        <div class="map-container-wrapper">
-            <div class="map-header-row">
-                <div>
-                    <h1 class="map-title" style="font-size: 1.8rem;">Bản đồ công tác an sinh</h1>
-                    <p class="map-desc" style="font-size: 0.9rem;">Theo dõi các điểm hỗ trợ, hoạt động chăm lo trên địa bàn Phường Tân Định. Lọc theo đơn vị, tìm nhanh tên điểm hỗ trợ.</p>
-                </div>
-                <div class="map-stats-group">
-                    <div class="map-stat-box"><div class="map-stat-label">Tổng địa điểm</div><div class="map-stat-value">@(ViewBag.TongDiaDiem ?? 0)</div></div>
-                    <div class="map-stat-box"><div class="map-stat-label">Đang hiển thị</div><div class="map-stat-value" id="hienThiCount">@(ViewBag.TongDiaDiem ?? 0)</div></div>
-                    <div class="map-stat-box"><div class="map-stat-label">Nhóm đơn vị</div><div class="map-stat-value">@(ViewBag.NhomDonVi ?? 0)</div></div>
-                </div>
-            </div>
-
-            <div class="map-search-bar">
-                <div class="search-input-wrap">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                    </svg>
-                    <input type="text" id="searchInput" class="map-search-input" placeholder="Tìm theo tên địa điểm, nội dung hoặc đơn vị thực hiện..." onkeyup="applyFilters()">
-                </div>
-                <button class="btn-clear-filter" onclick="clearFilters()">Bỏ chọn bộ lọc</button>
-            </div>
-
-            <div class="info-tags-row">
-                <span class="info-tag"><span class="red-dot"></span> Bấm vào marker để xem chi tiết</span>
-            </div>
-
-            <div class="filter-chips" id="filterContainer"></div>
-
-            <div class="mobile-map-tabs">
-                <button class="m-tab-btn active" id="btnShowMap" onclick="switchMobileTab('map')">Bản đồ</button>
-                <button class="m-tab-btn" id="btnShowList" onclick="switchMobileTab('list')">Danh sách <span class="m-badge" id="mListCountBadge">@(ViewBag.TongDiaDiem ?? 0)</span></button>
-            </div>
-
-            <div class="map-content-row" id="mapContentRow">
-                <div class="map-col"><div id="leafletMap"></div></div>
-                <div class="list-col">
-                    <div class="list-header">
-                        <h4>Danh sách điểm hỗ trợ</h4>
-                        <div id="listCountBadge" style="background: #fdf0ea; color: var(--map-red); padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 0.8rem;">@(ViewBag.TongDiaDiem ?? 0)</div>
+            <div class="map-container-wrapper">
+                <div class="map-header-row">
+                    <div>
+                        <h1 class="map-title" style="font-size: 1.8rem;">Bản đồ công tác an sinh</h1>
+                        <p class="map-desc" style="font-size: 0.9rem;">Theo dõi các điểm hỗ trợ, hoạt động chăm lo trên địa bàn Phường Tân Định. Lọc theo đơn vị, tìm nhanh tên điểm hỗ trợ.</p>
                     </div>
-                    <div class="list-wrapper" id="listWrapper"></div>
+                    <div class="map-stats-group">
+                        <div class="map-stat-box"><div class="map-stat-label">Tổng địa điểm</div><div class="map-stat-value">@(ViewBag.TongDiaDiem ?? 0)</div></div>
+                        <div class="map-stat-box"><div class="map-stat-label">Đang hiển thị</div><div class="map-stat-value" id="hienThiCount">@(ViewBag.TongDiaDiem ?? 0)</div></div>
+                        <div class="map-stat-box"><div class="map-stat-label">Nhóm đơn vị</div><div class="map-stat-value">@(ViewBag.NhomDonVi ?? 0)</div></div>
+                    </div>
+                </div>
+
+                <div class="map-search-bar">
+                    <div class="search-input-wrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="searchInput" class="map-search-input" placeholder="Tìm theo tên địa điểm, nội dung hoặc đơn vị thực hiện..." onkeyup="applyFilters()">
+                    </div>
+                    <button class="btn-clear-filter" onclick="clearFilters()">Bỏ chọn bộ lọc</button>
+                </div>
+
+                <div class="info-tags-row">
+                    <span class="info-tag"><span class="red-dot"></span> Bấm vào marker để xem chi tiết</span>
+                </div>
+
+                <div class="filter-chips" id="filterContainer"></div>
+
+                <div class="mobile-map-tabs">
+                    <button class="m-tab-btn active" id="btnShowMap" onclick="switchMobileTab('map')">Bản đồ</button>
+                    <button class="m-tab-btn" id="btnShowList" onclick="switchMobileTab('list')">Danh sách <span class="m-badge" id="mListCountBadge">@(ViewBag.TongDiaDiem ?? 0)</span></button>
+                </div>
+
+                <div class="map-content-row" id="mapContentRow">
+                    <div class="map-col"><div id="leafletMap"></div></div>
+                    <div class="list-col">
+                        <div class="list-header">
+                            <h4>Danh sách điểm hỗ trợ</h4>
+                            <div id="listCountBadge" style="background: #fdf0ea; color: var(--map-red); padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 0.8rem;">@(ViewBag.TongDiaDiem ?? 0)</div>
+                        </div>
+                        <div class="list-wrapper" id="listWrapper"></div>
+                    </div>
                 </div>
             </div>
-        </div>
         }
 
         <div class="help-section" id="nhu-cau-tro-giup">
@@ -1592,13 +1592,12 @@
         <div class="modal-desc" id="mDesc"></div>
     </div>
 </div>
-@if (ViewBag.HienThiBanDo == true)
-{
-<script type="application/json" id="mapDataJson">
-    @Html.Raw(ViewBag.MapDataJson ?? "[]")
-</script>
+
+<!-- ==========================================
+     ĐOẠN JAVASCRIPT CHUNG: LUÔN LUÔN HOẠT ĐỘNG
+     ========================================== -->
 <script>
-    // 1. CHĂM LO FILTER (ĐÃ ĐƯỢC CẬP NHẬT ĐỂ LỌC THEO CẢ THÁNG VÀ ĐƠN VỊ CÙNG LÚC)
+    // 1. CHĂM LO FILTER
     function filterCL() {
         var input = document.getElementById("clSearch").value.toLowerCase();
         var monthVal = document.getElementById("clMonth").value.toLowerCase();
@@ -1607,14 +1606,12 @@
         var tr = table.getElementsByTagName("tr");
 
         for (var i = 1; i < tr.length; i++) {
-            // Cột 0: Tháng, Cột 1: Đơn vị (có chứa thẻ span chứa Phân loại đơn vị), Nội dung toàn bộ dòng
             var textThang = tr[i].cells[0].innerText.toLowerCase();
             var textDonVi = tr[i].cells[1].innerText.toLowerCase();
             var rowText = tr[i].innerText.toLowerCase();
 
-            // So khớp các điều kiện
             var matchSearch = rowText.indexOf(input) > -1;
-            var matchMonth = monthVal === "" || textThang === monthVal; // Lọc đích danh "Tháng X"
+            var matchMonth = monthVal === "" || textThang === monthVal;
             var matchUnit = unitVal === "" || textDonVi.indexOf(unitVal) > -1;
 
             if (matchSearch && matchMonth && matchUnit) {
@@ -1625,169 +1622,215 @@
         }
     }
 
-    // 2. PHÂN TRANG AJAX
-    document.addEventListener('click', function(e) {
-        var link = e.target.closest('.ajax-page-link');
-        if (link) {
-            e.preventDefault();
-            var page = link.getAttribute('data-page');
-            fetch('/CongThongTinAnSXH/GetDanhSachUngHoPartial?page=' + page)
-                .then(res => res.text())
-                .then(html => document.getElementById('vung-chua-bang-danh-sach').innerHTML = html);
-        }
-    });
+    // 2. HÀM CHUYỂN TRANG KHÔNG LOAD LẠI TRÌNH DUYỆT ĐÃ ĐƯỢC KÉO RA NGOÀI ĐỂ KHÔNG BỊ LỖI
+    function loadTrangDanhSach(pageNumber) {
+        var vungChua = document.getElementById('vung-chua-bang-danh-sach');
+        if (!vungChua) return;
 
-    // 3. LEAFLET MAP & BỘ LỌC
-  // 3. LEAFLET MAP & BỘ LỌC
-// Đọc dữ liệu từ thẻ script ẩn ở trên và Parse ra Object
-const mapDataElement = document.getElementById('mapDataJson').textContent;
-const rawData = JSON.parse(mapDataElement);
-let currentData = [...rawData];
-let activeFilter = "";
-    const map = L.map('leafletMap').setView([10.7915, 106.6896], 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    let markersLayer = L.layerGroup().addTo(map);
+        // Làm mờ bảng để tạo hiệu ứng loading
+        vungChua.style.transition = 'opacity 0.3s ease';
+        vungChua.style.opacity = '0.4';
+        vungChua.style.pointerEvents = 'none';
 
-    fetch('https://nominatim.openstreetmap.org/lookup?osm_ids=R19260505&polygon_geojson=1&format=json')
-        .then(res => res.json())
-        .then(data => {
-            if (data && data.length > 0 && data[0].geojson) {
-                const boundaryLayer = L.geoJSON(data[0].geojson, {
-                    style: { color: "#e63946", weight: 3, fillColor: "#e63946", fillOpacity: 0.1 },
-                    interactive: false
-                }).addTo(map);
-                map.fitBounds(boundaryLayer.getBounds());
-            }
-        });
+        // Lấy URL cần tải
+        var fetchUrl = window.location.pathname + '?page=' + pageNumber;
 
-    const unitLogos = {
-        "Đoàn Thanh Niên": "/images/logo-doan.png",
-        "Hội LHPN": "/images/logo-hoi-lhpn.jpg",
-        "Mặt trận Tổ quốc": "https://upload.wikimedia.org/wikipedia/vi/thumb/b/b5/Mat_tran_To_quoc_Viet_Nam.svg/120px-Mat_tran_To_quoc_Viet_Nam.svg.png",
-        "Default": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-    };
+        fetch(fetchUrl)
+            .then(function(res) {
+                return res.text();
+            })
+            .then(function(html) {
+                var parser = new DOMParser();
+                var doc = parser.parseFromString(html, 'text/html');
 
-    function getLogoUrl(unitName) {
-        if (!unitName) return unitLogos["Default"];
-        let name = unitName.toLowerCase();
-        if (name.includes("đoàn") || name.includes("thanh niên")) return unitLogos["Đoàn Thanh Niên"];
-        if (name.includes("phụ nữ") || name.includes("lhpn")) return unitLogos["Hội LHPN"];
-        if (name.includes("mặt trận") || name.includes("tổ quốc")) return unitLogos["Mặt trận Tổ quốc"];
-        return unitLogos["Default"];
+                // Trích xuất đúng vùng bảng chứa danh sách
+                var bangMoi = doc.getElementById('vung-chua-bang-danh-sach');
+
+                if (bangMoi) {
+                    // Đắp nội dung mới vào
+                    vungChua.innerHTML = bangMoi.innerHTML;
+
+                    // Cuộn nhẹ màn hình lên tiêu đề bảng để người dùng dễ nhìn
+                    var theAnchor = document.getElementById('danh-sach-ung-ho');
+                    if (theAnchor) {
+                        theAnchor.scrollIntoView({ behavior: 'smooth' });
+                    }
+
+                    // Cập nhật đường dẫn trên thanh địa chỉ mà không làm giật trang
+                    window.history.pushState(null, '', fetchUrl);
+                }
+
+                // Hiển thị lại bảng rõ ràng
+                vungChua.style.opacity = '1';
+                vungChua.style.pointerEvents = 'auto';
+            })
+            .catch(function(err) {
+                console.error("Lỗi Fetch API:", err);
+                // Phương án dự phòng: Nếu mạng lỗi, load lại trang bình thường
+                window.location.href = fetchUrl;
+            });
     }
 
-    function openModal(item) {
-        document.getElementById('mTitle').innerText = item.ten;
-        document.getElementById('mDate').innerText = item.ngay;
-        document.getElementById('mUnit').innerText = item.phanLoai;
-        document.getElementById('mDesc').innerText = item.moTa;
-        const imgEl = document.getElementById('mImage');
-        if (item.hinhAnh) { imgEl.src = item.hinhAnh; imgEl.style.display = 'block'; } else { imgEl.style.display = 'none'; }
-        document.getElementById('mapModal').classList.add('active');
-    }
-
+    // Hàm phụ trợ đóng modal nếu không có Bản đồ
     function closeModal(e) {
         if (e && e.target.id !== 'mapModal' && e.type === 'click' && !e.target.classList.contains('btn-close-modal')) return;
         document.getElementById('mapModal').classList.remove('active');
     }
-
-    function renderMap(data) {
-        markersLayer.clearLayers();
-        data.forEach(item => {
-            if (item.viDo && item.kinhDo) {
-                const logoUrl = getLogoUrl(item.phanLoai);
-                const customIcon = L.divIcon({
-                    className: 'custom-div-icon',
-                    html: `<div style='background-color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid #eaeaea; box-shadow: 0 4px 10px rgba(0,0,0,0.3); overflow: hidden;'>
-                                       <img src='${logoUrl}' style='width: 28px; height: 28px; object-fit: contain;' onerror="this.onerror=null; this.src='${unitLogos["Default"]}';" alt='Logo' />
-                                   </div>`,
-                    iconSize: [40, 40], iconAnchor: [20, 20]
-                });
-                const marker = L.marker([item.viDo, item.kinhDo], { icon: customIcon }).addTo(markersLayer);
-                marker.on('click', () => { openModal(item); map.flyTo([item.viDo, item.kinhDo], 17, { duration: 1 }); });
-            }
-        });
-    }
-
-    function renderList(data) {
-        const wrapper = document.getElementById('listWrapper');
-        wrapper.innerHTML = "";
-        data.forEach(item => {
-            const card = document.createElement('div');
-            card.className = "map-card";
-            card.innerHTML = `<h5 class="card-title">${item.ten}</h5>
-                                      <div class="card-meta"><span style="color:#777;">📅 ${item.ngay}</span> <span class="unit-badge">${item.phanLoai}</span></div>
-                                      <div class="card-desc">${item.moTa.length > 80 ? item.moTa.substring(0, 80) + '...' : item.moTa}</div>`;
-            card.onclick = () => {
-                openModal(item);
-                if (item.viDo) {
-                    map.flyTo([item.viDo, item.kinhDo], 17, { duration: 1 });
-                    if (window.innerWidth <= 992) switchMobileTab('map');
-                }
-            };
-            wrapper.appendChild(card);
-        });
-    }
-
-    function renderFilterChips(units) {
-        const container = document.getElementById('filterContainer');
-        container.innerHTML = "";
-        units.forEach(unit => {
-            const chip = document.createElement('div');
-            chip.className = "chip";
-            chip.innerHTML = `<img src="${getLogoUrl(unit)}" onerror="this.onerror=null; this.src='${unitLogos["Default"]}';" /> ${unit}`;
-            chip.onclick = () => {
-                document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-                activeFilter = activeFilter === unit ? "" : unit;
-                if (activeFilter) chip.classList.add('active');
-                applyFilters();
-            };
-            container.appendChild(chip);
-        });
-    }
-
-    function applyFilters() {
-        const searchText = document.getElementById('searchInput').value.toLowerCase();
-        currentData = rawData.filter(item => {
-            const matchSearch = item.ten.toLowerCase().includes(searchText) || item.phanLoai.toLowerCase().includes(searchText);
-            const matchFilter = activeFilter === "" || item.phanLoai === activeFilter;
-            return matchSearch && matchFilter;
-        });
-        renderMap(currentData);
-        renderList(currentData);
-        document.getElementById('hienThiCount').innerText = currentData.length;
-        document.getElementById('listCountBadge').innerText = currentData.length;
-        document.getElementById('mListCountBadge').innerText = currentData.length;
-    }
-
-    function clearFilters() {
-        document.getElementById('searchInput').value = ""; activeFilter = "";
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        applyFilters(); map.setView([10.7915, 106.6896], 15);
-    }
-
-    // 4. JS XỬ LÝ CHUYỂN TAB MOBILE
-    function switchMobileTab(tab) {
-        const row = document.getElementById('mapContentRow');
-        const btnMap = document.getElementById('btnShowMap');
-        const btnList = document.getElementById('btnShowList');
-
-        if (tab === 'map') {
-            row.classList.remove('show-list');
-            btnMap.classList.add('active');
-            btnList.classList.remove('active');
-            setTimeout(() => { map.invalidateSize(); }, 100);
-        } else {
-            row.classList.add('show-list');
-            btnList.classList.add('active');
-            btnMap.classList.remove('active');
-        }
-    }
-
-    function init() {
-        renderFilterChips([...new Set(rawData.map(item => item.phanLoai))]);
-        applyFilters();
-    }
-    init();
 </script>
+
+<!-- ==========================================
+     ĐOẠN JAVASCRIPT RIÊNG CHO BẢN ĐỒ
+     ========================================== -->
+@if (ViewBag.HienThiBanDo == true)
+{
+    <script type="application/json" id="mapDataJson">
+        @Html.Raw(ViewBag.MapDataJson ?? "[]")
+    </script>
+    <script>
+        // 3. LEAFLET MAP & BỘ LỌC
+        const mapDataElement = document.getElementById('mapDataJson').textContent;
+        const rawData = JSON.parse(mapDataElement);
+        let currentData = [...rawData];
+        let activeFilter = "";
+        const map = L.map('leafletMap').setView([10.7915, 106.6896], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        let markersLayer = L.layerGroup().addTo(map);
+
+        fetch('https://nominatim.openstreetmap.org/lookup?osm_ids=R19260505&polygon_geojson=1&format=json')
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.length > 0 && data[0].geojson) {
+                    const boundaryLayer = L.geoJSON(data[0].geojson, {
+                        style: { color: "#e63946", weight: 3, fillColor: "#e63946", fillOpacity: 0.1 },
+                        interactive: false
+                    }).addTo(map);
+                    map.fitBounds(boundaryLayer.getBounds());
+                }
+            });
+
+        const unitLogos = {
+            "Đoàn Thanh Niên": "/images/logo-doan.png",
+            "Hội LHPN": "/images/logo-hoi-lhpn.jpg",
+            "Mặt trận Tổ quốc": "https://upload.wikimedia.org/wikipedia/vi/thumb/b/b5/Mat_tran_To_quoc_Viet_Nam.svg/120px-Mat_tran_To_quoc_Viet_Nam.svg.png",
+            "Default": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+        };
+
+        function getLogoUrl(unitName) {
+            if (!unitName) return unitLogos["Default"];
+            let name = unitName.toLowerCase();
+            if (name.includes("đoàn") || name.includes("thanh niên")) return unitLogos["Đoàn Thanh Niên"];
+            if (name.includes("phụ nữ") || name.includes("lhpn")) return unitLogos["Hội LHPN"];
+            if (name.includes("mặt trận") || name.includes("tổ quốc")) return unitLogos["Mặt trận Tổ quốc"];
+            return unitLogos["Default"];
+        }
+
+        function openModal(item) {
+            document.getElementById('mTitle').innerText = item.ten;
+            document.getElementById('mDate').innerText = item.ngay;
+            document.getElementById('mUnit').innerText = item.phanLoai;
+            document.getElementById('mDesc').innerText = item.moTa;
+            const imgEl = document.getElementById('mImage');
+            if (item.hinhAnh) { imgEl.src = item.hinhAnh; imgEl.style.display = 'block'; } else { imgEl.style.display = 'none'; }
+            document.getElementById('mapModal').classList.add('active');
+        }
+
+        function renderMap(data) {
+            markersLayer.clearLayers();
+            data.forEach(item => {
+                if (item.viDo && item.kinhDo) {
+                    const logoUrl = getLogoUrl(item.phanLoai);
+                    const customIcon = L.divIcon({
+                        className: 'custom-div-icon',
+                        html: `<div style='background-color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid #eaeaea; box-shadow: 0 4px 10px rgba(0,0,0,0.3); overflow: hidden;'>
+                                                   <img src='${logoUrl}' style='width: 28px; height: 28px; object-fit: contain;' onerror="this.onerror=null; this.src='${unitLogos["Default"]}';" alt='Logo' />
+                                               </div>`,
+                        iconSize: [40, 40], iconAnchor: [20, 20]
+                    });
+                    const marker = L.marker([item.viDo, item.kinhDo], { icon: customIcon }).addTo(markersLayer);
+                    marker.on('click', () => { openModal(item); map.flyTo([item.viDo, item.kinhDo], 17, { duration: 1 }); });
+                }
+            });
+        }
+
+        function renderList(data) {
+            const wrapper = document.getElementById('listWrapper');
+            wrapper.innerHTML = "";
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "map-card";
+                card.innerHTML = `<h5 class="card-title">${item.ten}</h5>
+                                                  <div class="card-meta"><span style="color:#777;">📅 ${item.ngay}</span> <span class="unit-badge">${item.phanLoai}</span></div>
+                                                  <div class="card-desc">${item.moTa.length > 80 ? item.moTa.substring(0, 80) + '...' : item.moTa}</div>`;
+                card.onclick = () => {
+                    openModal(item);
+                    if (item.viDo) {
+                        map.flyTo([item.viDo, item.kinhDo], 17, { duration: 1 });
+                        if (window.innerWidth <= 992) switchMobileTab('map');
+                    }
+                };
+                wrapper.appendChild(card);
+            });
+        }
+
+        function renderFilterChips(units) {
+            const container = document.getElementById('filterContainer');
+            container.innerHTML = "";
+            units.forEach(unit => {
+                const chip = document.createElement('div');
+                chip.className = "chip";
+                chip.innerHTML = `<img src="${getLogoUrl(unit)}" onerror="this.onerror=null; this.src='${unitLogos["Default"]}';" /> ${unit}`;
+                chip.onclick = () => {
+                    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+                    activeFilter = activeFilter === unit ? "" : unit;
+                    if (activeFilter) chip.classList.add('active');
+                    applyFilters();
+                };
+                container.appendChild(chip);
+            });
+        }
+
+        function applyFilters() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            currentData = rawData.filter(item => {
+                const matchSearch = item.ten.toLowerCase().includes(searchText) || item.phanLoai.toLowerCase().includes(searchText);
+                const matchFilter = activeFilter === "" || item.phanLoai === activeFilter;
+                return matchSearch && matchFilter;
+            });
+            renderMap(currentData);
+            renderList(currentData);
+            document.getElementById('hienThiCount').innerText = currentData.length;
+            document.getElementById('listCountBadge').innerText = currentData.length;
+            document.getElementById('mListCountBadge').innerText = currentData.length;
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = ""; activeFilter = "";
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            applyFilters(); map.setView([10.7915, 106.6896], 15);
+        }
+
+        // 4. JS XỬ LÝ CHUYỂN TAB MOBILE
+        function switchMobileTab(tab) {
+            const row = document.getElementById('mapContentRow');
+            const btnMap = document.getElementById('btnShowMap');
+            const btnList = document.getElementById('btnShowList');
+
+            if (tab === 'map') {
+                row.classList.remove('show-list');
+                btnMap.classList.add('active');
+                btnList.classList.remove('active');
+                setTimeout(() => { map.invalidateSize(); }, 100);
+            } else {
+                row.classList.add('show-list');
+                btnList.classList.add('active');
+                btnMap.classList.remove('active');
+            }
+        }
+
+        function init() {
+            renderFilterChips([...new Set(rawData.map(item => item.phanLoai))]);
+            applyFilters();
+        }
+        init();
+    </script>
 }
