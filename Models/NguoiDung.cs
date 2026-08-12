@@ -8,7 +8,8 @@ namespace WebMTTQ.Models;
 
 [Table("NguoiDung")]
 [Index("TenDangNhap", Name = "UQ__NguoiDun__55F68FC0CA9219EA", IsUnique = true)]
-[Index("Email", Name = "UQ__NguoiDun__A9D105348E5266DA", IsUnique = true)]
+// Unique index trên Email được cấu hình trong DataMTTQContext (filtered index)
+// để chỉ áp dụng khi Email IS NOT NULL (cho phép nhiều user NULL email)
 public partial class NguoiDung
 {
     [Key]

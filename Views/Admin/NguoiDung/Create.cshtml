@@ -1,0 +1,104 @@
+@model WebMTTQ.Models.TaoNguoiDungViewModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Tạo người dùng mới";
+}
+
+<div class="admin-page-header" style="margin-bottom: 20px;">
+    <div>
+        <h2><i class="fas fa-user-plus"></i> Tạo người dùng mới</h2>
+        <div class="subtitle">Tạo tài khoản người dùng - quyền truy cập xác định theo vai trò</div>
+    </div>
+    <a href="@Url.Action("VaiTro", "AdminNguoiDung")" class="admin-btn" style="padding:10px 20px; border-radius:10px; background:rgba(139,26,43,0.1); color:#8b1a2b;">
+        <i class="fas fa-users-cog"></i> Quản lý vai trò
+    </a>
+    <a href="/AdminNguoiDung/Index" class="admin-btn" style="padding:10px 20px; border-radius:10px;">
+        <i class="fas fa-arrow-left"></i> Quay lại
+    </a>
+</div>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div style="max-width: 600px; background:#fff; border:1px solid #eae5e1; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+        <h3 style="margin:0 0 20px; font-size:1rem; color:#1e1a1d; display:flex; align-items:center; gap:8px;">
+            <i class="fas fa-user-cog" style="color:#8b1a2b;"></i> Thông tin tài khoản
+        </h3>
+
+        <div class="admin-form-group">
+            <label class="admin-form-label">Tên đăng nhập <span style="color:#dc2626;">*</span></label>
+            <input asp-for="TenDangNhap" class="admin-form-control" placeholder="VD: nguyenvanan" />
+            <span asp-validation-for="TenDangNhap" style="color:#dc2626; font-size:0.75rem;"></span>
+        </div>
+
+        <div class="admin-form-group">
+            <label class="admin-form-label">Họ tên <span style="color:#dc2626;">*</span></label>
+            <input asp-for="HoTen" class="admin-form-control" placeholder="VD: Nguyễn Văn An" />
+            <span asp-validation-for="HoTen" style="color:#dc2626; font-size:0.75rem;"></span>
+        </div>
+
+        <div class="admin-form-group">
+            <label class="admin-form-label">Số điện thoại</label>
+            <input asp-for="SoDienThoai" class="admin-form-control" placeholder="VD: 0901234567" />
+            <span asp-validation-for="SoDienThoai" style="color:#dc2626; font-size:0.75rem;"></span>
+        </div>
+
+        <div class="admin-form-group">
+            <label class="admin-form-label">Email</label>
+            <input asp-for="Email" class="admin-form-control" placeholder="VD: nguyenvanan@example.com" />
+            <span asp-validation-for="Email" style="color:#dc2626; font-size:0.75rem;"></span>
+            <span style="font-size:0.72rem; color:#999; display:block; margin-top:4px;">
+                <i class="fas fa-info-circle"></i> Email dùng để đăng nhập / khôi phục mật khẩu. Có thể để trống.
+            </span>
+        </div>
+
+        <div class="admin-form-group">
+            <label class="admin-form-label">Vai trò <span style="color:#dc2626;">*</span></label>
+            <select asp-for="IdVaiTro" class="admin-form-control">
+                <option value="">-- Chọn vai trò --</option>
+                @foreach (var vaiTro in Model.VaiTros)
+                {
+                    <option value="@vaiTro.IdvaiTro">@vaiTro.TenVaiTro</option>
+                }
+            </select>
+            <span asp-validation-for="IdVaiTro" style="color:#dc2626; font-size:0.75rem;"></span>
+            <span style="font-size:0.72rem; color:#999; display:block; margin-top:4px;">
+                <i class="fas fa-info-circle"></i> Quyền truy cập của người dùng sẽ theo vai trò đã chọn.
+            </span>
+        </div>
+
+        <div class="admin-form-group">
+            <label class="admin-form-label">Mật khẩu <span style="color:#dc2626;">*</span></label>
+            <input asp-for="MatKhau" type="password" class="admin-form-control" placeholder="Ít nhất 6 ký tự" />
+            <span asp-validation-for="MatKhau" style="color:#dc2626; font-size:0.75rem;"></span>
+        </div>
+
+        <div class="admin-form-group">
+            <label class="admin-form-label">Xác nhận mật khẩu <span style="color:#dc2626;">*</span></label>
+            <input asp-for="XacNhanMatKhau" type="password" class="admin-form-control" placeholder="Nhập lại mật khẩu" />
+            <span asp-validation-for="XacNhanMatKhau" style="color:#dc2626; font-size:0.75rem;"></span>
+        </div>
+
+        <div class="admin-alert admin-alert-info" style="margin-top:12px; background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.2); color:#1d4ed8; padding:10px 14px; border-radius:8px; font-size:0.78rem;">
+            <i class="fas fa-info-circle"></i>
+            Người dùng có thể thêm/sửa email trong phần "Tài khoản của tôi" sau khi đăng nhập.
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px;">
+            <a href="/AdminNguoiDung/Index" class="admin-btn" style="padding:12px 24px; border-radius:10px;">Hủy</a>
+            <button type="submit" class="admin-btn admin-btn-success" style="padding:12px 32px; border-radius:10px; font-size:0.95rem;">
+                <i class="fas fa-save"></i> Tạo người dùng
+            </button>
+        </div>
+    </div>
+</form>
+
+<style>
+    .admin-page-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .admin-page-header h2 { margin: 0 0 4px; font-size: 1.4rem; color: #1e1a1d; }
+    .admin-page-header .subtitle { font-size: 0.85rem; color: #7a6e72; }
+    .admin-form-group { margin-bottom: 16px; }
+    .admin-form-label { display: block; font-size: 0.8rem; font-weight: 600; color: #555; margin-bottom: 6px; }
+    .admin-form-control { width: 100%; padding: 10px 14px; border: 1.5px solid #e0dcd8; border-radius: 8px; font-size: 0.85rem; font-family: inherit; outline: none; transition: border-color 0.2s; box-sizing: border-box; }
+    .admin-form-control:focus { border-color: #8b1a2b; }
+</style>

@@ -7,6 +7,7 @@ using System.Linq;
 namespace WebMTTQ.Controllers
 {
     [Route("admin/danhsachungho")]
+    [KiemTraQuyen(ModuleQuyen.DanhSachUngHo, "Xem")]
     public class AdminDanhSachUngHoController : BaseAdminController
     {
         private readonly DataMTTQContext _context;

@@ -9,7 +9,7 @@ using System;
 
 namespace WebMTTQ.Controllers
 {
-    // Đảm bảo có xác thực [Authorize(Roles = "Admin")] nếu hệ thống bạn có
+    [KiemTraQuyen(ModuleQuyen.DiaDiemBanDo, "Xem")]
     public class AdminDiaDiemBanDoController : BaseAdminController
     {
         private readonly DataMTTQContext _context;

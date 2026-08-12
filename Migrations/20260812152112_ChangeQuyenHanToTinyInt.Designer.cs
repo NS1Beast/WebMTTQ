@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebMTTQ.Models;
 
@@ -11,9 +12,11 @@ using WebMTTQ.Models;
 namespace WebMTTQ.Migrations
 {
     [DbContext(typeof(DataMTTQContext))]
-    partial class DataMTTQContextModelSnapshot : ModelSnapshot
+    [Migration("20260812152112_ChangeQuyenHanToTinyInt")]
+    partial class ChangeQuyenHanToTinyInt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,7 +97,7 @@ namespace WebMTTQ.Migrations
 
                     b.HasIndex(new[] { "DuongDan" }, "IDX_BaiViet_DuongDan");
 
-                    b.ToTable("BaiViet", (string)null);
+                    b.ToTable("BaiViet");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.Banner", b =>
@@ -143,7 +146,7 @@ namespace WebMTTQ.Migrations
 
                     b.HasKey("IdBanner");
 
-                    b.ToTable("Banner", (string)null);
+                    b.ToTable("Banner");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.CauHinhHeThong", b =>
@@ -174,7 +177,7 @@ namespace WebMTTQ.Migrations
                     b.HasIndex(new[] { "MaCauHinh" }, "UQ__CauHinhH__F0685B7C0CDBF0F8")
                         .IsUnique();
 
-                    b.ToTable("CauHinhHeThong", (string)null);
+                    b.ToTable("CauHinhHeThong");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.ChuongTrinhHoTro", b =>
@@ -212,7 +215,7 @@ namespace WebMTTQ.Migrations
                     b.HasKey("IdchuongTrinh")
                         .HasName("PK__ChuongTr__7B0509A41C0A9DEB");
 
-                    b.ToTable("ChuongTrinhHoTro", (string)null);
+                    b.ToTable("ChuongTrinhHoTro");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.ChuyenMuc", b =>
@@ -260,7 +263,7 @@ namespace WebMTTQ.Migrations
 
                     b.HasIndex(new[] { "DuongDan" }, "IDX_ChuyenMuc_DuongDan");
 
-                    b.ToTable("ChuyenMuc", (string)null);
+                    b.ToTable("ChuyenMuc");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.DanhMucQuy", b =>
@@ -306,7 +309,7 @@ namespace WebMTTQ.Migrations
                     b.HasKey("Idquy")
                         .HasName("PK__DanhMucQ__A743077E0D5CACAF");
 
-                    b.ToTable("DanhMucQuy", (string)null);
+                    b.ToTable("DanhMucQuy");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.DanhSachUngHo", b =>
@@ -332,7 +335,7 @@ namespace WebMTTQ.Migrations
 
                     b.HasIndex("NgayUngHo");
 
-                    b.ToTable("DanhSachUngHo", (string)null);
+                    b.ToTable("DanhSachUngHo");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.DiaDiemBanDo", b =>
@@ -399,7 +402,7 @@ namespace WebMTTQ.Migrations
 
                     b.HasIndex(new[] { "DaXoa" }, "IDX_DiaDiemBanDo_DaXoa");
 
-                    b.ToTable("DiaDiemBanDo", (string)null);
+                    b.ToTable("DiaDiemBanDo");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.DoanTheToChuc", b =>
@@ -432,7 +435,7 @@ namespace WebMTTQ.Migrations
                     b.HasKey("IddonVi")
                         .HasName("PK__DoanTheT__082302BFBA08A593");
 
-                    b.ToTable("DoanTheToChuc", (string)null);
+                    b.ToTable("DoanTheToChuc");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.DonXinHoTro", b =>
@@ -501,7 +504,7 @@ namespace WebMTTQ.Migrations
 
                     b.HasIndex("IdnguoiXuLy");
 
-                    b.ToTable("DonXinHoTro", (string)null);
+                    b.ToTable("DonXinHoTro");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.HopThuGopY", b =>
@@ -575,7 +578,7 @@ namespace WebMTTQ.Migrations
 
                     b.HasIndex("IdnguoiXuLy");
 
-                    b.ToTable("HopThuGopY", (string)null);
+                    b.ToTable("HopThuGopY");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.KetQuaChamLo", b =>
@@ -621,7 +624,7 @@ namespace WebMTTQ.Migrations
 
                     b.HasIndex("Thang");
 
-                    b.ToTable("KetQuaChamLo", (string)null);
+                    b.ToTable("KetQuaChamLo");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.KhoanDongGop", b =>
@@ -814,7 +817,7 @@ namespace WebMTTQ.Migrations
                     b.HasKey("IdmaXacThuc")
                         .HasName("PK__MaXacThuc");
 
-                    b.ToTable("MaXacThuc", (string)null);
+                    b.ToTable("MaXacThuc");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.NguoiCanGiupDo", b =>
@@ -864,7 +867,7 @@ namespace WebMTTQ.Migrations
                     b.HasKey("IdnguoiCanGiup")
                         .HasName("PK__NguoiCan__92DA5CD99DA55672");
 
-                    b.ToTable("NguoiCanGiupDo", (string)null);
+                    b.ToTable("NguoiCanGiupDo");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.NguoiDanCanTroGiup", b =>
@@ -905,7 +908,7 @@ namespace WebMTTQ.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NguoiDanCanTroGiup", (string)null);
+                    b.ToTable("NguoiDanCanTroGiup");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.NguoiDung", b =>
@@ -1032,7 +1035,7 @@ namespace WebMTTQ.Migrations
                     b.HasKey("IdnhaHaoTam")
                         .HasName("PK__NhaHaoTa__9835F40B35BF40E3");
 
-                    b.ToTable("NhaHaoTam", (string)null);
+                    b.ToTable("NhaHaoTam");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.NhatKyHeThong", b =>
@@ -1084,7 +1087,7 @@ namespace WebMTTQ.Migrations
 
                     b.HasIndex("IdnguoiDung");
 
-                    b.ToTable("NhatKyHeThong", (string)null);
+                    b.ToTable("NhatKyHeThong");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.SoDuQuyViNguoiNgheo", b =>
@@ -1109,7 +1112,7 @@ namespace WebMTTQ.Migrations
                     b.HasKey("Id")
                         .HasName("PK__SoDuQuyViNguoiNgheo");
 
-                    b.ToTable("SoDuQuyViNguoiNgheo", (string)null);
+                    b.ToTable("SoDuQuyViNguoiNgheo");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.ThanhPhanGiaoDien", b =>
@@ -1155,7 +1158,7 @@ namespace WebMTTQ.Migrations
                     b.HasKey("IdthanhPhan")
                         .HasName("PK__ThanhPha__90B69433059DBB34");
 
-                    b.ToTable("ThanhPhanGiaoDien", (string)null);
+                    b.ToTable("ThanhPhanGiaoDien");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.ThongTinNhanUngHo", b =>
@@ -1195,7 +1198,7 @@ namespace WebMTTQ.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ThongTinNhanUngHos", (string)null);
+                    b.ToTable("ThongTinNhanUngHos");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.TrangChuMuc", b =>
@@ -1237,7 +1240,7 @@ namespace WebMTTQ.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TrangChuMuc", (string)null);
+                    b.ToTable("TrangChuMuc");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.TrangChuTinTuc", b =>
@@ -1281,7 +1284,7 @@ namespace WebMTTQ.Migrations
 
                     b.HasIndex("IdTrangChuMuc");
 
-                    b.ToTable("TrangChuTinTuc", (string)null);
+                    b.ToTable("TrangChuTinTuc");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.VaiTro", b =>
@@ -1319,46 +1322,7 @@ namespace WebMTTQ.Migrations
                     b.HasKey("IdvaiTro")
                         .HasName("PK__VaiTro__45D3FF49D7A1FDCD");
 
-                    b.ToTable("VaiTro", (string)null);
-                });
-
-            modelBuilder.Entity("WebMTTQ.Models.VaiTroQuyen", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("CoQuyenSua")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("CoQuyenThem")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("CoQuyenXem")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("CoQuyenXoa")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("IdVaiTro")
-                        .HasColumnType("int")
-                        .HasColumnName("IDVaiTro");
-
-                    b.Property<string>("MaModule")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id")
-                        .HasName("PK__VaiTroQuyen");
-
-                    b.HasIndex("IdVaiTro", "MaModule")
-                        .IsUnique()
-                        .HasDatabaseName("UQ_VaiTroQuyen_VaiTro_Module");
-
-                    b.ToTable("VaiTroQuyen", (string)null);
+                    b.ToTable("VaiTro");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.VanBanTaiLieu", b =>
@@ -1413,7 +1377,7 @@ namespace WebMTTQ.Migrations
 
                     b.HasIndex(new[] { "DaXoa" }, "IDX_VanBan_DaXoa");
 
-                    b.ToTable("VanBanTaiLieu", (string)null);
+                    b.ToTable("VanBanTaiLieu");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.BaiViet", b =>
@@ -1571,18 +1535,6 @@ namespace WebMTTQ.Migrations
                     b.Navigation("TrangChuMuc");
                 });
 
-            modelBuilder.Entity("WebMTTQ.Models.VaiTroQuyen", b =>
-                {
-                    b.HasOne("WebMTTQ.Models.VaiTro", "IdVaiTroNavigation")
-                        .WithMany("VaiTroQuyens")
-                        .HasForeignKey("IdVaiTro")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_VaiTroQuyen_VaiTro");
-
-                    b.Navigation("IdVaiTroNavigation");
-                });
-
             modelBuilder.Entity("WebMTTQ.Models.VanBanTaiLieu", b =>
                 {
                     b.HasOne("WebMTTQ.Models.ChuyenMuc", "IdchuyenMucNavigation")
@@ -1654,8 +1606,6 @@ namespace WebMTTQ.Migrations
             modelBuilder.Entity("WebMTTQ.Models.VaiTro", b =>
                 {
                     b.Navigation("NguoiDungs");
-
-                    b.Navigation("VaiTroQuyens");
                 });
 #pragma warning restore 612, 618
         }

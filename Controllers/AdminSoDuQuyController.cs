@@ -8,6 +8,7 @@ using WebMTTQ.Models;
 namespace WebMTTQ.Controllers
 {
     [Route("admin/soduquy")]
+    [KiemTraQuyen(ModuleQuyen.SoDuQuy, "Xem")]
     public class AdminSoDuQuyController : BaseAdminController
     {
         private readonly DataMTTQContext _context;

@@ -23,27 +23,7 @@
         public bool BaoTriHeThong { get; set; }
 
         // ================================================
-        // 4. DỊCH VỤ BÊN NGOÀI - CLOUDFLARE R2
-        // ================================================
-        public bool CloudflareR2_Enabled { get; set; }
-        public string? CloudflareR2_Endpoint { get; set; }
-        public string? CloudflareR2_BucketName { get; set; }
-        public string? CloudflareR2_AccessKey { get; set; }
-        public string? CloudflareR2_SecretKey { get; set; }
-        public string? CloudflareR2_DefaultRegion { get; set; }
-        public string? CloudflareR2_FolderStructure { get; set; }
-        public long CloudflareR2_MaxUploadSize { get; set; }
-        public string? CloudflareR2_AllowedExtensions { get; set; }
-        public bool CloudflareR2_AutoImageOptimization { get; set; }
-        public bool CloudflareR2_AutoFileVersioning { get; set; }
-        public bool CloudflareR2_RecycleBin { get; set; }
-
-        // Display-only fields (show masked values)
-        public string? CloudflareR2_AccessKey_Display { get; set; }
-        public string? CloudflareR2_SecretKey_Display { get; set; }
-
-        // ================================================
-        // 5. CẤU HÌNH THƯ MỤC (Folder Configuration)
+        // 4. CẤU HÌNH THƯ MỤC (Folder Configuration)
         // ================================================
         public string? Folder_Documents { get; set; }
         public string? Folder_Images { get; set; }
@@ -58,6 +38,18 @@
         // 6. TỔ CHỨC TÀI LIỆU (Document Organization)
         // ================================================
         public string? DocOrg_SeparateBy { get; set; } // None, Year, Month, Department, DocumentCategory, Combination
+
+        // ================================================
+        // 6.1. CẤU HÌNH SMTP EMAIL (Gửi OTP)
+        // ================================================
+        public string? SmtpHost { get; set; }
+        public int SmtpPort { get; set; } = 587;
+        public bool SmtpUseSsl { get; set; } = true;
+        public string? SmtpUsername { get; set; }
+        public string? SmtpPassword { get; set; }
+        public string? SmtpPassword_Display { get; set; }
+        public string? SmtpFromEmail { get; set; }
+        public string? SmtpFromName { get; set; }
 
         // ================================================
         // 7. QUY TẮC TẢI LÊN (Upload Rules)

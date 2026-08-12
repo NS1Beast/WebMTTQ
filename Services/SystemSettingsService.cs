@@ -18,8 +18,7 @@ namespace WebMTTQ.Services
         // List of keys that should be encrypted
         private static readonly List<string> _encryptedKeys = new()
         {
-            "CloudflareR2_SecretKey",
-            "CloudflareR2_AccessKey"
+            "SmtpPassword"
         };
 
         public SystemSettingsService(DataMTTQContext context, IDataProtectionProvider protectionProvider)

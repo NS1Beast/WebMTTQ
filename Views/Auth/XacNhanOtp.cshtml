@@ -1,4 +1,4 @@
-@model WebMTTQ.Models.LoginViewModel
+@model WebMTTQ.Models.XacNhanOtpViewModel
 @{
     Layout = null;
 }
@@ -8,7 +8,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Đăng nhập - Quản trị MTTQ</title>
+    <title>Xác nhận OTP - Quản trị MTTQ</title>
     <meta name="theme-color" content="#8b1a2b" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -48,34 +48,17 @@
             border-radius: 50%;
             background: radial-gradient(circle, rgba(139,26,43,0.15) 0%, transparent 70%);
         }
-        .login-container {
+        .container {
             width: 100%;
-            max-width: 420px;
+            max-width: 480px;
             position: relative;
             z-index: 1;
         }
-        .login-brand {
+        .brand {
             text-align: center;
             margin-bottom: 32px;
         }
-        .login-brand .logo-wrap {
-            width: 72px;
-            height: 72px;
-            margin: 0 auto 16px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .login-brand .logo-wrap img {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-        }
-        .login-brand h1 {
+        .brand h1 {
             font-family: "Playfair Display", Georgia, serif;
             font-size: 1.3rem;
             font-weight: 700;
@@ -83,14 +66,14 @@
             margin: 0 0 4px;
             letter-spacing: 0.02em;
         }
-        .login-brand p {
+        .brand p {
             color: rgba(255,255,255,0.5);
             font-size: 0.78rem;
             margin: 0;
             letter-spacing: 0.05em;
             text-transform: uppercase;
         }
-        .login-card {
+        .card {
             background: rgba(255,255,255,0.05);
             backdrop-filter: blur(20px);
             border-radius: 16px;
@@ -98,32 +81,32 @@
             border: 1px solid rgba(255,255,255,0.08);
             box-shadow: 0 24px 80px rgba(0,0,0,0.4);
         }
-        .login-card .login-icon {
+        .card .icon {
             text-align: center;
             margin-bottom: 24px;
         }
-        .login-card .login-icon i {
+        .card .icon i {
             font-size: 2.2rem;
             color: var(--admin-gold);
             opacity: 0.7;
         }
-        .login-card .login-title {
+        .card .title {
             text-align: center;
             font-size: 1rem;
             font-weight: 600;
             color: rgba(255,255,255,0.9);
             margin: 0 0 6px;
         }
-        .login-card .login-subtitle {
+        .card .subtitle {
             text-align: center;
             font-size: 0.78rem;
             color: rgba(255,255,255,0.4);
             margin: 0 0 28px;
         }
-        .login-card .form-group {
+        .form-group {
             margin-bottom: 18px;
         }
-        .login-card .form-group label {
+        .form-group label {
             display: block;
             font-size: 0.78rem;
             font-weight: 500;
@@ -132,10 +115,10 @@
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
-        .login-card .form-group .input-wrap {
+        .form-group .input-wrap {
             position: relative;
         }
-        .login-card .form-group .input-wrap i {
+        .form-group .input-wrap i {
             position: absolute;
             left: 14px;
             top: 50%;
@@ -144,7 +127,7 @@
             font-size: 0.95rem;
             pointer-events: none;
         }
-        .login-card .form-group input {
+        .form-group input {
             width: 100%;
             padding: 12px 14px 12px 42px;
             background: rgba(255,255,255,0.06);
@@ -157,19 +140,22 @@
             transition: all 0.25s ease;
             box-sizing: border-box;
         }
-        .login-card .form-group input::placeholder {
+        .form-group input::placeholder {
             color: rgba(255,255,255,0.25);
         }
-        .login-card .form-group input:focus {
+        .form-group input:focus {
             border-color: #e8b84b;
             background: rgba(255,255,255,0.09);
             box-shadow: 0 0 0 3px rgba(232,184,75,0.12);
         }
-        .login-card .form-group input:-webkit-autofill {
-            -webkit-box-shadow: 0 0 0 30px rgba(30,26,29,0.95) inset !important;
-            -webkit-text-fill-color: #fff !important;
+        .otp-input {
+            text-align: center;
+            font-size: 1.4rem !important;
+            letter-spacing: 12px;
+            font-weight: 700;
+            font-family: 'Courier New', monospace !important;
         }
-        .login-card .btn-login {
+        .btn-primary {
             width: 100%;
             padding: 13px;
             background: linear-gradient(135deg, #8b1a2b, #a31f34);
@@ -187,62 +173,72 @@
             justify-content: center;
             gap: 8px;
         }
-        .login-card .btn-login:hover {
+        .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(139,26,43,0.4);
         }
-        .login-card .btn-login:active {
-            transform: translateY(0);
-        }
-        .login-card .btn-login i {
-            font-size: 0.9rem;
-        }
-        .login-card .login-error {
-            background: rgba(239,68,68,0.12);
-            border: 1px solid rgba(239,68,68,0.2);
-            color: #fca5a5;
-            padding: 12px 16px;
+        .btn-secondary {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.7);
+            border: 1px solid rgba(255,255,255,0.15);
             border-radius: 10px;
+            font-family: "Be Vietnam Pro", system-ui, sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+        }
+        .message {
+            border-radius: 10px;
+            padding: 12px 16px;
             font-size: 0.82rem;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        .login-card .login-error i {
-            font-size: 1rem;
-            flex-shrink: 0;
+        .message.success {
+            background: rgba(16,185,129,0.12);
+            border: 1px solid rgba(16,185,129,0.2);
+            color: #6ee7b7;
         }
-        .login-card .validation-summary {
-            margin-bottom: 20px;
-        }
-        .login-card .validation-summary ul {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
-        .login-card .validation-summary li {
+        .message.error {
             background: rgba(239,68,68,0.12);
             border: 1px solid rgba(239,68,68,0.2);
             color: #fca5a5;
-            padding: 10px 14px;
+        }
+        .alert {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.12);
             border-radius: 10px;
-            font-size: 0.82rem;
-            margin-bottom: 8px;
+            padding: 12px 14px;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.6);
+            margin-top: 16px;
             display: flex;
-            align-items: center;
             gap: 8px;
+            align-items: flex-start;
         }
-        .login-card .validation-summary li::before {
-            content: '\f071';
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
+        .alert i {
+            color: #e8b84b;
+            margin-top: 2px;
         }
-        .login-footer {
+        .footer {
             text-align: center;
             margin-top: 24px;
         }
-        .login-footer a {
+        .footer a {
             color: rgba(255,255,255,0.4);
             font-size: 0.78rem;
             text-decoration: none;
@@ -251,78 +247,97 @@
             align-items: center;
             gap: 6px;
         }
-        .login-footer a:hover {
+        .footer a:hover {
             color: rgba(255,255,255,0.7);
         }
-
-        @@media (max-width: 480px) {
-            .login-card {
-                padding: 28px 20px 24px;
-            }
+        .validation-error {
+            color: #fca5a5;
+            font-size: 0.75rem;
+            margin-top: 4px;
+            display: block;
+        }
+        .timer {
+            text-align: center;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.5);
+            margin-top: 12px;
+        }
+        .timer strong {
+            color: #e8b84b;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-brand">
-            <div class="logo-wrap">
-                <img src="https://mttq.phuhoadong.vn/apps/uploads/2025/11/cropped-favicon-270x270.png" alt="Biểu trưng MTTQ" />
-            </div>
+    <div class="container">
+        <div class="brand">
             <h1>MTTQ Quản trị</h1>
             <p>Phường Tân Định</p>
         </div>
 
-        <div class="login-card">
-            <div class="login-icon">
+        <div class="card">
+            <div class="icon">
                 <i class="fas fa-shield-halved"></i>
             </div>
-            <div class="login-title">Đăng nhập hệ thống</div>
-            <div class="login-subtitle">Vui lòng nhập thông tin tài khoản quản trị</div>
+            <div class="title">Xác nhận mã OTP</div>
+            <div class="subtitle">Nhập mã 6 số đã được gửi đến email của bạn</div>
 
-            @if (!ViewData.ModelState.IsValid)
+            @if (TempData["SuccessMessage"] != null)
             {
-                <div class="validation-summary">
-                    @Html.ValidationSummary(true, "", new { @class = "" })
+                <div class="message success">
+                    <i class="fas fa-check-circle"></i>
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="message error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    @TempData["ErrorMessage"]
                 </div>
             }
 
-            <form asp-action="Login" method="post">
+            <form asp-action="XacNhanOtp" method="post">
+                <input type="hidden" asp-for="Email" />
+
                 <div class="form-group">
-                    <label for="TenDangNhap">Tên đăng nhập</label>
+                    <label for="Email">Email</label>
                     <div class="input-wrap">
-                        <i class="fas fa-user"></i>
-                        <input asp-for="TenDangNhap" class="form-control" placeholder="Nhập tên đăng nhập" autocomplete="username" autofocus />
+                        <i class="fas fa-envelope"></i>
+                        <input asp-for="Email" type="email" placeholder="Nhập email" autocomplete="email" />
                     </div>
-                    <span asp-validation-for="TenDangNhap" style="color:#fca5a5;font-size:0.75rem;margin-top:4px;display:block;"></span>
+                    <span asp-validation-for="Email" class="validation-error"></span>
                 </div>
 
                 <div class="form-group">
-                    <label for="MatKhau">Mật khẩu</label>
+                    <label for="MaOtp">Mã OTP</label>
                     <div class="input-wrap">
-                        <i class="fas fa-lock"></i>
-                        <input asp-for="MatKhau" class="form-control" placeholder="Nhập mật khẩu" autocomplete="current-password" />
+                        <i class="fas fa-key"></i>
+                        <input asp-for="MaOtp" class="otp-input" maxlength="6" placeholder="••••••" inputmode="numeric" autocomplete="one-time-code" autofocus />
                     </div>
-                    <span asp-validation-for="MatKhau" style="color:#fca5a5;font-size:0.75rem;margin-top:4px;display:block;"></span>
+                    <span asp-validation-for="MaOtp" class="validation-error"></span>
                 </div>
 
-                <button type="submit" class="btn-login">
-                    <i class="fas fa-right-to-bracket"></i>
-                    Đăng nhập
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-check-circle"></i>
+                    Xác nhận OTP
                 </button>
 
-                <div style="text-align:center; margin-top:16px;">
-                    <a href="/Auth/QuenMatKhau" style="color:rgba(255,255,255,0.5); font-size:0.78rem; text-decoration:none; transition:color 0.2s; display:inline-flex; align-items:center; gap:6px;">
-                        <i class="fas fa-key"></i>
-                        Quên mật khẩu?
-                    </a>
+                <button type="button" class="btn-secondary" onclick="window.location.href='/Auth/QuenMatKhau'">
+                    <i class="fas fa-redo"></i>
+                    Gửi lại mã OTP
+                </button>
+
+                <div class="alert">
+                    <i class="fas fa-info-circle"></i>
+                    Mã OTP có hiệu lực trong <strong>2 phút</strong>. Nếu mã hết hạn, vui lòng nhấn "Gửi lại mã OTP" để nhận mã mới.
                 </div>
             </form>
         </div>
 
-        <div class="login-footer">
-            <a href="/">
+        <div class="footer">
+            <a href="/Auth/Login">
                 <i class="fas fa-arrow-left"></i>
-                Về trang chủ
+                Quay lại đăng nhập
             </a>
         </div>
     </div>

@@ -6,6 +6,7 @@ using WebMTTQ.Services;
 namespace WebMTTQ.Controllers
 {
     [Route("AdminCauHinh")]
+    [KiemTraQuyen(ModuleQuyen.CauHinh, "Xem")]
     public class AdminCauHinhController : BaseAdminController
     {
         private readonly ISystemSettingsService _settings;
@@ -36,26 +37,6 @@ namespace WebMTTQ.Controllers
                 // --- Maintenance Mode ---
                 BaoTriHeThong = await _settings.GetBooleanAsync("BaoTriHeThong"),
 
-                // --- Cloudflare R2 ---
-                CloudflareR2_Enabled = await _settings.GetBooleanAsync("CloudflareR2_Enabled"),
-                CloudflareR2_Endpoint = await _settings.GetValueAsync("CloudflareR2_Endpoint"),
-                CloudflareR2_BucketName = await _settings.GetValueAsync("CloudflareR2_BucketName"),
-                CloudflareR2_DefaultRegion = await _settings.GetValueAsync("CloudflareR2_DefaultRegion"),
-                CloudflareR2_FolderStructure = await _settings.GetValueAsync("CloudflareR2_FolderStructure"),
-                CloudflareR2_MaxUploadSize = await _settings.GetLongAsync("CloudflareR2_MaxUploadSize"),
-                CloudflareR2_AllowedExtensions = await _settings.GetValueAsync("CloudflareR2_AllowedExtensions"),
-                CloudflareR2_AutoImageOptimization = await _settings.GetBooleanAsync("CloudflareR2_AutoImageOptimization"),
-                CloudflareR2_AutoFileVersioning = await _settings.GetBooleanAsync("CloudflareR2_AutoFileVersioning"),
-                CloudflareR2_RecycleBin = await _settings.GetBooleanAsync("CloudflareR2_RecycleBin"),
-
-                // Display masked values for encrypted fields
-                CloudflareR2_AccessKey_Display = await _settings.ExistsAsync("CloudflareR2_AccessKey")
-                    ? "**************"
-                    : string.Empty,
-                CloudflareR2_SecretKey_Display = await _settings.ExistsAsync("CloudflareR2_SecretKey")
-                    ? "**************"
-                    : string.Empty,
-
                 // --- Folder Configuration ---
                 Folder_Documents = await _settings.GetValueAsync("Folder_Documents"),
                 Folder_Images = await _settings.GetValueAsync("Folder_Images"),
@@ -68,6 +49,15 @@ namespace WebMTTQ.Controllers
 
                 // --- Document Organization ---
                 DocOrg_SeparateBy = await _settings.GetValueAsync("DocOrg_SeparateBy"),
+
+                // --- SMTP Email ---
+                SmtpHost = await _settings.GetValueAsync("SmtpHost"),
+                SmtpPort = await _settings.GetIntAsync("SmtpPort"),
+                SmtpUseSsl = await _settings.GetBooleanAsync("SmtpUseSsl"),
+                SmtpUsername = await _settings.GetValueAsync("SmtpUsername"),
+                SmtpPassword_Display = await _settings.ExistsAsync("SmtpPassword") ? "**************" : string.Empty,
+                SmtpFromEmail = await _settings.GetValueAsync("SmtpFromEmail"),
+                SmtpFromName = await _settings.GetValueAsync("SmtpFromName"),
 
                 // --- Upload Rules ---
                 Upload_MaxImageSize = await _settings.GetLongAsync("Upload_MaxImageSize"),
@@ -106,28 +96,6 @@ namespace WebMTTQ.Controllers
                 // --- Maintenance Mode ---
                 await _settings.SetValueAsync("BaoTriHeThong", model.BaoTriHeThong ? "1" : "0", "Chế độ bảo trì hệ thống (1=Bật, 0=Tắt)");
 
-                // --- Cloudflare R2 ---
-                await _settings.SetValueAsync("CloudflareR2_Enabled", model.CloudflareR2_Enabled ? "1" : "0", "Bật tài khoản lưu trữ Cloudflare R2");
-                await _settings.SetValueAsync("CloudflareR2_Endpoint", model.CloudflareR2_Endpoint, "Endpoint Cloudflare R2");
-                await _settings.SetValueAsync("CloudflareR2_BucketName", model.CloudflareR2_BucketName, "Tên Bucket Cloudflare R2");
-                await _settings.SetValueAsync("CloudflareR2_DefaultRegion", model.CloudflareR2_DefaultRegion, "Vùng mặc định (optional)");
-                await _settings.SetValueAsync("CloudflareR2_FolderStructure", model.CloudflareR2_FolderStructure, "Cấu trúc thư mục gốc");
-                await _settings.SetValueAsync("CloudflareR2_MaxUploadSize", model.CloudflareR2_MaxUploadSize.ToString(), "Kích thước tải lên tối đa (bytes)");
-                await _settings.SetValueAsync("CloudflareR2_AllowedExtensions", model.CloudflareR2_AllowedExtensions, "Định dạng tập tin cho phép");
-                await _settings.SetValueAsync("CloudflareR2_AutoImageOptimization", model.CloudflareR2_AutoImageOptimization ? "1" : "0", "Tự động tối ưu hình ảnh");
-                await _settings.SetValueAsync("CloudflareR2_AutoFileVersioning", model.CloudflareR2_AutoFileVersioning ? "1" : "0", "Tự động đánh phiên bản tập tin");
-                await _settings.SetValueAsync("CloudflareR2_RecycleBin", model.CloudflareR2_RecycleBin ? "1" : "0", "Bật thùng rác");
-
-                // Encrypted fields - only update if a new value is provided
-                if (!string.IsNullOrEmpty(model.CloudflareR2_AccessKey))
-                {
-                    await _settings.SetEncryptedValueAsync("CloudflareR2_AccessKey", model.CloudflareR2_AccessKey, "Access Key Cloudflare R2 (mã hóa)");
-                }
-                if (!string.IsNullOrEmpty(model.CloudflareR2_SecretKey))
-                {
-                    await _settings.SetEncryptedValueAsync("CloudflareR2_SecretKey", model.CloudflareR2_SecretKey, "Secret Key Cloudflare R2 (mã hóa)");
-                }
-
                 // --- Folder Configuration ---
                 await _settings.SetValueAsync("Folder_Documents", model.Folder_Documents, "Thư mục lưu tài liệu");
                 await _settings.SetValueAsync("Folder_Images", model.Folder_Images, "Thư mục lưu hình ảnh");
@@ -140,6 +108,18 @@ namespace WebMTTQ.Controllers
 
                 // --- Document Organization ---
                 await _settings.SetValueAsync("DocOrg_SeparateBy", model.DocOrg_SeparateBy, "Phân loại thư mục theo (None, Year, Month, Department, DocumentCategory, Combination)");
+
+                // --- SMTP Email ---
+                await _settings.SetValueAsync("SmtpHost", model.SmtpHost, "SMTP Host để gửi email OTP");
+                await _settings.SetValueAsync("SmtpPort", model.SmtpPort.ToString(), "SMTP Port");
+                await _settings.SetValueAsync("SmtpUseSsl", model.SmtpUseSsl ? "1" : "0", "Bật SSL/TLS cho SMTP");
+                await _settings.SetValueAsync("SmtpUsername", model.SmtpUsername, "SMTP Username");
+                if (!string.IsNullOrEmpty(model.SmtpPassword))
+                {
+                    await _settings.SetEncryptedValueAsync("SmtpPassword", model.SmtpPassword, "SMTP Password (mã hóa)");
+                }
+                await _settings.SetValueAsync("SmtpFromEmail", model.SmtpFromEmail, "Email gửi (From)");
+                await _settings.SetValueAsync("SmtpFromName", model.SmtpFromName, "Tên hiển thị (From)");
 
                 // --- Upload Rules ---
                 await _settings.SetValueAsync("Upload_MaxImageSize", model.Upload_MaxImageSize.ToString(), "Kích thước tối đa tập tin hình ảnh (bytes)");

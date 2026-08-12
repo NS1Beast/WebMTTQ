@@ -1,0 +1,136 @@
+@model WebMTTQ.Models.VaiTroViewModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Chỉnh sửa vai trò";
+}
+
+<div class="admin-page-header" style="margin-bottom: 20px;">
+    <div>
+        <h2><i class="fas fa-user-edit"></i> Chỉnh sửa vai trò</h2>
+        <div class="subtitle">Cập nhật tên và phân quyền truy cập cho vai trò @Model.TenVaiTro</div>
+    </div>
+    <a href="/AdminNguoiDung/VaiTro" class="admin-btn" style="padding:10px 20px; border-radius:10px;">
+        <i class="fas fa-arrow-left"></i> Quay lại
+    </a>
+</div>
+
+<form asp-action="VaiTroEdit" asp-route-id="@Model.IdvaiTro" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="IdvaiTro" />
+
+    <div style="max-width: 800px; background:#fff; border:1px solid #eae5e1; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+        <div class="admin-form-group">
+            <label class="admin-form-label">Tên vai trò <span style="color:#dc2626;">*</span></label>
+            <input asp-for="TenVaiTro" class="admin-form-control" />
+            <span asp-validation-for="TenVaiTro" style="color:#dc2626; font-size:0.75rem;"></span>
+        </div>
+
+        <hr style="border:none; border-top:1px solid #eae5e1; margin:20px 0;" />
+
+        <h3 style="margin:0 0 16px; font-size:1rem; color:#1e1a1d; display:flex; align-items:center; gap:8px;">
+            <i class="fas fa-shield-alt" style="color:#8b1a2b;"></i> Phân quyền truy cập
+        </h3>
+        <p style="font-size:0.8rem; color:#7a6e72; margin:0 0 16px;">
+            Tích vào các module mà vai trò này được phép truy cập. Sau đó chọn chi tiết quyền (Xem, Thêm, Sửa, Xóa).
+        </p>
+
+        <div style="max-height: 500px; overflow-y:auto; padding-right:8px;">
+            @for (int i = 0; i < Model.Modules.Count; i++)
+            {
+                var module = Model.Modules[i];
+                <div class="permission-module" data-module="@module.MaModule" style="border:1px solid #eae5e1; border-radius:10px; padding:14px 16px; margin-bottom:10px; transition: all 0.2s;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <label style="display:flex; align-items:center; gap:10px; flex:1; cursor:pointer; margin:0;">
+                            <input type="checkbox"
+                                   name="Modules[@module.MaModule].DuocChon"
+                                   value="true"
+                                   class="module-check"
+                                   data-module="@module.MaModule"
+                                   @(module.DuocChon ? "checked" : "") />
+                            <i class="fas @module.Icon" style="color:#8b1a2b; width:20px; text-align:center;"></i>
+                            <div>
+                                <strong style="font-size:0.85rem; color:#333; display:block;">@module.TenModule</strong>
+                                <span style="font-size:0.75rem; color:#999;">@module.MoTa</span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="permission-details" data-module="@module.MaModule" style="display:@(module.DuocChon ? "flex" : "none"); gap:16px; margin-top:12px; padding-top:12px; border-top:1px dashed #eae5e1; flex-wrap:wrap;">
+                        <label style="display:flex; align-items:center; gap:6px; font-size:0.8rem; color:#555; cursor:pointer;">
+                            <input type="checkbox" name="Modules[@module.MaModule].CoQuyenXem" value="true" class="perm-check" data-module="@module.MaModule" @(module.CoQuyenXem ? "checked" : "") />
+                            <i class="fas fa-eye" style="color:#2563eb;"></i> Xem
+                        </label>
+                        <label style="display:flex; align-items:center; gap:6px; font-size:0.8rem; color:#555; cursor:pointer;">
+                            <input type="checkbox" name="Modules[@module.MaModule].CoQuyenThem" value="true" class="perm-check" data-module="@module.MaModule" @(module.CoQuyenThem ? "checked" : "") />
+                            <i class="fas fa-plus-circle" style="color:#059669;"></i> Thêm
+                        </label>
+                        <label style="display:flex; align-items:center; gap:6px; font-size:0.8rem; color:#555; cursor:pointer;">
+                            <input type="checkbox" name="Modules[@module.MaModule].CoQuyenSua" value="true" class="perm-check" data-module="@module.MaModule" @(module.CoQuyenSua ? "checked" : "") />
+                            <i class="fas fa-edit" style="color:#d97706;"></i> Sửa
+                        </label>
+                        <label style="display:flex; align-items:center; gap:6px; font-size:0.8rem; color:#555; cursor:pointer;">
+                            <input type="checkbox" name="Modules[@module.MaModule].CoQuyenXoa" value="true" class="perm-check" data-module="@module.MaModule" @(module.CoQuyenXoa ? "checked" : "") />
+                            <i class="fas fa-trash-alt" style="color:#dc2626;"></i> Xóa
+                        </label>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px;">
+            <a href="/AdminNguoiDung/VaiTro" class="admin-btn" style="padding:12px 24px; border-radius:10px;">Hủy</a>
+            <button type="submit" class="admin-btn admin-btn-success" style="padding:12px 32px; border-radius:10px; font-size:0.95rem;">
+                <i class="fas fa-save"></i> Lưu thay đổi
+            </button>
+        </div>
+    </div>
+</form>
+
+<style>
+    .admin-page-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .admin-page-header h2 { margin: 0 0 4px; font-size: 1.4rem; color: #1e1a1d; }
+    .admin-page-header .subtitle { font-size: 0.85rem; color: #7a6e72; }
+    .admin-form-group { margin-bottom: 16px; }
+    .admin-form-label { display: block; font-size: 0.8rem; font-weight: 600; color: #555; margin-bottom: 6px; }
+    .admin-form-control { width: 100%; padding: 10px 14px; border: 1.5px solid #e0dcd8; border-radius: 8px; font-size: 0.85rem; font-family: inherit; outline: none; transition: border-color 0.2s; box-sizing: border-box; }
+    .admin-form-control:focus { border-color: #8b1a2b; }
+    .permission-module.selected { border-color: #8b1a2b; background: #fcfaf9; }
+    .permission-module.selected .module-check { accent-color: #8b1a2b; }
+    .permission-details label { user-select: none; }
+    .permission-details input[type="checkbox"] { accent-color: #8b1a2b; }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.module-check').forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                var module = this.dataset.module;
+                var details = document.querySelector('.permission-details[data-module="' + module + '"]');
+                var container = document.querySelector('.permission-module[data-module="' + module + '"]');
+
+                if (this.checked) {
+                    details.style.display = 'flex';
+                    container.classList.add('selected');
+                    var xemCheck = details.querySelector('input[name="Modules[' + module + '].CoQuyenXem"]');
+                    if (xemCheck) xemCheck.checked = true;
+                } else {
+                    details.style.display = 'none';
+                    container.classList.remove('selected');
+                    details.querySelectorAll('input[type="checkbox"]').forEach(function(perm) {
+                        perm.checked = false;
+                    });
+                }
+            });
+        });
+
+        document.querySelectorAll('.perm-check').forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                var module = this.dataset.module;
+                var moduleCheck = document.querySelector('.module-check[data-module="' + module + '"]');
+                if (moduleCheck && !moduleCheck.checked) {
+                    this.checked = false;
+                }
+            });
+        });
+    });
+</script>

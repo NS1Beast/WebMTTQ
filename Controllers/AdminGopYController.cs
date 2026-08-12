@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace WebMTTQ.Controllers
 {
+    [KiemTraQuyen(ModuleQuyen.GopY, "Xem")]
     public class AdminGopYController : BaseAdminController
     {
         private readonly DataMTTQContext _context; // Đổi WebMTTQContext thành tên DbContext của bạn

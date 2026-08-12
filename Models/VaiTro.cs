@@ -16,10 +16,24 @@ public partial class VaiTro
     [StringLength(100)]
     public string TenVaiTro { get; set; } = null!;
 
-    public string? QuyenHan { get; set; }
+    /// <summary>
+    /// Quyền truy cập được lưu dạng bitmask (tinyint):
+    /// 1 = Xem, 2 = Thêm, 4 = Sửa, 8 = Xóa.
+    /// Admin (toàn quyền) = 15 (1+2+4+8).
+    /// </summary>
+    public byte? QuyenHan { get; set; }
 
     public bool? DaXoa { get; set; }
 
+    [Column(TypeName = "datetime")]
+    public DateTime? NgayTao { get; set; }
+
+    [Column(TypeName = "datetime")]
+    public DateTime? NgayCapNhat { get; set; }
+
     [InverseProperty("IdvaiTroNavigation")]
     public virtual ICollection<NguoiDung> NguoiDungs { get; set; } = new List<NguoiDung>();
+
+    [InverseProperty("IdVaiTroNavigation")]
+    public virtual ICollection<VaiTroQuyen> VaiTroQuyens { get; set; } = new List<VaiTroQuyen>();
 }

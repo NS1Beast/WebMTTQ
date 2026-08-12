@@ -39,15 +39,17 @@ public partial class DataMTTQContext : DbContext
     public virtual DbSet<NguoiDung> NguoiDungs { get; set; }
     public virtual DbSet<NhaHaoTam> NhaHaoTams { get; set; }
     public virtual DbSet<NhatKyHeThong> NhatKyHeThongs { get; set; }
+    public virtual DbSet<MaXacThuc> MaXacThus { get; set; }
     public virtual DbSet<ThanhPhanGiaoDien> ThanhPhanGiaoDiens { get; set; }
     public virtual DbSet<VaiTro> VaiTros { get; set; }
+    public virtual DbSet<VaiTroQuyen> VaiTroQuyens { get; set; }
     public virtual DbSet<VanBanTaiLieu> VanBanTaiLieus { get; set; }
 
-//    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-//        => optionsBuilder.UseSqlServer("Server=.;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");
-     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-      => optionsBuilder.UseSqlServer("Server=DESKTOP-C5LJ9BM\\SQL2025_DEV;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=.;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");
+    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    // => optionsBuilder.UseSqlServer("Server=DESKTOP-C5LJ9BM\\SQL2025_DEV;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<BaiViet>(entity =>
@@ -216,7 +218,22 @@ public partial class DataMTTQContext : DbContext
             entity.Property(e => e.NgayTao).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.TrangThai).HasDefaultValue("HoatDong");
 
+            // Unique index trên Email nhưng chỉ áp dụng khi Email IS NOT NULL
+            // (cho phép nhiều user không có email - NULL)
+            entity.HasIndex(e => e.Email)
+                .IsUnique()
+                .HasDatabaseName("UQ__NguoiDun__A9D105348E5266DA")
+                .HasFilter("[Email] IS NOT NULL");
+
             entity.HasOne(d => d.IdvaiTroNavigation).WithMany(p => p.NguoiDungs).HasConstraintName("FK_NguoiDung_VaiTro");
+        });
+
+        modelBuilder.Entity<MaXacThuc>(entity =>
+        {
+            entity.HasKey(e => e.IdmaXacThuc).HasName("PK__MaXacThuc");
+
+            entity.Property(e => e.NgayTao).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.DaSuDung).HasDefaultValue(false);
         });
 
         modelBuilder.Entity<NhaHaoTam>(entity =>
@@ -256,6 +273,21 @@ public partial class DataMTTQContext : DbContext
             entity.HasKey(e => e.IdvaiTro).HasName("PK__VaiTro__45D3FF49D7A1FDCD");
 
             entity.Property(e => e.DaXoa).HasDefaultValue(false);
+            entity.Property(e => e.NgayTao).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.NgayCapNhat).HasDefaultValueSql("(getdate())");
+        });
+
+        modelBuilder.Entity<VaiTroQuyen>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__VaiTroQuyen");
+
+            entity.HasIndex(e => new { e.IdVaiTro, e.MaModule }).IsUnique().HasDatabaseName("UQ_VaiTroQuyen_VaiTro_Module");
+
+            entity.HasOne(d => d.IdVaiTroNavigation)
+                .WithMany(p => p.VaiTroQuyens)
+                .HasForeignKey(d => d.IdVaiTro)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_VaiTroQuyen_VaiTro");
         });
 
         modelBuilder.Entity<VanBanTaiLieu>(entity =>

@@ -10,7 +10,8 @@ using System;
 
 namespace WebMTTQ.Controllers
 {
-    public class AdminBannerController : Controller
+    [KiemTraQuyen(ModuleQuyen.Banner, "Xem")]
+    public class AdminBannerController : BaseAdminController
     {
         private readonly DataMTTQContext _context;
         private readonly IWebHostEnvironment _env;

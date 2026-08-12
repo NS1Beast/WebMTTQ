@@ -126,127 +126,7 @@
         </div>
 
         <!-- ============================================ -->
-        <!-- SECTION 4: DỊCH VỤ BÊN NGOÀI - CLOUDFLARE R2 -->
-        <!-- ============================================ -->
-        <div class="settings-section">
-            <div class="settings-header" onclick="toggleSection(this)">
-                <div class="settings-header-left">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <span>Dịch vụ lưu trữ đám mây - Cloudflare R2</span>
-                </div>
-                <div class="settings-header-right">
-                    <span class="settings-badge blue">External Service</span>
-                    <i class="fas fa-chevron-down toggle-icon"></i>
-                </div>
-            </div>
-            <div class="settings-body">
-                <!-- Enable Toggle -->
-                <div class="toggle-group" style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--admin-line);">
-                    <div class="toggle-group-info">
-                        <strong>Bật Cloudflare R2</strong>
-                        <span>Kích hoạt dịch vụ lưu trữ đám mây Cloudflare R2 cho hệ thống quản lý tài liệu.</span>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" asp-for="CloudflareR2_Enabled">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="admin-form-row">
-                    <div class="admin-form-group">
-                        <label class="admin-form-label">Endpoint</label>
-                        <input asp-for="CloudflareR2_Endpoint" class="admin-form-control" placeholder="VD: https://<accountid>.r2.cloudflarestorage.com" />
-                    </div>
-                    <div class="admin-form-group">
-                        <label class="admin-form-label">Bucket Name</label>
-                        <input asp-for="CloudflareR2_BucketName" class="admin-form-control" placeholder="VD: mttq-documents" />
-                    </div>
-                </div>
-
-                <div class="admin-form-row">
-                    <div class="admin-form-group">
-                        <label class="admin-form-label">Access Key</label>
-                        <div class="password-field-wrapper">
-                            <input asp-for="CloudflareR2_AccessKey" type="password" class="admin-form-control" placeholder="@(Model.CloudflareR2_AccessKey_Display == "**************" ? "**************" : "Nhập Access Key")" autocomplete="off" />
-                            @if (Model.CloudflareR2_AccessKey_Display == "**************")
-                            {
-                                <span class="field-status configured">Đã cấu hình</span>
-                            }
-                        </div>
-                        <span class="admin-form-hint">Để trống nếu không muốn thay đổi giá trị hiện tại.</span>
-                    </div>
-                    <div class="admin-form-group">
-                        <label class="admin-form-label">Secret Key</label>
-                        <div class="password-field-wrapper">
-                            <input asp-for="CloudflareR2_SecretKey" type="password" class="admin-form-control" placeholder="@(Model.CloudflareR2_SecretKey_Display == "**************" ? "**************" : "Nhập Secret Key")" autocomplete="off" />
-                            @if (Model.CloudflareR2_SecretKey_Display == "**************")
-                            {
-                                <span class="field-status configured">Đã cấu hình</span>
-                            }
-                        </div>
-                        <span class="admin-form-hint">Để trống nếu không muốn thay đổi giá trị hiện tại.</span>
-                    </div>
-                </div>
-
-                <div class="admin-form-row">
-                    <div class="admin-form-group">
-                        <label class="admin-form-label">Default Region <span style="color: #999;">(không bắt buộc)</span></label>
-                        <input asp-for="CloudflareR2_DefaultRegion" class="admin-form-control" placeholder="VD: auto, us-east-1" />
-                    </div>
-                    <div class="admin-form-group">
-                        <label class="admin-form-label">Cấu trúc thư mục gốc</label>
-                        <input asp-for="CloudflareR2_FolderStructure" class="admin-form-control" placeholder="VD: mttq-uploads/" />
-                    </div>
-                </div>
-
-                <div class="admin-form-row">
-                    <div class="admin-form-group">
-                        <label class="admin-form-label">Kích thước tải lên tối đa (bytes)</label>
-                        <input asp-for="CloudflareR2_MaxUploadSize" type="number" class="admin-form-control" placeholder="VD: 104857600 (100MB)" />
-                    </div>
-                    <div class="admin-form-group">
-                        <label class="admin-form-label">Định dạng tập tin cho phép</label>
-                        <input asp-for="CloudflareR2_AllowedExtensions" class="admin-form-control" placeholder="VD: .jpg,.jpeg,.png,.gif,.pdf,.docx" />
-                    </div>
-                </div>
-
-                <div class="toggle-group" style="margin-top: 10px;">
-                    <div class="toggle-group-info">
-                        <strong>Tự động tối ưu hình ảnh</strong>
-                        <span>Tự động nén và tối ưu hình ảnh khi tải lên.</span>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" asp-for="CloudflareR2_AutoImageOptimization">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="toggle-group">
-                    <div class="toggle-group-info">
-                        <strong>Tự động đánh phiên bản tập tin</strong>
-                        <span>Giữ lại các phiên bản cũ khi cập nhật tập tin.</span>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" asp-for="CloudflareR2_AutoFileVersioning">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-
-                <div class="toggle-group">
-                    <div class="toggle-group-info">
-                        <strong>Bật thùng rác</strong>
-                        <span>Cho phép khôi phục tập tin đã xóa trong vòng 30 ngày.</span>
-                    </div>
-                    <label class="switch">
-                        <input type="checkbox" asp-for="CloudflareR2_RecycleBin">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <!-- ============================================ -->
-        <!-- SECTION 5: CẤU HÌNH THƯ MỤC                  -->
+        <!-- SECTION 4: CẤU HÌNH THƯ MỤC                  -->
         <!-- ============================================ -->
         <div class="settings-section">
             <div class="settings-header" onclick="toggleSection(this)">
@@ -307,7 +187,7 @@
         </div>
 
         <!-- ============================================ -->
-        <!-- SECTION 6: TỔ CHỨC TÀI LIỆU                  -->
+        <!-- SECTION 5: TỔ CHỨC TÀI LIỆU                  -->
         <!-- ============================================ -->
         <div class="settings-section">
             <div class="settings-header" onclick="toggleSection(this)">
@@ -338,7 +218,7 @@
         </div>
 
         <!-- ============================================ -->
-        <!-- SECTION 7: QUY TẮC TẢI LÊN                   -->
+        <!-- SECTION 6: QUY TẮC TẢI LÊN                   -->
         <!-- ============================================ -->
         <div class="settings-section">
             <div class="settings-header" onclick="toggleSection(this)">
@@ -423,6 +303,74 @@
                             <span class="slider"></span>
                         </label>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SECTION 7: CẤU HÌNH SMTP EMAIL (GỬI OTP)    -->
+        <!-- ============================================ -->
+        <div class="settings-section" style="border-left: 4px solid #8b1a2b;">
+            <div class="settings-header" onclick="toggleSection(this)">
+                <div class="settings-header-left">
+                    <i class="fas fa-envelope"></i>
+                    <span>Cấu hình Email (SMTP) - Gửi mã OTP</span>
+                </div>
+                <div class="settings-header-right">
+                    <span class="settings-badge" style="background:rgba(139,26,43,0.1); color:#8b1a2b;">Email Service</span>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="settings-body">
+                <p style="color: var(--admin-muted); margin-bottom: 16px;">
+                    <i class="fas fa-info-circle"></i> Cấu hình SMTP để gửi mã OTP khi người dùng quên mật khẩu.
+                </p>
+                <div class="admin-form-row">
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">SMTP Host <span style="color:#dc2626;">*</span></label>
+                        <input asp-for="SmtpHost" class="admin-form-control" placeholder="VD: smtp.gmail.com" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">SMTP Port <span style="color:#dc2626;">*</span></label>
+                        <input asp-for="SmtpPort" type="number" class="admin-form-control" placeholder="VD: 587" />
+                    </div>
+                </div>
+                <div class="admin-form-row">
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">SMTP Username</label>
+                        <input asp-for="SmtpUsername" class="admin-form-control" placeholder="VD: mttq.tandinh@gmail.com" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">SMTP Password</label>
+                        <div class="password-field-wrapper">
+                            <input asp-for="SmtpPassword" type="password" class="admin-form-control" placeholder="@(Model.SmtpPassword_Display == "**************" ? "**************" : "Nhập mật khẩu SMTP")" autocomplete="off" />
+                            @if (Model.SmtpPassword_Display == "**************")
+                            {
+                                <span class="field-status configured">Đã cấu hình</span>
+                            }
+                        </div>
+                        <span class="admin-form-hint">Để trống nếu không muốn thay đổi mật khẩu hiện tại.</span>
+                    </div>
+                </div>
+                <div class="admin-form-row">
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Email gửi (From)</label>
+                        <input asp-for="SmtpFromEmail" type="email" class="admin-form-control" placeholder="VD: mttq.tandinh@gmail.com" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label class="admin-form-label">Tên hiển thị (From)</label>
+                        <input asp-for="SmtpFromName" class="admin-form-control" placeholder="VD: MTTQ Phường Tân Định" />
+                    </div>
+                </div>
+                <div class="toggle-group">
+                    <div class="toggle-group-info">
+                        <strong>Bật SSL/TLS</strong>
+                        <span>Kết nối an toàn đến máy chủ SMTP.</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" asp-for="SmtpUseSsl">
+                        <span class="slider"></span>
+                    </label>
                 </div>
             </div>
         </div>

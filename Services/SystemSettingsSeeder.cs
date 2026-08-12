@@ -47,22 +47,6 @@ namespace WebMTTQ.Services
             AddIfNotExists("BaoTriHeThong", "0", "Chế độ bảo trì hệ thống (1=Bật, 0=Tắt)");
 
             // ================================================
-            // CLOUDFLARE R2
-            // ================================================
-            AddIfNotExists("CloudflareR2_Enabled", "0", "Bật tài khoản lưu trữ Cloudflare R2");
-            AddIfNotExists("CloudflareR2_Endpoint", "", "Endpoint Cloudflare R2");
-            AddIfNotExists("CloudflareR2_BucketName", "", "Tên Bucket Cloudflare R2");
-            AddIfNotExists("CloudflareR2_AccessKey", "", "Access Key Cloudflare R2 (mã hóa)");
-            AddIfNotExists("CloudflareR2_SecretKey", "", "Secret Key Cloudflare R2 (mã hóa)");
-            AddIfNotExists("CloudflareR2_DefaultRegion", "auto", "Vùng mặc định (optional)");
-            AddIfNotExists("CloudflareR2_FolderStructure", "mttq-uploads/", "Cấu trúc thư mục gốc");
-            AddIfNotExists("CloudflareR2_MaxUploadSize", "104857600", "Kích thước tải lên tối đa (bytes) - Mặc định 100MB");
-            AddIfNotExists("CloudflareR2_AllowedExtensions", ".jpg,.jpeg,.png,.gif,.webp,.pdf,.docx,.xlsx,.pptx", "Định dạng tập tin cho phép");
-            AddIfNotExists("CloudflareR2_AutoImageOptimization", "1", "Tự động tối ưu hình ảnh");
-            AddIfNotExists("CloudflareR2_AutoFileVersioning", "1", "Tự động đánh phiên bản tập tin");
-            AddIfNotExists("CloudflareR2_RecycleBin", "1", "Bật thùng rác");
-
-            // ================================================
             // FOLDER CONFIGURATION
             // ================================================
             AddIfNotExists("Folder_Documents", "documents/", "Thư mục lưu tài liệu");
@@ -78,6 +62,17 @@ namespace WebMTTQ.Services
             // DOCUMENT ORGANIZATION
             // ================================================
             AddIfNotExists("DocOrg_SeparateBy", "None", "Phân loại thư mục theo (None, Year, Month, Department, DocumentCategory, Combination)");
+
+            // ================================================
+            // SMTP EMAIL (Gửi OTP)
+            // ================================================
+            AddIfNotExists("SmtpHost", "", "SMTP Host để gửi email OTP");
+            AddIfNotExists("SmtpPort", "587", "SMTP Port");
+            AddIfNotExists("SmtpUseSsl", "1", "Bật SSL/TLS cho SMTP");
+            AddIfNotExists("SmtpUsername", "", "SMTP Username");
+            AddIfNotExists("SmtpPassword", "", "SMTP Password (mã hóa)");
+            AddIfNotExists("SmtpFromEmail", "", "Email gửi (From)");
+            AddIfNotExists("SmtpFromName", "MTTQ Phường Tân Định", "Tên hiển thị (From)");
 
             // ================================================
             // UPLOAD RULES

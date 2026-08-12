@@ -18,6 +18,12 @@ builder.Services.AddDataProtection()
 // 4. Đăng ký System Settings Service
 builder.Services.AddScoped<ISystemSettingsService, SystemSettingsService>();
 
+// 4.1. Đăng ký Email Service (gửi OTP)
+builder.Services.AddScoped<IEmailService, EmailService>();
+
+// 4.2. Đăng ký Quyền Truy Cập Service
+builder.Services.AddScoped<IQuyenTruyCapService, QuyenTruyCapService>();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddMemoryCache();
@@ -60,6 +66,7 @@ using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<DataMTTQContext>();
     await SystemSettingsSeeder.SeedAsync(context);
+    await SystemUserSeeder.SeedAsync(context);
 }
 
 app.Run();

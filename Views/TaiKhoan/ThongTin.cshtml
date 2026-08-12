@@ -1,0 +1,172 @@
+@model WebMTTQ.Models.ThongTinCaNhanViewModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Tài khoản của tôi";
+}
+
+<div class="admin-page-header" style="margin-bottom: 20px;">
+    <div>
+        <h2><i class="fas fa-user-circle"></i> Tài khoản của tôi</h2>
+        <div class="subtitle">Quản lý thông tin cá nhân và tài khoản đăng nhập</div>
+    </div>
+    <div style="display:flex; gap:10px;">
+        <a href="/TaiKhoan/DoiMatKhau" class="admin-btn" style="padding:10px 20px; border-radius:10px; background:rgba(245,158,11,0.1); color:#d97706;">
+            <i class="fas fa-key"></i> Đổi mật khẩu
+        </a>
+        <a href="/TaiKhoan/QuyenCuaToi" class="admin-btn" style="padding:10px 20px; border-radius:10px;">
+            <i class="fas fa-shield-alt"></i> Quyền của tôi
+        </a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="admin-alert admin-alert-success" style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2); color:#059669; padding:12px 16px; border-radius:8px; margin-bottom:16px; display:flex; gap:8px; align-items:center;">
+        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+    </div>
+}
+
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+    <!-- Thông tin cá nhân -->
+    <div style="background:#fff; border:1px solid #eae5e1; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+        <h3 style="margin:0 0 20px; font-size:1rem; color:#1e1a1d; display:flex; align-items:center; gap:8px;">
+            <i class="fas fa-user" style="color:#8b1a2b;"></i> Thông tin cá nhân
+        </h3>
+
+        <form asp-action="ThongTin" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="IdnguoiDung" />
+            <input type="hidden" asp-for="TenDangNhap" />
+
+            <div class="admin-form-group">
+                <label class="admin-form-label">Tên đăng nhập</label>
+                <input value="@Model.TenDangNhap" class="admin-form-control" disabled style="background:#f8f8f8; color:#999;" />
+                <span style="font-size:0.72rem; color:#999;">Tên đăng nhập không thể thay đổi</span>
+            </div>
+
+            <div class="admin-form-group">
+                <label class="admin-form-label">Họ tên <span style="color:#dc2626;">*</span></label>
+                <input asp-for="HoTen" class="admin-form-control" />
+                <span asp-validation-for="HoTen" style="color:#dc2626; font-size:0.75rem;"></span>
+            </div>
+
+            <div class="admin-form-group">
+                <label class="admin-form-label">Email</label>
+                <input asp-for="Email" type="email" class="admin-form-control" placeholder="Nhập email để sử dụng chức năng quên mật khẩu" />
+                <span asp-validation-for="Email" style="color:#dc2626; font-size:0.75rem;"></span>
+                <span style="font-size:0.72rem; color:#999; display:block; margin-top:4px;">
+                    <i class="fas fa-info-circle"></i> Thêm email để có thể đặt lại mật khẩu khi quên.
+                </span>
+            </div>
+
+            <div class="admin-form-group">
+                <label class="admin-form-label">Số điện thoại</label>
+                <input asp-for="SoDienThoai" class="admin-form-control" />
+                <span asp-validation-for="SoDienThoai" style="color:#dc2626; font-size:0.75rem;"></span>
+            </div>
+
+            <div style="margin-top:20px; display:flex; justify-content:flex-end;">
+                <button type="submit" class="admin-btn admin-btn-success" style="padding:10px 24px; border-radius:10px;">
+                    <i class="fas fa-save"></i> Lưu thông tin
+                </button>
+            </div>
+        </form>
+
+        <hr style="border:none; border-top:1px solid #eae5e1; margin:20px 0;" />
+
+        <div style="display:grid; gap:12px;">
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                <span style="color:#7a6e72;">Vai trò</span>
+                <strong>@Model.TenVaiTro</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                <span style="color:#7a6e72;">Ngày tạo tài khoản</span>
+                <strong>@(Model.NgayTao?.ToString("dd/MM/yyyy HH:mm") ?? "-")</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem;">
+                <span style="color:#7a6e72;">Cập nhật gần nhất</span>
+                <strong>@(Model.NgayCapNhat?.ToString("dd/MM/yyyy HH:mm") ?? "-")</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quyền truy cập của tôi -->
+    <div style="background:#fff; border:1px solid #eae5e1; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+        <h3 style="margin:0 0 20px; font-size:1rem; color:#1e1a1d; display:flex; align-items:center; gap:8px;">
+            <i class="fas fa-shield-alt" style="color:#8b1a2b;"></i> Quyền truy cập của tôi
+        </h3>
+
+        @if (Model.ModulesDuocQuyen.Count == 0)
+        {
+            <div style="background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2); color:#b45309; padding:12px 16px; border-radius:8px; font-size:0.8rem;">
+                <i class="fas fa-exclamation-triangle"></i>
+                Bạn chưa được cấp quyền truy cập vào module nào. Vui lòng liên hệ quản trị viên.
+            </div>
+        }
+        else
+        {
+            <div style="display:grid; gap:12px;">
+                @foreach (var moduleName in Model.ModulesDuocQuyen)
+                {
+                    <div style="display:flex; align-items:center; gap:10px; border:1px solid #eae5e1; border-radius:8px; padding:12px 16px;">
+                        <i class="fas fa-check-circle" style="color:#059669;"></i>
+                        <span style="font-size:0.85rem; color:#333;">@moduleName</span>
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="admin-alert admin-alert-info" style="margin-top:16px; background:rgba(59,130,246,0.06); border:1px solid rgba(59,130,246,0.2); color:#1d4ed8; padding:10px 14px; border-radius:8px; font-size:0.78rem;">
+            <i class="fas fa-info-circle"></i>
+            Cần thêm quyền? Vui lòng liên hệ quản trị viên hệ thống để được cấp quyền truy cập.
+        </div>
+    </div>
+</div>
+
+<style>
+    .admin-page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .admin-page-header h2 {
+        margin: 0 0 4px;
+        font-size: 1.4rem;
+        color: #1e1a1d;
+    }
+    .admin-page-header .subtitle {
+        font-size: 0.85rem;
+        color: #7a6e72;
+    }
+    .admin-form-group {
+        margin-bottom: 16px;
+    }
+    .admin-form-label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 6px;
+    }
+    .admin-form-control {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1.5px solid #e0dcd8;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.2s;
+        box-sizing: border-box;
+    }
+    .admin-form-control:focus {
+        border-color: #8b1a2b;
+    }
+    @@media (max-width: 900px) {
+        div[style*="grid-template-columns: 1fr 1fr"] {
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>

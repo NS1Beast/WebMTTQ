@@ -101,66 +101,120 @@
                 <small>Phường Tân Định</small>
             </div>
             <nav class="admin-sidebar-nav">
-                <a href="/admin" class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Index" && ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "is-active" : "")">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Dashboard</span>
-                </a>
+                @{
+                    var session = Context.Session;
+                    var isAdmin = WebMTTQ.Services.PhanQuyenHelper.IsAdmin(session);
+                    var coQuyen = (string module) => isAdmin || WebMTTQ.Services.PhanQuyenHelper.CoQuyenXem(session, module);
+                }
+
+                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.Dashboard))
+                {
+                    <a href="/admin" class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Index" && ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "is-active" : "")">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                }
 
                 <div class="nav-sep"></div>
                 <div class="nav-label">Quản lý nội dung</div>
 
-                <a href="/AdminTrangChu/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminTrangChu" ? "is-active" : "")">
-                    <i class="fas fa-home"></i>
-                    <span>Cài đặt Trang chủ</span>
-                </a>
+                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.TrangChu))
+                {
+                    <a href="/AdminTrangChu/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminTrangChu" ? "is-active" : "")">
+                        <i class="fas fa-home"></i>
+                        <span>Cài đặt Trang chủ</span>
+                    </a>
+                }
 
-                <a href="/admin/thongtinungho" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminThongTin" ? "is-active" : "")">
-                    <i class="fas fa-university"></i>
-                    <span>Thông tin ủng hộ</span>
-                </a>
+                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.ThongTinUngHo))
+                {
+                    <a href="/admin/thongtinungho" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminThongTin" ? "is-active" : "")">
+                        <i class="fas fa-university"></i>
+                        <span>Thông tin ủng hộ</span>
+                    </a>
+                }
 
-                <a href="/admin/danhsachungho" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminDanhSachUngHo" ? "is-active" : "")">
-                    <i class="fas fa-hand-holding-usd"></i>
-                    <span>Danh sách ủng hộ</span>
-                </a>
+                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.DanhSachUngHo))
+                {
+                    <a href="/admin/danhsachungho" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminDanhSachUngHo" ? "is-active" : "")">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        <span>Danh sách ủng hộ</span>
+                    </a>
+                }
 
-                <a href="/admin/soduquy" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSoDuQuy" ? "is-active" : "")">
-                    <i class="fas fa-wallet"></i>
-                    <span>Số dư Quỹ</span>
-                </a>
+                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.SoDuQuy))
+                {
+                    <a href="/admin/soduquy" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSoDuQuy" ? "is-active" : "")">
+                        <i class="fas fa-wallet"></i>
+                        <span>Số dư Quỹ</span>
+                    </a>
+                }
 
-                <a href="/admin/ketquachamlo" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminKetQuaChamLo" ? "is-active" : "")">
-                    <i class="fas fa-hand-holding-heart"></i>
-                    <span>Kết quả chăm lo</span>
-                </a>
+                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.KetQuaChamLo))
+                {
+                    <a href="/admin/ketquachamlo" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminKetQuaChamLo" ? "is-active" : "")">
+                        <i class="fas fa-hand-holding-heart"></i>
+                        <span>Kết quả chăm lo</span>
+                    </a>
+                }
 
-                <a href="/AdminDiaDiemBanDo/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminDiaDiemBanDo" ? "is-active" : "")">
-                    <i class="fas fa-map-marked-alt"></i>
-                    <span>Bản đồ an sinh</span>
-                </a>
+                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.DiaDiemBanDo))
+                {
+                    <a href="/AdminDiaDiemBanDo/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminDiaDiemBanDo" ? "is-active" : "")">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>Bản đồ an sinh</span>
+                    </a>
+                }
 
                 <div class="nav-sep"></div>
                 <div class="nav-label">Tương tác</div>
 
-                <a href="/AdminNguoiDanCanTroGiup/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminNguoiDanCanTroGiup" ? "is-active" : "")">
-                    <i class="fas fa-life-ring"></i>
-                    <span>Yêu cầu trợ giúp</span>
-                </a>
+                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.NguoiDanCanTroGiup))
+                {
+                    <a href="/AdminNguoiDanCanTroGiup/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminNguoiDanCanTroGiup" ? "is-active" : "")">
+                        <i class="fas fa-life-ring"></i>
+                        <span>Yêu cầu trợ giúp</span>
+                    </a>
+                }
 
-                <a href="/AdminGopY/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminGopY" ? "is-active" : "")">
-                    <i class="fas fa-envelope-open-text"></i>
-                    <span>Hộp thư góp ý</span>
-                </a>
+                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.GopY))
+                {
+                    <a href="/AdminGopY/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminGopY" ? "is-active" : "")">
+                        <i class="fas fa-envelope-open-text"></i>
+                        <span>Hộp thư góp ý</span>
+                    </a>
+                }
 
                 <div class="nav-sep"></div>
 
-                <a href="/AdminBanner/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminBanner" ? "is-active" : "")">
-                    <i class="fas fa-images"></i>
-                    <span>Quản lý Banner</span>
-                </a>
-                <a href="/AdminCauHinh/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminCauHinh" ? "is-active" : "")">
-                    <i class="fas fa-cog"></i>
-                    <span>Cài đặt hệ thống</span>
+                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.Banner))
+                {
+                    <a href="/AdminBanner/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminBanner" ? "is-active" : "")">
+                        <i class="fas fa-images"></i>
+                        <span>Quản lý Banner</span>
+                    </a>
+                }
+
+                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.CauHinh))
+                {
+                    <a href="/AdminCauHinh/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminCauHinh" ? "is-active" : "")">
+                        <i class="fas fa-cog"></i>
+                        <span>Cài đặt hệ thống</span>
+                    </a>
+                }
+
+                @if (isAdmin)
+                {
+                    <a href="/AdminNguoiDung/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminNguoiDung" ? "is-active" : "")">
+                        <i class="fas fa-users"></i>
+                        <span>Quản lý người dùng</span>
+                    </a>
+                }
+
+                <div class="nav-sep"></div>
+                <a href="/TaiKhoan/ThongTin">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Tài khoản của tôi</span>
                 </a>
 
                 <a href="/" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.06);">
