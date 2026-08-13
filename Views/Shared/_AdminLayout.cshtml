@@ -203,12 +203,63 @@
                     </a>
                 }
 
+                <!-- PHẦN DÀNH RIÊNG CHO QUYỀN ADMIN TỐI CAO -->
                 @if (isAdmin)
                 {
                     <a href="/AdminNguoiDung/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminNguoiDung" ? "is-active" : "")">
                         <i class="fas fa-users"></i>
                         <span>Quản lý người dùng</span>
                     </a>
+
+                    <!-- THÊM MỚI: MENU QUỸ VÌ BIỂN ĐẢO -->
+                    <div class="nav-sep"></div>
+                    <div class="nav-label">Quỹ Vì Biển Đảo</div>
+
+                    <a href="/AdminQuyBienDao/ThongTin" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminQuyBienDao" && ViewContext.RouteData.Values["action"]?.ToString() == "ThongTin" ? "is-active" : "")">
+                        <i class="fas fa-university"></i>
+                        <span>Thông tin ủng hộ BĐ</span>
+                    </a>
+
+                    <a href="/AdminQuyBienDao/DanhSach" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminQuyBienDao" && ViewContext.RouteData.Values["action"]?.ToString() == "DanhSach" ? "is-active" : "")">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        <span>Danh sách ủng hộ BĐ</span>
+                    </a>
+
+                    <a href="/AdminQuyBienDao/SoDu" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminQuyBienDao" && ViewContext.RouteData.Values["action"]?.ToString() == "SoDu" ? "is-active" : "")">
+                        <i class="fas fa-wallet"></i>
+                        <span>Số dư Quỹ Biển Đảo</span>
+                    </a>
+
+                    <a href="/AdminQuyBienDao/KetQua" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminQuyBienDao" && ViewContext.RouteData.Values["action"]?.ToString() == "KetQua" ? "is-active" : "")">
+                        <i class="fas fa-ship"></i>
+                        <span>Hoạt động Biển Đảo</span>
+                    </a>
+                    <!-- KẾT THÚC THÊM MỚI QUỸ VÌ BIỂN ĐẢO -->
+
+                    <!-- THÊM MỚI: QUỸ CỨU TRỢ -->
+                    <div class="nav-sep"></div>
+                    <div class="nav-label">Quỹ Cứu Trợ</div>
+
+                    <a href="/AdminQuyCuuTro/ThongTin" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminQuyCuuTro" && ViewContext.RouteData.Values["action"]?.ToString() == "ThongTin" ? "is-active" : "")">
+                        <i class="fas fa-hospital"></i>
+                        <span>Thông tin tiếp nhận CT</span>
+                    </a>
+
+                    <a href="/AdminQuyCuuTro/DanhSach" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminQuyCuuTro" && ViewContext.RouteData.Values["action"]?.ToString() == "DanhSach" ? "is-active" : "")">
+                        <i class="fas fa-hands-helping"></i>
+                        <span>Danh sách ủng hộ CT</span>
+                    </a>
+
+                    <a href="/AdminQuyCuuTro/SoDu" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminQuyCuuTro" && ViewContext.RouteData.Values["action"]?.ToString() == "SoDu" ? "is-active" : "")">
+                        <i class="fas fa-piggy-bank"></i>
+                        <span>Số dư Quỹ Cứu trợ</span>
+                    </a>
+
+                    <a href="/AdminQuyCuuTro/KetQua" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminQuyCuuTro" && ViewContext.RouteData.Values["action"]?.ToString() == "KetQua" ? "is-active" : "")">
+                        <i class="fas fa-truck-loading"></i>
+                        <span>Hoạt động Cứu trợ</span>
+                    </a>
+                    <!-- KẾT THÚC THÊM MỚI QUỸ CỨU TRỢ -->
                 }
 
                 <div class="nav-sep"></div>

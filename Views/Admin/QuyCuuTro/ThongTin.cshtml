@@ -1,0 +1,73 @@
+﻿@model IEnumerable<WebMTTQ.Models.ThongTinNhanUngHoCuuTro>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Tài khoản tiếp nhận Cứu trợ";
+}
+
+<div class="admin-page-header">
+    <div>
+        <h2>Tài khoản tiếp nhận Cứu trợ</h2>
+        <div class="subtitle">Quản lý các tài khoản ngân hàng tiếp nhận ủng hộ Quỹ Cứu trợ</div>
+    </div>
+    <a href="/Admin/QuyCuuTro/ThemThongTin" class="admin-btn admin-btn-primary">
+        <i class="fas fa-plus"></i> Thêm tài khoản
+    </a>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-body p-0">
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Ngân hàng</th>
+                        <th>Thông tin Tài khoản</th>
+                        <th>Đơn vị thụ hưởng</th>
+                        <th class="cell-actions">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@item.TenNganHang</strong>
+                                    <div style="font-size:0.78rem;color:var(--admin-muted);">@item.ChiNhanh</div>
+                                </td>
+                                <td>
+                                    <span class="admin-badge gold" style="font-size: 0.9rem; margin-bottom: 4px;">@item.SoTaiKhoan</span>
+                                    <div style="font-size:0.85rem;color:var(--admin-ink);">@item.TenTaiKhoan</div>
+                                </td>
+                                <td>@item.DonViThuHuong</td>
+                                <td class="cell-actions">
+                                    <a href="/Admin/QuyCuuTro/SuaThongTin/@item.Id" class="admin-btn admin-btn-warning admin-btn-sm">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </a>
+                                    <form action="/Admin/QuyCuuTro/XoaThongTin" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?');">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4">
+                                <div class="admin-empty">
+                                    <i class="fas fa-university"></i>
+                                    <p>Chưa cấu hình tài khoản tiếp nhận nào.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

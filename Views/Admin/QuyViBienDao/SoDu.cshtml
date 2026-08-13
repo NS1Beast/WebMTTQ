@@ -1,0 +1,71 @@
+﻿@model IEnumerable<WebMTTQ.Models.SoDuQuyBienDao>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Số dư Quỹ Biển Đảo";
+}
+
+<div class="admin-page-header">
+    <div>
+        <h2>Lịch sử Số dư Quỹ Biển Đảo</h2>
+        <div class="subtitle">Theo dõi biến động số dư quỹ qua các thời điểm</div>
+    </div>
+    <a href="/AdminQuyBienDao/ThemSoDu" class="admin-btn admin-btn-primary">
+        <i class="fas fa-plus"></i> Cập nhật số dư mới
+    </a>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-body p-0">
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Ngày cập nhật</th>
+                        <th class="cell-right">Tiền mặt</th>
+                        <th class="cell-right">Tiền gửi ngân hàng</th>
+                        <th class="cell-right">Tổng tồn quỹ</th>
+                        <th class="cell-actions">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@(item.NgayCapNhat?.ToString("dd/MM/yyyy HH:mm"))</strong>
+                                </td>
+                                <td class="cell-right"><span class="admin-money green">@(item.TienMat?.ToString("N0"))đ</span></td>
+                                <td class="cell-right"><span class="admin-money blue">@(item.TienGuiNganHang?.ToString("N0"))đ</span></td>
+                                <td class="cell-right"><span class="admin-money red" style="font-size: 1.1rem;">@(item.TongTonQuy?.ToString("N0"))đ</span></td>
+                                <td class="cell-actions">
+                                    <a href="/AdminQuyBienDao/SuaSoDu/@item.Id" class="admin-btn admin-btn-warning admin-btn-sm">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </a>
+                                    <form action="/AdminQuyBienDao/XoaSoDu" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa số dư này?');">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5">
+                                <div class="admin-empty">
+                                    <i class="fas fa-wallet"></i>
+                                    <p>Chưa có lịch sử cập nhật số dư nào.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

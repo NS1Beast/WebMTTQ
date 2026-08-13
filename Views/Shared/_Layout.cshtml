@@ -194,8 +194,12 @@
                         <a href="#" class="nav-link dropdown-toggle @(isNews ? "is-active" : "")" role="button" aria-expanded="false">An sinh xã hội</a>
                         <ul class="dropdown-menu">
                             <li class="nav-item"><a class="dropdown-item" asp-controller="CongThongTinAnSXH" asp-action="Index">Quỹ “Vì người nghèo”</a></li>
-                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Quỹ “Vì biển đảo quê hương, vì tuyến đầu Tổ quốc”</a></li>
-                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Quỹ “Cứu trợ”</a></li>
+                            <a class="dropdown-item" asp-controller="QuyBienDao" asp-action="ViBienDaoQueHuongViTuyenDauTQ">
+                                Quỹ “Vì biển đảo quê hương, vì tuyến đầu Tổ quốc”
+                            </a>
+                            <a class="dropdown-item" asp-controller="QuyCuuTro" asp-action="Index">
+                                Quỹ “Cứu trợ”
+                            </a>
                         </ul>
                     </li>
                     <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="UnderConstruction">Văn bản và tài liệu</a></li>

@@ -1,0 +1,73 @@
+﻿@model WebMTTQ.Models.KetQuaHoatDongCuuTro
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Thêm hoạt động Cứu trợ";
+}
+
+<div class="admin-page-header">
+    <div>
+        <h2>Thêm hoạt động hướng về Cứu trợ</h2>
+        <div class="subtitle">Ghi nhận chương trình, hoạt động hỗ trợ chiến sĩ và ngư dân</div>
+    </div>
+    <a href="/Admin/QuyCuuTro/KetQua" class="admin-btn admin-btn-ghost">
+        <i class="fas fa-arrow-left"></i> Quay lại
+    </a>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-body">
+        <form action="/Admin/QuyCuuTro/ThemKetQua" method="post">
+
+            <div class="admin-form-row">
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Tháng <span class="required">*</span></label>
+                    <input type="number" name="Thang" value="@DateTime.Now.Month" min="1" max="12" class="admin-form-control" required />
+                </div>
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Năm <span class="required">*</span></label>
+                    <input type="number" name="Nam" value="@DateTime.Now.Year" class="admin-form-control" required />
+                </div>
+            </div>
+
+            <div class="admin-form-row">
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Đơn vị thực hiện (Tên tổ chức) <span class="required">*</span></label>
+                    <input type="text" name="DonViUngHo" class="admin-form-control" required placeholder="VD: UBND Phường Tân Định" />
+                </div>
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Nhóm đơn vị (Dùng để thống kê biểu đồ) <span class="required">*</span></label>
+                    <select name="PhanLoaiDonVi" class="admin-form-control" required>
+                        <option value="Mặt trận Tổ quốc">Mặt trận Tổ quốc</option>
+                        <option value="Đoàn Thanh Niên">Đoàn Thanh Niên</option>
+                        <option value="Hội LHPN">Hội LHPN</option>
+                        <option value="Khối Doanh nghiệp">Khối Doanh nghiệp</option>
+                        <option value="Khác">Khác</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="admin-form-group">
+                <label class="admin-form-label">Nội dung hoạt động <span class="required">*</span></label>
+                <textarea name="NoiDung" class="admin-form-control" required placeholder="VD: Thăm hỏi động viên chiến sĩ đảo xa..."></textarea>
+            </div>
+
+            <div class="admin-form-row">
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Kinh phí (VNĐ) <span class="required">*</span></label>
+                    <input type="number" name="KinhPhi" class="admin-form-control" required placeholder="Nhập số tiền..." />
+                </div>
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Lượt đối tượng hỗ trợ <span class="required">*</span></label>
+                    <input type="number" name="SoLuongHo" class="admin-form-control" required placeholder="Số lượng chiến sĩ/ngư dân..." />
+                </div>
+            </div>
+
+            <div class="admin-form-actions">
+                <button type="submit" class="admin-btn admin-btn-primary">
+                    <i class="fas fa-save"></i> Lưu hoạt động
+                </button>
+                <a href="/Admin/QuyCuuTro/KetQua" class="admin-btn admin-btn-ghost">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>

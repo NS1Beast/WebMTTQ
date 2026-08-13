@@ -1,0 +1,71 @@
+﻿@model IEnumerable<WebMTTQ.Models.DanhSachUngHoBienDao>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Danh sách ủng hộ Biển Đảo";
+}
+
+<div class="admin-page-header">
+    <div>
+        <h2>Danh sách Ủng hộ Biển Đảo</h2>
+        <div class="subtitle">Quản lý các cá nhân, tổ chức đóng góp cho Quỹ Vì Biển Đảo quê hương</div>
+    </div>
+    <a href="/AdminQuyBienDao/ThemDanhSach" class="admin-btn admin-btn-primary">
+        <i class="fas fa-plus"></i> Thêm lượt ủng hộ
+    </a>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-body p-0">
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Đơn vị / Cá nhân</th>
+                        <th class="cell-center">Thời gian</th>
+                        <th class="cell-right">Số tiền</th>
+                        <th class="cell-actions">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@item.TenNguoiUngHo</strong>
+                                </td>
+                                <td class="cell-center">
+                                    <span class="admin-badge gray">@(item.NgayUngHo?.ToString("dd/MM/yyyy"))</span>
+                                </td>
+                                <td class="cell-right"><span class="admin-money green">@(item.SoTien?.ToString("N0"))đ</span></td>
+                                <td class="cell-actions">
+                                    <a href="/AdminQuyBienDao/SuaDanhSach/@item.Id" class="admin-btn admin-btn-warning admin-btn-sm">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </a>
+                                    <form action="/AdminQuyBienDao/XoaDanhSach" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa lượt ủng hộ này?');">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4">
+                                <div class="admin-empty">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                    <p>Chưa có dữ liệu ủng hộ Biển Đảo nào.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

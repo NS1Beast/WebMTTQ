@@ -1,0 +1,48 @@
+﻿@model WebMTTQ.Models.DanhSachUngHoCuuTro
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Sửa lượt ủng hộ Cứu trợ";
+}
+
+<div class="admin-page-header">
+    <div>
+        <h2>Chỉnh sửa lượt ủng hộ</h2>
+        <div class="subtitle">Cập nhật lại thông tin đã đóng góp</div>
+    </div>
+    <a href="/Admin/QuyCuuTro/DanhSach" class="admin-btn admin-btn-ghost">
+        <i class="fas fa-arrow-left"></i> Quay lại
+    </a>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-body">
+        <form action="/Admin/QuyCuuTro/SuaDanhSach" method="post">
+            <input type="hidden" name="Id" value="@Model.Id" />
+            <input type="hidden" name="HienThi" value="true" />
+
+            <div class="admin-form-group">
+                <label class="admin-form-label">Cá nhân / Đơn vị ủng hộ <span class="required">*</span></label>
+                <input type="text" name="TenNguoiUngHo" value="@Model.TenNguoiUngHo" class="admin-form-control" required />
+            </div>
+
+            <div class="admin-form-row">
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Thời gian ủng hộ <span class="required">*</span></label>
+                    <!-- Định dạng ToString("yyyy-MM-dd") là BẮT BUỘC cho thẻ input type="date" -->
+                    <input type="date" name="NgayUngHo" value="@(Model.NgayUngHo?.ToString("yyyy-MM-dd"))" class="admin-form-control" required />
+                </div>
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Số tiền ủng hộ (VNĐ) <span class="required">*</span></label>
+                    <input type="number" name="SoTien" value="@Model.SoTien" class="admin-form-control" required />
+                </div>
+            </div>
+
+            <div class="admin-form-actions">
+                <button type="submit" class="admin-btn admin-btn-primary">
+                    <i class="fas fa-save"></i> Cập nhật thay đổi
+                </button>
+                <a href="/Admin/QuyCuuTro/DanhSach" class="admin-btn admin-btn-ghost">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>

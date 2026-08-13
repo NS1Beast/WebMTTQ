@@ -1,0 +1,41 @@
+﻿@model WebMTTQ.Models.SoDuQuyCuuTro
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Thêm số dư Quỹ Cứu trợ";
+}
+
+<div class="admin-page-header">
+    <div>
+        <h2>Cập nhật số dư Quỹ Cứu trợ mới</h2>
+        <div class="subtitle">Nhập số dư hiện tại của quỹ để công khai minh bạch</div>
+    </div>
+    <a href="/Admin/QuyCuuTro/SoDu" class="admin-btn admin-btn-ghost">
+        <i class="fas fa-arrow-left"></i> Quay lại
+    </a>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-body">
+        <form action="/Admin/QuyCuuTro/ThemSoDu" method="post">
+
+            <div class="admin-form-row">
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Tiền mặt (VNĐ) <span class="required">*</span></label>
+                    <input type="number" name="TienMat" class="admin-form-control" required placeholder="Nhập số tiền..." />
+                </div>
+
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Tiền gửi ngân hàng (VNĐ) <span class="required">*</span></label>
+                    <input type="number" name="TienGuiNganHang" class="admin-form-control" required placeholder="Nhập số tiền..." />
+                </div>
+            </div>
+
+            <div class="admin-form-actions">
+                <button type="submit" class="admin-btn admin-btn-primary" style="background: #0056b3; border: none; box-shadow: 0 2px 8px rgba(0, 86, 179, 0.2);">
+                    <i class="fas fa-save"></i> Lưu số dư
+                </button>
+                <a href="/Admin/QuyCuuTro/SoDu" class="admin-btn admin-btn-ghost">Hủy bỏ</a>
+            </div>
+        </form>
+    </div>
+</div>
