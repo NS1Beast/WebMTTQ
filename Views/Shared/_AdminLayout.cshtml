@@ -117,7 +117,10 @@
 
                 <div class="nav-sep"></div>
                 <div class="nav-label">Quản lý nội dung</div>
-
+                <a href="/AdminVanBanTaiLieu/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminVanBanTaiLieu" ? "is-active" : "")">
+                    <i class="fas fa-file-signature"></i>
+                    <span>Văn bản & Tài liệu</span>
+                </a>
                 @if (coQuyen(WebMTTQ.Models.ModuleQuyen.TrangChu))
                 {
                     <a href="/AdminTrangChu/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminTrangChu" ? "is-active" : "")">

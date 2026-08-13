@@ -1,0 +1,63 @@
+﻿@model WebMTTQ.Models.VanBanTaiLieu
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="admin-page-header">
+    <div>
+        <h2>Thêm Văn bản mới</h2>
+        <div class="subtitle">Đăng tải văn bản, tài liệu, biểu mẫu lên hệ thống</div>
+    </div>
+    <a href="/AdminVanBanTaiLieu/Index" class="admin-btn admin-btn-ghost">
+        <i class="fas fa-arrow-left"></i> Quay lại
+    </a>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-body">
+        <form action="/AdminVanBanTaiLieu/Create" method="post" enctype="multipart/form-data">
+
+            <div class="admin-form-row">
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Số hiệu văn bản</label>
+                    <input type="text" name="SoHieu" class="admin-form-control" placeholder="VD: 11/HD-MTTW-BTT" />
+                </div>
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Chuyên mục <span class="required">*</span></label>
+                    <select name="IdchuyenMuc" class="admin-form-control" asp-items="ViewBag.ChuyenMucs" required>
+                        <option value="">-- Chọn chuyên mục --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="admin-form-group">
+                <label class="admin-form-label">Tên văn bản / Trích yếu <span class="required">*</span></label>
+                <textarea name="TenVanBan" class="admin-form-control" rows="3" required placeholder="Nhập trích yếu nội dung văn bản..."></textarea>
+            </div>
+
+            <div class="admin-form-row">
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Cơ quan ban hành</label>
+                    <input type="text" name="CoQuanBanHanh" class="admin-form-control" placeholder="VD: Ủy ban MTTQ Việt Nam" />
+                </div>
+                <div class="admin-form-group">
+                    <label class="admin-form-label">Ngày ban hành</label>
+                    <input type="date" name="NgayBanHanh" class="admin-form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                </div>
+            </div>
+
+            <div class="admin-form-group" style="background: #fcfcfc; padding: 20px; border: 1px dashed #ccc; border-radius: 8px;">
+                <label class="admin-form-label">Tệp đính kèm (PDF, Word, Excel...) <span class="required">*</span></label>
+                <input type="file" name="FileUpload" class="admin-form-control" required style="background: white;" />
+                <div class="admin-form-hint">Tệp đính kèm sẽ được mã hóa và lưu trữ trực tiếp trên hệ thống an toàn.</div>
+            </div>
+
+            <div class="admin-form-actions">
+                <button type="submit" class="admin-btn admin-btn-primary">
+                    <i class="fas fa-save"></i> Đăng văn bản
+                </button>
+                <a href="/AdminVanBanTaiLieu/Index" class="admin-btn admin-btn-ghost">Hủy bỏ</a>
+            </div>
+        </form>
+    </div>
+</div>

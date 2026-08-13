@@ -1,0 +1,457 @@
+﻿@model IEnumerable<WebMTTQ.Models.VanBanTaiLieu>
+
+@{
+    ViewData["Title"] = "Văn bản & Tài liệu";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Hàm C# định dạng dung lượng file theo chuẩn chữ thường (mb, kb) -->
+@functions {
+    public string FormatSize(double? bytes)
+    {
+        if (bytes == null || bytes == 0) return "0 kb";
+
+        if (bytes > 1048576) return (bytes.Value / 1048576.0).ToString("0") + " mb";
+        if (bytes > 1024) return (bytes.Value / 1024.0).ToString("0") + " kb";
+
+        return bytes.Value.ToString("0") + " bytes";
+    }
+}
+
+<style>
+    /* Chỉnh màu nền toàn trang thành màu kem nhạt giống Ảnh 2 */
+    body {
+        background-color: #faf7f2 !important;
+    }
+
+    /* 1. BANNER TRÀN VIỀN */
+    .vb-full-width-banner {
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        background-color: #8a1527; /* Màu đỏ đô chuẩn Ảnh 2 */
+        color: white;
+        padding: 40px 0 90px 0; /* Padding dưới lớn để lấy chỗ cho bộ lọc đè lên */
+        overflow: hidden;
+    }
+
+        /* Background chìm (Logo) bên phải banner */
+        .vb-full-width-banner::after {
+            content: "";
+            position: absolute;
+            top: -50px;
+            right: 5%;
+            width: 400px;
+            height: 400px;
+            background-image: url('https://upload.wikimedia.org/wikipedia/vi/thumb/b/b5/Mat_tran_To_quoc_Viet_Nam.svg/512px-Mat_tran_To_quoc_Viet_Nam.svg.png');
+            background-size: cover;
+            opacity: 0.05;
+            pointer-events: none;
+        }
+
+    .vb-banner-content {
+        max-width: 1140px;
+        margin: 0 auto;
+        padding: 0 15px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .vb-breadcrumb {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+        .vb-breadcrumb a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+        }
+
+            .vb-breadcrumb a:hover {
+                color: white;
+            }
+
+    .vb-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .vb-subtitle {
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 0;
+    }
+
+    /* 2. BỘ LỌC TÌM KIẾM BẰNG FLEXBOX (Đảm bảo nằm ngang) */
+    .vb-filter-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 25px 30px;
+        box-shadow: 0 5px 25px rgba(0,0,0,0.06);
+        margin-top: -50px;
+        position: relative;
+        z-index: 10;
+        margin-bottom: 30px;
+        /* THÊM 3 DÒNG NÀY VÀO ĐÂY */
+        max-width: 1168px; /* Bạn có thể thay đổi số này (VD: 900px, 1000px, 1100px) để chỉnh độ rộng */
+        margin-left: auto; /* Căn giữa */
+        margin-right: auto; /* Căn giữa */
+    }
+
+    .vb-filter-flex {
+        display: flex;
+        align-items: flex-end; /* Căn dưới đáy để nút bấm thẳng hàng với input */
+        gap: 20px;
+        width: 100%;
+    }
+
+    .vb-form-group-name {
+        flex: 5; /* Chiếm khoảng 50% */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .vb-form-group-cat {
+        flex: 3; /* Chiếm khoảng 30% */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .vb-form-group-btn {
+        flex: 1.5; /* Chiếm khoảng 15% */
+    }
+
+    .vb-filter-label {
+        font-size: 0.85rem;
+        font-weight: bold;
+        color: #444;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .vb-input, .vb-select {
+        width: 100%;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        padding: 12px 15px;
+        font-size: 0.95rem;
+        outline: none;
+        color: #333;
+        transition: border-color 0.2s;
+        background: #fff;
+    }
+
+        .vb-input:focus, .vb-select:focus {
+            border-color: #8a1527;
+        }
+
+    .vb-btn-search {
+        background: #8a1527;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        width: 100%;
+        height: 48px; /* Cân bằng chiều cao với input */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        transition: 0.2s;
+        cursor: pointer;
+    }
+
+        .vb-btn-search:hover {
+            background: #6b101e;
+        }
+
+    /* 3. KHỐI DANH SÁCH VĂN BẢN (Gom chung 1 khối trắng) */
+    .vb-list-container {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        margin-bottom: 40px;
+        overflow: hidden;
+        /* THÊM 3 DÒNG NÀY VÀO ĐÂY */
+        max-width: 1168px; /* Nhập số giống hệt với khung trên để 2 khung bằng nhau */
+        margin-left: auto; /* Căn giữa */
+        margin-right: auto; /* Căn giữa */
+    }
+
+    .vb-list-item {
+        display: flex;
+        align-items: center;
+        padding: 20px 25px;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background-color 0.2s;
+    }
+
+        .vb-list-item:hover {
+            background-color: #fafafa;
+        }
+
+        .vb-list-item:last-child {
+            border-bottom: none;
+        }
+
+    .vb-item-icon {
+        width: 45px;
+        height: 45px;
+        margin-right: 20px;
+        flex-shrink: 0;
+    }
+
+        .vb-item-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+    .vb-item-content {
+        flex-grow: 1;
+        padding-right: 20px;
+    }
+
+    .vb-item-title {
+        font-size: 1.05rem;
+        font-weight: bold;
+        color: #222;
+        line-height: 1.4;
+        margin-bottom: 0;
+    }
+
+    .vb-item-actions {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-shrink: 0;
+    }
+
+    .vb-item-size {
+        font-size: 0.9rem;
+        color: #888;
+        font-weight: 500;
+        min-width: 50px;
+        text-align: right;
+    }
+
+    .vb-btn-download {
+        border: 1px solid #8a1527;
+        color: #8a1527;
+        background: transparent;
+        padding: 8px 18px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: bold;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+    }
+
+        .vb-btn-download:hover {
+            background: #8a1527;
+            color: white;
+        }
+
+    /* 4. PHÂN TRANG */
+    .vb-pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 50px;
+    }
+
+    .vb-page-link {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        background: white;
+        border: 1px solid #ddd;
+        color: #333;
+        font-weight: bold;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+        .vb-page-link:hover {
+            border-color: #8a1527;
+            color: #8a1527;
+        }
+
+        .vb-page-link.active {
+            background: #8a1527;
+            color: white;
+            border-color: #8a1527;
+        }
+
+    /* Responsive cho điện thoại (tự động rớt dòng trên màn hình nhỏ) */
+    @@media (max-width: 768px) {
+        .vb-filter-flex {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 15px;
+        }
+
+        .vb-list-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .vb-item-actions {
+            width: 100%;
+            justify-content: space-between;
+            padding-top: 10px;
+            border-top: 1px dashed #eee;
+        }
+
+        .vb-item-size {
+            text-align: left;
+        }
+    }
+</style>
+
+<!-- Thông báo lỗi -->
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="container mt-3">
+        <div class="alert alert-danger shadow-sm border-0">@TempData["ErrorMessage"]</div>
+    </div>
+}
+
+<!-- 1. Banner Tràn Viền -->
+<div class="vb-full-width-banner">
+    <div class="vb-banner-content">
+        <div class="vb-breadcrumb">
+            <a href="/">Trang chủ</a>
+            <i class="fas fa-chevron-right" style="font-size: 10px;"></i>
+            <span>Văn bản & Tài liệu</span>
+        </div>
+        <h1 class="vb-title">Văn bản & Tài liệu</h1>
+        <p class="vb-subtitle">Kho văn bản, biểu mẫu được công khai và cập nhật thường xuyên.</p>
+    </div>
+</div>
+
+<div class="container" style="position: relative; z-index: 10;">
+
+    <!-- 2. Khung Tìm kiếm (Sử dụng Flexbox chuẩn xác) -->
+    <div class="vb-filter-card">
+        <form method="get" action="@Url.Action("Index", "VanBanTaiLieu")">
+            <div class="vb-filter-flex">
+                <div class="vb-form-group-name">
+                    <label class="vb-filter-label">Tên tài liệu</label>
+                    <input type="text" name="keyword" value="@ViewBag.Keyword" class="vb-input" placeholder="Nhập tên tài liệu..." />
+                </div>
+                <div class="vb-form-group-cat">
+                    <label class="vb-filter-label">Chuyên mục</label>
+                    <select name="chuyenMucId" class="vb-select" asp-items="ViewBag.ChuyenMucs">
+                        <option value="">Tất cả chuyên mục</option>
+                    </select>
+                </div>
+                <div class="vb-form-group-btn">
+                    <button type="submit" class="vb-btn-search">
+                        <i class="fas fa-search"></i> Tìm kiếm
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- 3. Danh sách Văn bản -->
+    <div class="vb-list-container">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                // Sử dụng Icon chuẩn của dạng tài liệu (Giống Ảnh 2)
+                string iconUrl = "https://cdn-icons-png.flaticon.com/512/337/337946.png";
+                if (!string.IsNullOrEmpty(item.LoaiTep) && (item.LoaiTep.ToLower().Contains("doc") || item.LoaiTep.ToLower().Contains("word")))
+                {
+                    iconUrl = "https://cdn-icons-png.flaticon.com/512/337/337932.png";
+                }
+                else if (!string.IsNullOrEmpty(item.LoaiTep) && (item.LoaiTep.ToLower().Contains("xls") || item.LoaiTep.ToLower().Contains("excel")))
+                {
+                    iconUrl = "https://cdn-icons-png.flaticon.com/512/337/337958.png";
+                }
+
+                <div class="vb-list-item">
+                    <div class="vb-item-icon">
+                        <img src="@iconUrl" alt="Icon" />
+                    </div>
+
+                    <div class="vb-item-content">
+                        <h4 class="vb-item-title">
+                            @if (!string.IsNullOrEmpty(item.SoHieu))
+                            {
+                                @item.SoHieu <text>-</text>
+                            }
+                            @item.TenVanBan
+                        </h4>
+                    </div>
+
+                    <div class="vb-item-actions">
+                        <div class="vb-item-size">@FormatSize(item.DungLuong)</div>
+                        <a href="@Url.Action("Download", "VanBanTaiLieu", new { id = item.IdvanBan })" class="vb-btn-download">
+                            <i class="fas fa-download"></i> Tải về
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-folder-open" style="font-size: 3.5rem; color: #e0e0e0; margin-bottom: 15px;"></i>
+                <p style="color: #888; font-size: 1.1rem;">Không tìm thấy văn bản tài liệu nào.</p>
+            </div>
+        }
+    </div>
+
+    <!-- 4. Phân trang -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <div class="vb-pagination">
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <a href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, keyword = ViewBag.Keyword, chuyenMucId = ViewBag.ChuyenMucId })" class="vb-page-link">
+                    <i class="fas fa-angle-left"></i>
+                </a>
+            }
+
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                if (i == 1 || i == ViewBag.TotalPages || (i >= ViewBag.CurrentPage - 2 && i <= ViewBag.CurrentPage + 2))
+                {
+                    <a href="@Url.Action("Index", new { page = i, keyword = ViewBag.Keyword, chuyenMucId = ViewBag.ChuyenMucId })"
+                       class="vb-page-link @(i == ViewBag.CurrentPage ? "active" : "")">@i</a>
+                }
+                else if (i == ViewBag.CurrentPage - 3 || i == ViewBag.CurrentPage + 3)
+                {
+                    <span class="vb-page-link" style="border:none; background:transparent; pointer-events:none;">...</span>
+                }
+            }
+
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <a href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, keyword = ViewBag.Keyword, chuyenMucId = ViewBag.ChuyenMucId })" class="vb-page-link">
+                    <i class="fas fa-angle-right"></i>
+                </a>
+            }
+        </div>
+    }
+</div>

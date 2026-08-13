@@ -1,0 +1,76 @@
+﻿@model IEnumerable<WebMTTQ.Models.VanBanTaiLieu>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="admin-page-header">
+    <div>
+        <h2>Quản lý Văn bản & Tài liệu</h2>
+        <div class="subtitle">Quản lý kho văn bản, biểu mẫu công khai trên hệ thống</div>
+    </div>
+    <a href="/AdminVanBanTaiLieu/Create" class="admin-btn admin-btn-primary">
+        <i class="fas fa-plus"></i> Thêm văn bản mới
+    </a>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-body p-0">
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th width="120">Số hiệu</th>
+                        <th>Tên văn bản / Trích yếu</th>
+                        <th>Chuyên mục</th>
+                        <th class="cell-center">Ngày ban hành</th>
+                        <th class="cell-actions">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td><strong>@item.SoHieu</strong></td>
+                                <td>
+                                    <strong style="color: var(--admin-red);">@item.TenVanBan</strong>
+                                    @if (!string.IsNullOrEmpty(item.CoQuanBanHanh))
+                                    {
+                                        <div style="font-size:0.8rem; color:var(--admin-muted); margin-top:4px;">
+                                            <i class="fas fa-building"></i> @item.CoQuanBanHanh
+                                        </div>
+                                    }
+                                </td>
+                                <td><span class="admin-badge gray">@(item.IdchuyenMucNavigation?.TenChuyenMuc ?? "Không phân loại")</span></td>
+                                <td class="cell-center">@(item.NgayBanHanh?.ToString("dd/MM/yyyy"))</td>
+                                <td class="cell-actions">
+                                    <a href="/AdminVanBanTaiLieu/Edit/@item.IdvanBan" class="admin-btn admin-btn-warning admin-btn-sm">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </a>
+                                    <form action="/AdminVanBanTaiLieu/Delete" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa văn bản này?');">
+                                        <input type="hidden" name="id" value="@item.IdvanBan" />
+                                        <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5">
+                                <div class="admin-empty">
+                                    <i class="fas fa-file-signature"></i>
+                                    <p>Chưa có văn bản tài liệu nào trong hệ thống.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
