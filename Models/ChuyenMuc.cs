@@ -31,6 +31,12 @@ public partial class ChuyenMuc
 
     public bool? DaXoa { get; set; }
 
+    /// <summary>
+    /// Trạng thái hiển thị trên dropdown menu (tối đa 10 chuyên mục hiển thị cùng lúc).
+    /// true = Hiển thị, false = Ẩn.
+    /// </summary>
+    public bool? HienThi { get; set; } = true;
+
     [InverseProperty("IdchuyenMucNavigation")]
     public virtual ICollection<BaiViet> BaiViets { get; set; } = new List<BaiViet>();
 

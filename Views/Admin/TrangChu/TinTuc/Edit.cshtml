@@ -21,7 +21,7 @@
         </div>
     }
 
-    <form asp-action="TinTucEdit" method="post" enctype="multipart/form-data">
+    <form asp-action="TinTucEdit" method="post" enctype="multipart/form-data" onsubmit="return confirm('Xác nhận lưu các thay đổi này? Kiểm tra lại nội dung trước khi cập nhật.');">
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="Id" />
         <input type="hidden" name="id" value="@Model.Id" />

@@ -12,6 +12,10 @@ public sealed class NewsIndexViewModel
 
     // Sidebar
     public IReadOnlyList<SidebarDocItem> RecentDocs { get; init; } = [];
+
+    // Trạng thái chuyên mục hiện tại
+    public string CurrentCategoryName { get; init; } = "Tin tức";
+    public bool HasArticles { get; init; } = true;
 }
 
 public sealed class NewsCategoryInfo
@@ -42,4 +46,23 @@ public sealed class SidebarDocItem
 {
     public string Title { get; init; } = "";
     public string Url { get; init; } = "#";
+}
+
+/// <summary>
+/// ViewModel cho trang chi tiết bài viết.
+/// </summary>
+public sealed class NewsDetailViewModel
+{
+    public int Id { get; init; }
+    public string Title { get; init; } = "";
+    public string? Excerpt { get; init; }
+    public string? Content { get; init; }
+    public string? ImageUrl { get; init; }
+    public string? VideoUrl { get; init; }
+    public string Date { get; init; } = "";
+    public string Author { get; init; } = "";
+    public int ViewCount { get; init; }
+    public string CategoryName { get; init; } = "";
+    public string CategorySlug { get; init; } = "";
+    public IReadOnlyList<NewsArticleItem> RelatedArticles { get; init; } = [];
 }

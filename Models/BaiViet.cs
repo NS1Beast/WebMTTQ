@@ -28,6 +28,18 @@ public partial class BaiViet
 
     public byte[]? AnhDaiDien { get; set; }
 
+    /// <summary>
+    /// Đường dẫn ảnh đại diện (URL) - dùng thay thế AnhDaiDien (byte[]) để dễ hiển thị.
+    /// </summary>
+    [StringLength(1000)]
+    public string? HinhAnh { get; set; }
+
+    /// <summary>
+    /// Đường dẫn video nhúng (YouTube, Facebook, Vimeo...) hiển thị trong bài viết.
+    /// </summary>
+    [StringLength(1000)]
+    public string? VideoUrl { get; set; }
+
     [Column("IDChuyenMuc")]
     public int? IdchuyenMuc { get; set; }
 

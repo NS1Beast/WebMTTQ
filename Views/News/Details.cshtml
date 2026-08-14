@@ -1,0 +1,436 @@
+@model WebMTTQ.Models.NewsDetailViewModel
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+@section Head {
+    <link rel="stylesheet" href="~/css/news.css" asp-append-version="true" />
+    <style>
+        /* Article detail styles */
+        .m26-article {
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid var(--m26-line);
+            padding: 2rem;
+        }
+        .m26-article .feat {
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        .m26-article .feat img {
+            width: 100%;
+            height: auto;
+            max-height: 450px;
+            object-fit: cover;
+        }
+        .m26-article .m26-video {
+            margin-bottom: 1.5rem;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .m26-article .m26-video iframe,
+        .m26-article .m26-video video {
+            display: block;
+            width: 100%;
+        }
+        .m26-article .content {
+            font-size: .95rem;
+            line-height: 1.8;
+            color: #333;
+        }
+        .m26-article .content p {
+            margin-bottom: 1rem;
+        }
+        .m26-article .content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .m26-article .content h2,
+        .m26-article .content h3,
+        .m26-article .content h4 {
+            margin: 1.5rem 0 .75rem;
+            color: var(--m26-red);
+        }
+        .m26-article .content figure {
+            margin: 1rem 0;
+        }
+        .m26-article .content figure img {
+            width: 100%;
+        }
+        .m26-article .content figcaption {
+            font-size: .8rem;
+            color: var(--m26-muted);
+            text-align: center;
+            margin-top: .5rem;
+            /* CHẶN người xem chỉnh sửa mô tả hình ảnh */
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            cursor: default;
+        }
+        /* Vô hiệu hóa mọi thuộc tính contenteditable trên trang công khai */
+        .m26-article .content [contenteditable] {
+            contenteditable: false !important;
+            pointer-events: none !important;
+        }
+        /* Ẩn các phần tử editor-only nếu bị lưu nhầm */
+        .m26-article .content .news-caption-delete,
+        .m26-article .content .news-resize-handle,
+        .m26-article .content .news-media-toolbar,
+        .m26-article .content .news-context-menu {
+            display: none !important;
+        }
+        /* Loại bỏ viền focus của contenteditable */
+        .m26-article .content figcaption:focus {
+            outline: none !important;
+        }
+        .m26-article .content blockquote {
+            border-left: 4px solid var(--m26-gold-dark);
+            padding: .75rem 1rem;
+            margin: 1rem 0;
+            background: rgba(242,193,78,.08);
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+        }
+        .m26-article .content a {
+            color: var(--m26-red);
+            text-decoration: underline;
+        }
+        .m26-article .content ul,
+        .m26-article .content ol {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+        .m26-article .content li {
+            margin-bottom: .5rem;
+        }
+        .m26-article .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        .m26-article .content table th,
+        .m26-article .content table td {
+            border: 1px solid var(--m26-line);
+            padding: .5rem .75rem;
+        }
+        .m26-article .content table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        .m26-article .content iframe {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+        .m26-article .content .wp-block-image {
+            margin: 1rem 0;
+        }
+        .m26-article .content .wp-block-image img {
+            width: 100%;
+        }
+        .m26-article .content .wp-block-paragraph {
+            margin-bottom: 1rem;
+        }
+
+        /* Share button */
+        .m26-share {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+        }
+        .m26-native-share {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .5rem 1rem;
+            border: 1px solid var(--m26-line);
+            border-radius: 8px;
+            background: #fff;
+            font-size: .8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .m26-native-share:hover {
+            border-color: var(--m26-red);
+            color: var(--m26-red);
+        }
+        .m26-native-share svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Related articles */
+        .m26-related {
+            margin-top: 2rem;
+        }
+        .m26-related h3 {
+            font-family: var(--font-display);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--m26-red);
+            margin: 0 0 1rem;
+            padding-bottom: .5rem;
+            border-bottom: 2px solid var(--m26-red);
+        }
+        .m26-rel-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        @@media (max-width: 768px) {
+            .m26-rel-grid { grid-template-columns: 1fr; }
+        }
+        .m26-card {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid var(--m26-line);
+            overflow: hidden;
+            transition: box-shadow .3s, transform .3s;
+        }
+        .m26-card:hover {
+            box-shadow: 0 8px 24px rgba(60,7,9,.08);
+            transform: translateY(-3px);
+        }
+        .m26-card .ph {
+            display: block;
+            overflow: hidden;
+        }
+        .m26-card .ph img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            transition: transform .4s;
+        }
+        .m26-card:hover .ph img { transform: scale(1.05); }
+        .m26-card .cbody {
+            padding: .85rem;
+        }
+        .m26-card h4 {
+            font-size: .82rem;
+            font-weight: 600;
+            margin: 0 0 .35rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .m26-card h4 a:hover { color: var(--m26-red); }
+        .m26-card .date {
+            font-size: .72rem;
+            color: var(--m26-muted);
+        }
+    </style>
+}
+
+<!-- Page Hero -->
+<section class="m26-phero">
+    <div class="rays"></div>
+    <div class="wrap">
+        <nav class="m26-crumb" aria-label="Breadcrumb">
+            <a asp-controller="Home" asp-action="Index">Trang chủ</a>
+            <span class="sep">›</span>
+            <a href="/News?category=@Model.CategorySlug">@Model.CategoryName</a>
+        </nav>
+        <span class="tag">@Model.CategoryName</span>
+        <h1>@Model.Title</h1>
+        <div class="m26-postmeta">
+            <span>📅 @Model.Date</span>
+            <span>✍ @Model.Author</span>
+            <span>👁 @Model.ViewCount lượt xem</span>
+        </div>
+    </div>
+</section>
+
+<div class="m26-body">
+    <div class="wrap m26-layout">
+        <div class="m26-main">
+            <article class="m26-article">
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <div class="feat">
+                        <img src="@Model.ImageUrl" alt="@Model.Title" loading="lazy" />
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.VideoUrl))
+                {
+                    <div class="m26-video">
+                        @{
+                            var videoUrl = Model.VideoUrl;
+                            var videoEmbed = "";
+                            var ytMatch = System.Text.RegularExpressions.Regex.Match(videoUrl, @"(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})");
+                            if (ytMatch.Success)
+                            {
+                                videoEmbed = "https://www.youtube.com/embed/" + ytMatch.Groups[1].Value;
+                            }
+                            else
+                            {
+                                var vimeoMatch = System.Text.RegularExpressions.Regex.Match(videoUrl, @"vimeo\.com\/(\d+)");
+                                if (vimeoMatch.Success)
+                                {
+                                    videoEmbed = "https://player.vimeo.com/video/" + vimeoMatch.Groups[1].Value;
+                                }
+                                else if (videoUrl.Contains("facebook.com") || videoUrl.Contains("fb.watch"))
+                                {
+                                    videoEmbed = "https://www.facebook.com/plugins/video.php?href=" + Uri.EscapeDataString(videoUrl) + "&show_text=false";
+                                }
+                            }
+                        }
+                        @if (!string.IsNullOrEmpty(videoEmbed))
+                        {
+                            <iframe src="@videoEmbed" width="100%" height="400" style="border:none; border-radius:10px;" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" loading="lazy"></iframe>
+                        }
+                        else if (System.Text.RegularExpressions.Regex.IsMatch(videoUrl, @"\.(mp4|webm|ogg)(\?.*)?$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+                        {
+                            <video controls width="100%" style="border-radius:10px; max-height:400px;">
+                                <source src="@videoUrl" type="video/mp4">
+                                Trình duyệt không hỗ trợ video.
+                            </video>
+                        }
+                    </div>
+                }
+
+                <div class="m26-share">
+                    <button type="button" class="m26-native-share" data-url="@Context.Request.Path" data-title="@Model.Title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5 15.4 17.5M15.4 6.5 8.6 10.5"/></svg>
+                        <span>Chia sẻ liên kết</span>
+                    </button>
+                </div>
+
+                <div class="content">
+                    @Html.Raw(Model.Content ?? "")
+                </div>
+            </article>
+
+            @if (Model.RelatedArticles.Any())
+            {
+                <div class="m26-related">
+                    <h3>Nội dung liên quan</h3>
+                    <div class="m26-rel-grid">
+                        @foreach (var item in Model.RelatedArticles)
+                        {
+                            <article class="m26-card">
+                                <a href="@item.Url" class="ph">
+                                    <img src="@item.ImageUrl" alt="@item.Title" loading="lazy" />
+                                </a>
+                                <div class="cbody">
+                                    <h4><a href="@item.Url">@item.Title</a></h4>
+                                    <span class="date">📅 @item.Date</span>
+                                </div>
+                            </article>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <aside class="m26-side">
+            <!-- Banner an sinh -->
+            <a class="banner" asp-controller="CongThongTinAnSXH" asp-action="Index">
+                <img src="~/images/PhuongTanDinh.png"
+                alt="Cổng thông tin an sinh xã hội"
+                 loading="lazy" />
+            </a>
+
+            <!-- Thời tiết -->
+            <div class="m26-widget">
+                <h3>Thời tiết</h3>
+                <iframe src="https://thoitiet247.vn/widget/embed/ho-chi-minh/cu-chi/phu-hoa-dong?style=2&day=7&td=%23ffffff&ntd=%231c84ee&mvb=%23848484&mv=%231c84ee&mdk=%23dddddd&htd=true"
+                        width="100%" height="430" scrolling="no" loading="lazy" allowtransparency="true"></iframe>
+            </div>
+
+            <!-- Liên kết website -->
+            <div class="m26-widget">
+                <h3>Liên kết</h3>
+                <select onchange="if(this.value){window.location.href=this.value}">
+                    <option value="">-- Liên kết website --</option>
+                    <option value="https://dichvucong.gov.vn/">Dịch vụ công quốc gia</option>
+                    <option value="https://chinhphu.vn/">Chính phủ CHXHCN Việt Nam</option>
+                    <option value="http://dangcongsan.vn/">Đảng Cộng sản Việt Nam</option>
+                    <option value="https://mattran.org.vn/">MTTQ Việt Nam</option>
+                    <option value="http://www.hochiminhcity.gov.vn/">TP Hồ Chí Minh</option>
+                    <option value="https://www.mof.gov.vn/">Bộ Tài chính</option>
+                    <option value="http://moh.gov.vn/">Bộ Y tế</option>
+                    <option value="http://www.moet.gov.vn/">Bộ Giáo dục - Đào tạo</option>
+                </select>
+            </div>
+
+            <!-- Thống kê truy cập -->
+            <div class="m26-widget">
+                <h3>Thống kê truy cập</h3>
+                <ul class="stats-list">
+                    <li><span>Đang truy cập:</span> <strong>—</strong></li>
+                    <li><span>Hôm nay:</span> <strong>—</strong></li>
+                    <li><span>Tuần này:</span> <strong>—</strong></li>
+                    <li><span>Tổng truy cập:</span> <strong>—</strong></li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Native share
+        document.querySelectorAll('.m26-native-share').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var url = window.location.href;
+                var title = this.getAttribute('data-title') || document.title;
+                if (navigator.share) {
+                    navigator.share({ title: title, url: url }).catch(function() {});
+                } else {
+                    navigator.clipboard.writeText(url).then(function() {
+                        alert('Đã sao chép liên kết!');
+                    });
+                }
+            });
+        });
+
+        // BẢO VỆ: Xóa contenteditable khỏi toàn bộ nội dung bài viết công khai
+        // Ngăn người xem website chỉnh sửa mô tả hình ảnh
+        (function() {
+            // 1. Loại bỏ thuộc tính contenteditable khỏi mọi phần tử
+            var contentEl = document.querySelector('.m26-article .content');
+            if (contentEl) {
+                contentEl.querySelectorAll('[contenteditable]').forEach(function(el) {
+                    el.removeAttribute('contenteditable');
+                });
+            }
+
+            // 2. Chặn sự kiện contextmenu (chuột phải) trên mô tả hình ảnh
+            document.addEventListener('contextmenu', function(e) {
+                var t = e.target;
+                if (t && t.tagName === 'FIGCAPTION') {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            // 3. Chặn DOM mutation cố gắng thêm lại contenteditable
+            var observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    mutation.addedNodes.forEach(function(node) {
+                        if (node.nodeType === 1) {
+                            var els = node.querySelectorAll ? node.querySelectorAll('[contenteditable]') : [];
+                            els.forEach(function(el) {
+                                el.removeAttribute('contenteditable');
+                            });
+                            if (node.hasAttribute && node.hasAttribute('contenteditable')) {
+                                node.removeAttribute('contenteditable');
+                            }
+                        }
+                    });
+                });
+            });
+            var targetNode = document.querySelector('.m26-article .content');
+            if (targetNode) {
+                observer.observe(targetNode, { childList: true, subtree: true });
+            }
+        })();
+    </script>
+}

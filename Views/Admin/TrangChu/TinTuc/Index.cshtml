@@ -89,7 +89,7 @@
                                     <a href="@Url.Action("TinTucEdit", "AdminTrangChu", new { id = item.Id })" style="color: #17a2b8; text-decoration: none; padding: 5px 12px; border: 1px solid #17a2b8; border-radius: 4px; font-size: 0.85rem;">
                                         <i class="fas fa-edit"></i> Sửa
                                     </a>
-                                    <form asp-action="TinTucToggleStatus" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                    <form asp-action="TinTucToggleStatus" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Xác nhận thay đổi trạng thái hiển thị tin tức này?');">
                                         <button type="submit" style="color: @(item.TrangThai ? "#ffc107" : "#28a745"); background: none; border: 1px solid @(item.TrangThai ? "#ffc107" : "#28a745"); cursor: pointer; font-size: 0.85rem; padding: 5px 12px; border-radius: 4px;">
                                             <i class="fas @(item.TrangThai ? "fa-eye-slash" : "fa-eye")"></i> @(item.TrangThai ? "Ẩn" : "Hiện")
                                         </button>

@@ -26,6 +26,14 @@
     var isAbout = ViewContext.RouteData.Values["action"]?.ToString() == "Index"
         && ViewContext.RouteData.Values["controller"]?.ToString() == "About";
     var isNews = ViewContext.RouteData.Values["controller"]?.ToString() == "News";
+
+    // Lấy danh sách chuyên mục tin tức hiển thị (tối đa 10)
+    var newsCategories = _context.ChuyenMucs
+        .Where(c => c.DaXoa == false && c.HienThi == true)
+        .OrderBy(c => c.ThuTu)
+        .ThenBy(c => c.TenChuyenMuc)
+        .Take(10)
+        .ToList();
 }
 <!DOCTYPE html>
 <html lang="vi">
@@ -38,7 +46,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,700&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap&subset=vietnamese" rel="stylesheet" />
-    <link rel="icon" href="https://mttq.phuhoadong.vn/apps/uploads/2025/11/cropped-favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" href="~/images/LogoGioiThieu/logoMTTQ.jpg" sizes="32x32" />
     <link rel="stylesheet" href="~/css/mttq.css" asp-append-version="true" />
 
     <!-- CSS Tùy chỉnh cho Nút Lên Đầu Trang & Trợ Lý AI -->
@@ -142,7 +150,7 @@
     <div id="m26-splash" role="status" aria-label="Đang tải">
         <div class="m26-splash-in">
             <div class="m26-splash-badge">
-                <img src="https://mttq.phuhoadong.vn/apps/uploads/2025/11/cropped-favicon-270x270.png" alt="" width="82" height="82" />
+                <img src="~/images/LogoGioiThieu/logoMTTQ.jpg" alt="" width="82" height="82" />
             </div>
             <span class="m26-splash-txt">@tenCoQuan</span>
         </div>
@@ -170,7 +178,7 @@
         <header class="m26-head" id="m26-head">
             <div class="wrap head-inner">
                 <a class="m26-brand" asp-controller="Home" asp-action="Index">
-                    <img class="logo" src="https://mttq.phuhoadong.vn/apps/uploads/2025/11/cropped-favicon-270x270.png" alt="Biểu trưng MTTQ Việt Nam" />
+                    <img class="logo" src="~/images/LogoGioiThieu/logoMTTQ.jpg" alt="Biểu trưng MTTQ Việt Nam" />
                     <span>
                         <strong>Mặt trận Tổ quốc Việt Nam</strong>
                         <span>PHƯỜNG TÂN ĐỊNH</span>
@@ -183,11 +191,12 @@
                     <li class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle @(isNews ? "is-active" : "")" role="button" aria-expanded="false">Danh mục Tin tức</a>
                         <ul class="dropdown-menu">
-                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Mặt trận Tổ quốc</a></li>
-                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Đoàn Thanh niên</a></li>
-                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Hội Liên hiệp Phụ nữ</a></li>
-                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Hội Cựu Chiến binh</a></li>
-                            <li class="nav-item"><a class="dropdown-item" asp-controller="Home" asp-action="UnderConstruction">Công đoàn</a></li>
+                            @foreach (var cat in newsCategories)
+                            {
+                                <li class="nav-item">
+                                    <a class="dropdown-item" href="/News?category=@cat.DuongDan">@cat.TenChuyenMuc</a>
+                                </li>
+                            }
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -230,8 +239,11 @@
             <div class="m26-drawer-in">
                 <div class="m26-drawer-head">
                     <a class="m26-drawer-brand" asp-controller="Home" asp-action="Index">
-                        <img src="https://mttq.phuhoadong.vn/apps/uploads/2025/11/cropped-favicon-270x270.png" alt="Biểu trưng MTTQ" />
-                        <span><strong>Mặt trận Tổ quốc</strong><small>PHƯỜNG TÂN ĐỊNH</small></span>
+                        <img src="~/images/PhuongTanDinh.png" alt="Biểu trưng MTTQ" />
+                        <span>
+                            <strong>Mặt trận Tổ quốc</strong>
+                            <small>PHƯỜNG TÂN ĐỊNH</small>
+                        </span>
                     </a>
                     <button class="x" type="button" data-close aria-label="Đóng menu">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6L6 18" /></svg>
@@ -264,7 +276,7 @@
                 <div class="grid">
                     <div>
                         <div class="fb">
-                            <img src="https://mttq.phuhoadong.vn/apps/uploads/2025/11/cropped-favicon-270x270.png" alt="Biểu trưng MTTQ Việt Nam" />
+                            <img src="~/images/PhuongTanDinh.png" alt="Biểu trưng MTTQ Việt Nam" />
                             <div>
                                 <strong>MTTQ Việt Nam</strong>
                                 <span>PHƯỜNG TÂN ĐỊNH</span>
@@ -332,7 +344,7 @@
        class="m26-ai-btn"
        aria-label="Mở Trợ lý AI">
         <div class="m26-ai-icon">
-            <img src="https://mttq.phuhoadong.vn/apps/uploads/2025/11/cropped-favicon-270x270.png" alt="Avatar Trợ lý AI" />
+            <img src="~/images/LogoGioiThieu/logoMTTQ.jpg" alt="Avatar Trợ lý AI" />
         </div>
         <span class="m26-ai-text">Hỏi Trợ lý AI</span>
     </a>

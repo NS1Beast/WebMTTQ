@@ -17,6 +17,7 @@ namespace WebMTTQ.Models
         public const string NguoiDanCanTroGiup = "nguoidancantrogium";
         public const string GopY = "gopy";
         public const string Banner = "banner";
+        public const string TinTuc = "tintuc";
         public const string CauHinh = "cauhinh";
         public const string QuanLyNguoiDung = "quanlynguoidung";
 
@@ -34,6 +35,7 @@ namespace WebMTTQ.Models
                 new ModuleInfo { MaModule = NguoiDanCanTroGiup, TenModule = "Yêu cầu trợ giúp", Icon = "fa-life-ring", MoTa = "Quản lý yêu cầu trợ giúp" },
                 new ModuleInfo { MaModule = GopY, TenModule = "Hộp thư góp ý", Icon = "fa-envelope-open-text", MoTa = "Quản lý hộp thư góp ý" },
                 new ModuleInfo { MaModule = Banner, TenModule = "Quản lý Banner", Icon = "fa-images", MoTa = "Quản lý banner" },
+                new ModuleInfo { MaModule = TinTuc, TenModule = "Quản lý Tin tức", Icon = "fa-newspaper", MoTa = "Quản lý bài viết và chuyên mục tin tức" },
                 new ModuleInfo { MaModule = CauHinh, TenModule = "Cài đặt hệ thống", Icon = "fa-cog", MoTa = "Cấu hình hệ thống" },
                 new ModuleInfo { MaModule = QuanLyNguoiDung, TenModule = "Quản lý người dùng", Icon = "fa-users", MoTa = "Quản lý tài khoản và phân quyền" }
             };

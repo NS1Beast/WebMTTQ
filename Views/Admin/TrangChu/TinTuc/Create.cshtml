@@ -21,7 +21,7 @@
         </div>
     }
 
-    <form asp-action="TinTucCreate" method="post" enctype="multipart/form-data">
+    <form asp-action="TinTucCreate" method="post" enctype="multipart/form-data" onsubmit="return confirm('Xác nhận tạo tin tức này? Kiểm tra lại nội dung trước khi lưu.');">
         @Html.AntiForgeryToken()
         <input type="hidden" name="sectionId" value="@sec.Id" />
 

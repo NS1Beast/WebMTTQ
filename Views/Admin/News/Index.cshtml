@@ -1,0 +1,161 @@
+@model IEnumerable<WebMTTQ.Models.BaiViet>
+
+@{
+    ViewData["Title"] = "Quản lý Tin tức";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var categories = ViewBag.Categories as List<WebMTTQ.Models.ChuyenMuc> ?? new();
+    var selectedCategory = ViewBag.SelectedCategory as string;
+    var keyword = ViewBag.Keyword as string;
+    var currentPage = (int)(ViewBag.CurrentPage ?? 1);
+    var totalPages = (int)(ViewBag.TotalPages ?? 1);
+}
+
+<div class="admin-card" style="background:#fff; padding:25px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <h2 style="margin: 0; color: #333; font-size: 1.5rem;">
+            <i class="fas fa-newspaper"></i> Quản lý Tin tức
+        </h2>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="@Url.Action("Categories", "AdminNews")" style="color: #17a2b8; text-decoration: none; padding: 8px 16px; border: 1px solid #17a2b8; border-radius: 6px; font-size: 0.9rem;">
+                <i class="fas fa-folder"></i> Chuyên mục
+            </a>
+            <a href="@Url.Action("Create", "AdminNews")" class="btn" style="background: #28a745; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">
+                <i class="fas fa-plus"></i> Thêm bài viết
+            </a>
+        </div>
+    </div>
+
+    <!-- Bộ lọc -->
+    <form method="get" action="@Url.Action("Index", "AdminNews")" style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+        <select name="category" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem; min-width: 200px;">
+            <option value="">-- Tất cả chuyên mục --</option>
+            @foreach (var cat in categories)
+            {
+                <option value="@cat.DuongDan" selected="@(cat.DuongDan == selectedCategory)">@cat.TenChuyenMuc</option>
+            }
+        </select>
+        <input type="text" name="keyword" value="@keyword" placeholder="Tìm kiếm tiêu đề..." style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem; flex: 1; min-width: 200px;" />
+        <button type="submit" style="padding: 8px 16px; background: #17a2b8; color: white; border: none; border-radius: 6px; cursor: pointer;">
+            <i class="fas fa-search"></i> Lọc
+        </button>
+    </form>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="table-responsive" style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
+            <thead>
+                <tr style="background: #f8f9fa; text-align: left; border-bottom: 2px solid #ddd;">
+                    <th style="padding: 15px; min-width: 120px;">Hình ảnh</th>
+                    <th style="padding: 15px;">Tiêu đề</th>
+                    <th style="padding: 15px;">Chuyên mục</th>
+                    <th style="padding: 15px;">Ngày đăng</th>
+                    <th style="padding: 15px; width: 100px;">Trạng thái</th>
+                    <th style="padding: 15px; text-align: center; min-width: 180px;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 10px 15px;">
+                                @if (!string.IsNullOrEmpty(item.HinhAnh))
+                                {
+                                    <img src="@item.HinhAnh" alt="@item.TieuDe" style="width: 120px; height: 70px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd;" onerror="this.onerror=null;this.src='https://via.placeholder.com/120x70/cccccc/999999?text=No+Image'" />
+                                }
+                                else
+                                {
+                                    <div style="width: 120px; height: 70px; background: #f0f0f0; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 0.8rem;">
+                                        <i class="fas fa-image"></i>
+                                    </div>
+                                }
+                            </td>
+                            <td style="padding: 15px; font-weight: bold; max-width: 300px; overflow: hidden; text-overflow: ellipsis;">
+                                @item.TieuDe
+                                @if (item.LaTinNoiBat == true)
+                                {
+                                    <span style="background: #ffc107; color: #333; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; margin-left: 5px;">Nổi bật</span>
+                                }
+                            </td>
+                            <td style="padding: 15px; color: #666; font-size: 0.9rem;">
+                                @(item.IdchuyenMucNavigation?.TenChuyenMuc ?? "—")
+                            </td>
+                            <td style="padding: 15px; color: #666; font-size: 0.9rem;">
+                                @(item.NgayXuatBan?.ToString("dd/MM/yyyy") ?? "—")
+                            </td>
+                            <td style="padding: 15px;">
+                                @if (item.TrangThai == "DaDang")
+                                {
+                                    <span style="background: #d4edda; color: #155724; padding: 5px 10px; border-radius: 20px; font-size: 0.85rem;">Hiển thị</span>
+                                }
+                                else
+                                {
+                                    <span style="background: #f8d7da; color: #721c24; padding: 5px 10px; border-radius: 20px; font-size: 0.85rem;">Đang ẩn</span>
+                                }
+                            </td>
+                            <td style="padding: 15px; text-align: center;">
+                                <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                                    <a href="/News/Details/@item.IdbaiViet" target="_blank" style="color: #6c757d; text-decoration: none; padding: 5px 12px; border: 1px solid #6c757d; border-radius: 4px; font-size: 0.85rem;">
+                                        <i class="fas fa-eye"></i> Xem
+                                    </a>
+                                    <a href="@Url.Action("Edit", "AdminNews", new { id = item.IdbaiViet })" style="color: #17a2b8; text-decoration: none; padding: 5px 12px; border: 1px solid #17a2b8; border-radius: 4px; font-size: 0.85rem;">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </a>
+                                    <form asp-action="ToggleStatus" asp-route-id="@item.IdbaiViet" method="post" style="display:inline;" onsubmit="return confirm('Xác nhận thay đổi trạng thái hiển thị bài viết này?');">
+                                        <button type="submit" style="color: @(item.TrangThai == "DaDang" ? "#ffc107" : "#28a745"); background: none; border: 1px solid @(item.TrangThai == "DaDang" ? "#ffc107" : "#28a745"); cursor: pointer; font-size: 0.85rem; padding: 5px 12px; border-radius: 4px;">
+                                            <i class="fas @(item.TrangThai == "DaDang" ? "fa-eye-slash" : "fa-eye")"></i> @(item.TrangThai == "DaDang" ? "Ẩn" : "Hiện")
+                                        </button>
+                                    </form>
+                                    <form asp-action="Delete" asp-route-id="@item.IdbaiViet" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài viết này?');">
+                                        <button type="submit" style="color: #dc3545; background: none; border: 1px solid #dc3545; cursor: pointer; font-size: 0.85rem; padding: 5px 12px; border-radius: 4px;">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: #888;">
+                            <div style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;">
+                                <i class="fas fa-newspaper"></i>
+                            </div>
+                            <p style="font-size: 1.1rem; margin-bottom: 5px;">Chưa có bài viết nào.</p>
+                            <p style="font-size: 0.9rem;">Nhấn nút "Thêm bài viết" để bắt đầu thêm nội dung.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Phân trang -->
+    @if (totalPages > 1)
+    {
+        <div style="display: flex; justify-content: center; gap: 8px; margin-top: 20px;">
+            @for (int p = 1; p <= totalPages; p++)
+            {
+                <a href="@Url.Action("Index", "AdminNews", new { category = selectedCategory, keyword = keyword, page = p })"
+                   style="padding: 8px 14px; border: 1px solid #ddd; border-radius: 6px; text-decoration: none; color: @(p == currentPage ? "#fff" : "#333"); background: @(p == currentPage ? "#17a2b8" : "#fff");">
+                    @p
+                </a>
+            }
+        </div>
+    }
+</div>
