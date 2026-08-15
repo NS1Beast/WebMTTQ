@@ -12,6 +12,12 @@
         background: var(--m26-ink, #1a1a2e);
         /* Thêm !important để ghi đè inline style chiều cao bị giới hạn trong HTML */
         height: auto !important;
+        /* --- ĐOẠN CODE THÊM MỚI ĐỂ THU GỌN VÀ CĂN GIỮA BANNER --- */
+        max-width: auto; /* Bạn có thể thay đổi số này (VD: 900px, 1140px, 1200px) */
+        margin-left: auto; /* Căn giữa */
+        margin-right: auto; /* Căn giữa */
+        /* Gợi ý thêm: Bạn có thể bỏ comment dòng dưới nếu muốn bo góc banner cho đẹp */
+         border-radius: 12px; 
     }
 
     .banner-track {
@@ -57,8 +63,14 @@
         }
     }
 
-    .banner-slide.zoom img { transform: scale(1.15); }
-    .banner-slide.zoom.active img { transform: scale(1); }
+    .banner-slide.zoom img {
+        transform: scale(1.15);
+    }
+
+    .banner-slide.zoom.active img {
+        transform: scale(1);
+    }
+
     .banner-overlay {
         position: absolute;
         bottom: 0;
@@ -69,19 +81,22 @@
         color: white;
         z-index: 2;
     }
-    .banner-overlay h3 {
-        margin: 0 0 6px;
-        font-size: clamp(1.1rem, 2.5vw, 1.6rem);
-        font-weight: 700;
-        text-shadow: 0 2px 8px rgba(0,0,0,0.5);
-    }
-    .banner-overlay p {
-        margin: 0;
-        font-size: clamp(0.85rem, 1.5vw, 1rem);
-        opacity: 0.9;
-        text-shadow: 0 1px 4px rgba(0,0,0,0.5);
-        max-width: 600px;
-    }
+
+        .banner-overlay h3 {
+            margin: 0 0 6px;
+            font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+            font-weight: 700;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+
+        .banner-overlay p {
+            margin: 0;
+            font-size: clamp(0.85rem, 1.5vw, 1rem);
+            opacity: 0.9;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+            max-width: 600px;
+        }
+
     .banner-btn {
         position: absolute;
         top: 50%;
@@ -103,15 +118,26 @@
         transition: all 0.3s ease;
         opacity: 0;
     }
-    .banner-wrapper:hover .banner-btn { opacity: 1; }
+
+    .banner-wrapper:hover .banner-btn {
+        opacity: 1;
+    }
+
     .banner-btn:hover {
         background: var(--m26-gold, #e8b84b);
         border-color: var(--m26-gold, #e8b84b);
         transform: translateY(-50%) scale(1.1);
         box-shadow: 0 4px 20px rgba(232,184,75,0.4);
     }
-    .banner-prev { left: 20px; }
-    .banner-next { right: 20px; }
+
+    .banner-prev {
+        left: 20px;
+    }
+
+    .banner-next {
+        right: 20px;
+    }
+
     .banner-dots {
         position: absolute;
         bottom: 15px;
@@ -121,6 +147,7 @@
         gap: 10px;
         z-index: 10;
     }
+
     .dot {
         width: 12px;
         height: 12px;
@@ -130,13 +157,18 @@
         transition: all 0.4s ease;
         border: 2px solid transparent;
     }
-    .dot.active {
-        background: var(--m26-gold, #e8b84b);
-        border-color: rgba(255,255,255,0.6);
-        box-shadow: 0 0 12px rgba(232,184,75,0.5);
-        transform: scale(1.2);
-    }
-    .dot:hover { background: rgba(255,255,255,0.7); }
+
+        .dot.active {
+            background: var(--m26-gold, #e8b84b);
+            border-color: rgba(255,255,255,0.6);
+            box-shadow: 0 0 12px rgba(232,184,75,0.5);
+            transform: scale(1.2);
+        }
+
+        .dot:hover {
+            background: rgba(255,255,255,0.7);
+        }
+
     .banner-progress {
         position: absolute;
         bottom: 0;

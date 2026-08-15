@@ -11,17 +11,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
 
-    <!-- CỤM CSS CHO TOAST NOTIFICATION -->
     <style>
+            /* ========================================================
+                       CỤM CSS CHO TOAST NOTIFICATION
+                       ======================================================== */
             .admin-toast-container {
                 position: fixed;
-                top: 80px; /* Cách header một chút */
+                top: 80px;
                 right: 20px;
                 z-index: 9999;
                 display: flex;
                 flex-direction: column;
                 gap: 15px;
-                pointer-events: none; /* Không chặn click chuột vào web */
+                pointer-events: none;
             }
 
             .admin-toast {
@@ -34,7 +36,7 @@
                 display: flex;
                 align-items: center;
                 gap: 15px;
-                transform: translateX(120%); /* Ẩn ra ngoài màn hình */
+                transform: translateX(120%);
                 animation: toastSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
                 transition: all 0.5s ease-out;
                 pointer-events: auto;
@@ -89,6 +91,70 @@
                     transform: translateX(0);
                 }
             }
+
+            /* ========================================================
+                       CỤM CSS CHO ACCORDION MENU SIDEBAR (MENU THẢ XUỐNG)
+                       ======================================================== */
+            .nav-group {
+                margin-bottom: 5px;
+            }
+
+            .nav-group-toggle {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 20px 12px 15px;
+                color: rgba(255,255,255,0.5);
+                font-weight: 600;
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                cursor: pointer;
+                transition: all 0.3s;
+                user-select: none;
+            }
+
+                .nav-group-toggle:hover {
+                    color: #fff;
+                    background: rgba(255,255,255,0.05);
+                }
+
+                .nav-group-toggle .caret {
+                    transition: transform 0.3s ease;
+                    font-size: 0.8rem;
+                }
+
+            /* Khi menu mở */
+            .nav-group.is-open .nav-group-toggle {
+                color: var(--admin-gold, #e8b84b);
+            }
+
+                .nav-group.is-open .nav-group-toggle .caret {
+                    transform: rotate(180deg);
+                }
+
+            /* Menu con */
+            .nav-submenu {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+                background: rgba(0,0,0,0.15); /* Làm nền menu con tối hơn một chút */
+            }
+
+            .nav-group.is-open .nav-submenu {
+                max-height: 1000px; /* Số lớn để hiệu ứng trượt hoạt động mượt */
+            }
+
+            /* Thụt lề cho các item bên trong menu con */
+            .nav-submenu a {
+                padding-left: 45px !important; /* Thụt vào sâu hơn */
+                font-size: 0.9rem;
+            }
+
+                .nav-submenu a i {
+                    font-size: 0.9rem;
+                    width: 20px;
+                }
     </style>
 </head>
 <body class="admin-body">
@@ -105,171 +171,208 @@
                     var session = Context.Session;
                     var isAdmin = WebMTTQ.Services.PhanQuyenHelper.IsAdmin(session);
                     var coQuyen = (string module) => isAdmin || WebMTTQ.Services.PhanQuyenHelper.CoQuyenXem(session, module);
+
+                    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+                    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+
+                    // Logic kiểm tra Active cho từng Group
+                    bool isNoiDungActive = currentController == "AdminNews" || currentController == "AdminVanBanTaiLieu" || currentController == "AdminTrangChu";
+                    bool isNguoiNgheoActive = currentController == "AdminThongTin" || currentController == "AdminDanhSachUngHo" || currentController == "AdminSoDuQuy" || currentController == "AdminKetQuaChamLo" || currentController == "AdminDiaDiemBanDo";
+                    bool isBienDaoActive = currentController == "AdminQuyBienDao";
+                    bool isCuuTroActive = currentController == "AdminQuyCuuTro";
+                    bool isTuongTacActive = currentController == "AdminNguoiDanCanTroGiup" || currentController == "AdminGopY";
                 }
 
                 @if (coQuyen(WebMTTQ.Models.ModuleQuyen.Dashboard))
                 {
-                    <a href="/admin" class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Index" && ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "is-active" : "")">
+                    <a href="/admin" class="@(currentAction == "Index" && currentController == "Admin" ? "is-active" : "")">
                         <i class="fas fa-chart-pie"></i>
                         <span>Dashboard</span>
                     </a>
                 }
 
                 <div class="nav-sep"></div>
-                <div class="nav-label">Quản lý nội dung</div>
-                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.TinTuc))
-                {
-                    <a href="/AdminNews/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminNews" ? "is-active" : "")">
-                        <i class="fas fa-newspaper"></i>
-                        <span>Quản lý Tin tức</span>
-                    </a>
-                }
-                <a href="/AdminVanBanTaiLieu/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminVanBanTaiLieu" ? "is-active" : "")">
-                    <i class="fas fa-file-signature"></i>
-                    <span>Văn bản & Tài liệu</span>
-                </a>
-                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.TrangChu))
-                {
-                    <a href="/AdminTrangChu/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminTrangChu" ? "is-active" : "")">
-                        <i class="fas fa-home"></i>
-                        <span>Cài đặt Trang chủ</span>
-                    </a>
-                }
 
-                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.ThongTinUngHo))
-                {
-                    <a href="/admin/thongtinungho" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminThongTin" ? "is-active" : "")">
-                        <i class="fas fa-university"></i>
-                        <span>Thông tin ủng hộ</span>
-                    </a>
-                }
-
-                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.DanhSachUngHo))
-                {
-                    <a href="/admin/danhsachungho" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminDanhSachUngHo" ? "is-active" : "")">
-                        <i class="fas fa-hand-holding-usd"></i>
-                        <span>Danh sách ủng hộ</span>
-                    </a>
-                }
-
-                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.SoDuQuy))
-                {
-                    <a href="/admin/soduquy" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminSoDuQuy" ? "is-active" : "")">
-                        <i class="fas fa-wallet"></i>
-                        <span>Số dư Quỹ</span>
-                    </a>
-                }
-
-                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.KetQuaChamLo))
-                {
-                    <a href="/admin/ketquachamlo" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminKetQuaChamLo" ? "is-active" : "")">
-                        <i class="fas fa-hand-holding-heart"></i>
-                        <span>Kết quả chăm lo</span>
-                    </a>
-                }
-
-                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.DiaDiemBanDo))
-                {
-                    <a href="/AdminDiaDiemBanDo/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminDiaDiemBanDo" ? "is-active" : "")">
-                        <i class="fas fa-map-marked-alt"></i>
-                        <span>Bản đồ an sinh</span>
-                    </a>
-                }
-
-                <div class="nav-sep"></div>
-                <div class="nav-label">Tương tác</div>
-
-                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.NguoiDanCanTroGiup))
-                {
-                    <a href="/AdminNguoiDanCanTroGiup/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminNguoiDanCanTroGiup" ? "is-active" : "")">
-                        <i class="fas fa-life-ring"></i>
-                        <span>Yêu cầu trợ giúp</span>
-                    </a>
-                }
-
-                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.GopY))
-                {
-                    <a href="/AdminGopY/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminGopY" ? "is-active" : "")">
-                        <i class="fas fa-envelope-open-text"></i>
-                        <span>Hộp thư góp ý</span>
-                    </a>
-                }
+                <!-- GROUP 1: QUẢN LÝ NỘI DUNG -->
+                <div class="nav-group @(isNoiDungActive ? "is-open" : "")">
+                    <div class="nav-group-toggle">
+                        <span>Quản lý nội dung</span>
+                        <i class="fas fa-chevron-down caret"></i>
+                    </div>
+                    <div class="nav-submenu">
+                        @if (coQuyen(WebMTTQ.Models.ModuleQuyen.TinTuc))
+                        {
+                            <a href="/AdminNews/Index" class="@(currentController == "AdminNews" ? "is-active" : "")">
+                                <i class="fas fa-newspaper"></i>
+                                <span>Quản lý Tin tức</span>
+                            </a>
+                        }
+                        <a href="/AdminVanBanTaiLieu/Index" class="@(currentController == "AdminVanBanTaiLieu" ? "is-active" : "")">
+                            <i class="fas fa-file-signature"></i>
+                            <span>Văn bản & Tài liệu</span>
+                        </a>
+                        @if (coQuyen(WebMTTQ.Models.ModuleQuyen.TrangChu))
+                        {
+                            <a href="/AdminTrangChu/Index" class="@(currentController == "AdminTrangChu" ? "is-active" : "")">
+                                <i class="fas fa-home"></i>
+                                <span>Cài đặt Trang chủ</span>
+                            </a>
+                        }
+                    </div>
+                </div>
 
                 <div class="nav-sep"></div>
 
+                <!-- GROUP 2: QUỸ VÌ NGƯỜI NGHÈO -->
+                <div class="nav-group @(isNguoiNgheoActive ? "is-open" : "")">
+                    <div class="nav-group-toggle">
+                        <span>Quỹ vì người nghèo</span>
+                        <i class="fas fa-chevron-down caret"></i>
+                    </div>
+                    <div class="nav-submenu">
+                        @if (coQuyen(WebMTTQ.Models.ModuleQuyen.ThongTinUngHo))
+                        {
+                            <a href="/admin/thongtinungho" class="@(currentController == "AdminThongTin" ? "is-active" : "")">
+                                <i class="fas fa-university"></i>
+                                <span>Thông tin ủng hộ</span>
+                            </a>
+                        }
+                        @if (coQuyen(WebMTTQ.Models.ModuleQuyen.DanhSachUngHo))
+                        {
+                            <a href="/admin/danhsachungho" class="@(currentController == "AdminDanhSachUngHo" ? "is-active" : "")">
+                                <i class="fas fa-hand-holding-usd"></i>
+                                <span>Danh sách ủng hộ</span>
+                            </a>
+                        }
+                        @if (coQuyen(WebMTTQ.Models.ModuleQuyen.SoDuQuy))
+                        {
+                            <a href="/admin/soduquy" class="@(currentController == "AdminSoDuQuy" ? "is-active" : "")">
+                                <i class="fas fa-wallet"></i>
+                                <span>Số dư Quỹ</span>
+                            </a>
+                        }
+                        @if (coQuyen(WebMTTQ.Models.ModuleQuyen.KetQuaChamLo))
+                        {
+                            <a href="/admin/ketquachamlo" class="@(currentController == "AdminKetQuaChamLo" ? "is-active" : "")">
+                                <i class="fas fa-hand-holding-heart"></i>
+                                <span>Kết quả chăm lo</span>
+                            </a>
+                        }
+                        @if (coQuyen(WebMTTQ.Models.ModuleQuyen.DiaDiemBanDo))
+                        {
+                            <a href="/AdminDiaDiemBanDo/Index" class="@(currentController == "AdminDiaDiemBanDo" ? "is-active" : "")">
+                                <i class="fas fa-map-marked-alt"></i>
+                                <span>Bản đồ an sinh</span>
+                            </a>
+                        }
+                    </div>
+                </div>
+
+                <!-- GROUP 3: QUỸ VÌ BIỂN ĐẢO (CHỈ DÀNH CHO ADMIN) -->
+                @if (isAdmin)
+                {
+                    <div class="nav-group @(isBienDaoActive ? "is-open" : "")">
+                        <div class="nav-group-toggle">
+                            <span>Quỹ Vì Biển Đảo</span>
+                            <i class="fas fa-chevron-down caret"></i>
+                        </div>
+                        <div class="nav-submenu">
+                            <a href="/AdminQuyBienDao/ThongTin" class="@(currentController == "AdminQuyBienDao" && currentAction == "ThongTin" ? "is-active" : "")">
+                                <i class="fas fa-university"></i>
+                                <span>Thông tin ủng hộ BĐ</span>
+                            </a>
+                            <a href="/AdminQuyBienDao/DanhSach" class="@(currentController == "AdminQuyBienDao" && currentAction == "DanhSach" ? "is-active" : "")">
+                                <i class="fas fa-hand-holding-usd"></i>
+                                <span>Danh sách ủng hộ BĐ</span>
+                            </a>
+                            <a href="/AdminQuyBienDao/SoDu" class="@(currentController == "AdminQuyBienDao" && currentAction == "SoDu" ? "is-active" : "")">
+                                <i class="fas fa-wallet"></i>
+                                <span>Số dư Quỹ Biển Đảo</span>
+                            </a>
+                            <a href="/AdminQuyBienDao/KetQua" class="@(currentController == "AdminQuyBienDao" && currentAction == "KetQua" ? "is-active" : "")">
+                                <i class="fas fa-ship"></i>
+                                <span>Hoạt động Biển Đảo</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- GROUP 4: QUỸ CỨU TRỢ -->
+                    <div class="nav-group @(isCuuTroActive ? "is-open" : "")">
+                        <div class="nav-group-toggle">
+                            <span>Quỹ Cứu Trợ</span>
+                            <i class="fas fa-chevron-down caret"></i>
+                        </div>
+                        <div class="nav-submenu">
+                            <a href="/AdminQuyCuuTro/ThongTin" class="@(currentController == "AdminQuyCuuTro" && currentAction == "ThongTin" ? "is-active" : "")">
+                                <i class="fas fa-hospital"></i>
+                                <span>Thông tin tiếp nhận CT</span>
+                            </a>
+                            <a href="/AdminQuyCuuTro/DanhSach" class="@(currentController == "AdminQuyCuuTro" && currentAction == "DanhSach" ? "is-active" : "")">
+                                <i class="fas fa-hands-helping"></i>
+                                <span>Danh sách ủng hộ CT</span>
+                            </a>
+                            <a href="/AdminQuyCuuTro/SoDu" class="@(currentController == "AdminQuyCuuTro" && currentAction == "SoDu" ? "is-active" : "")">
+                                <i class="fas fa-piggy-bank"></i>
+                                <span>Số dư Quỹ Cứu trợ</span>
+                            </a>
+                            <a href="/AdminQuyCuuTro/KetQua" class="@(currentController == "AdminQuyCuuTro" && currentAction == "KetQua" ? "is-active" : "")">
+                                <i class="fas fa-truck-loading"></i>
+                                <span>Hoạt động Cứu trợ</span>
+                            </a>
+                        </div>
+                    </div>
+                }
+
+                <div class="nav-sep"></div>
+
+                <!-- GROUP 5: TƯƠNG TÁC -->
+                <div class="nav-group @(isTuongTacActive ? "is-open" : "")">
+                    <div class="nav-group-toggle">
+                        <span>Tương tác</span>
+                        <i class="fas fa-chevron-down caret"></i>
+                    </div>
+                    <div class="nav-submenu">
+                        @if (coQuyen(WebMTTQ.Models.ModuleQuyen.NguoiDanCanTroGiup))
+                        {
+                            <a href="/AdminNguoiDanCanTroGiup/Index" class="@(currentController == "AdminNguoiDanCanTroGiup" ? "is-active" : "")">
+                                <i class="fas fa-life-ring"></i>
+                                <span>Yêu cầu trợ giúp</span>
+                            </a>
+                        }
+                        @if (coQuyen(WebMTTQ.Models.ModuleQuyen.GopY))
+                        {
+                            <a href="/AdminGopY/Index" class="@(currentController == "AdminGopY" ? "is-active" : "")">
+                                <i class="fas fa-envelope-open-text"></i>
+                                <span>Hộp thư góp ý</span>
+                            </a>
+                        }
+                    </div>
+                </div>
+
+                <div class="nav-sep"></div>
+
+                <!-- CÁC CHỨC NĂNG LẺ CÒN LẠI -->
                 @if (coQuyen(WebMTTQ.Models.ModuleQuyen.Banner))
                 {
-                    <a href="/AdminBanner/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminBanner" ? "is-active" : "")">
+                    <a href="/AdminBanner/Index" class="@(currentController == "AdminBanner" ? "is-active" : "")">
                         <i class="fas fa-images"></i>
                         <span>Quản lý Banner</span>
                     </a>
                 }
-
                 @if (coQuyen(WebMTTQ.Models.ModuleQuyen.CauHinh))
                 {
-                    <a href="/AdminCauHinh/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminCauHinh" ? "is-active" : "")">
+                    <a href="/AdminCauHinh/Index" class="@(currentController == "AdminCauHinh" ? "is-active" : "")">
                         <i class="fas fa-cog"></i>
                         <span>Cài đặt hệ thống</span>
                     </a>
                 }
 
-                <!-- PHẦN DÀNH RIÊNG CHO QUYỀN ADMIN TỐI CAO -->
                 @if (isAdmin)
                 {
-                    <a href="/AdminNguoiDung/Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminNguoiDung" ? "is-active" : "")">
+                    <a href="/AdminNguoiDung/Index" class="@(currentController == "AdminNguoiDung" ? "is-active" : "")">
                         <i class="fas fa-users"></i>
                         <span>Quản lý người dùng</span>
                     </a>
-
-                    <!-- THÊM MỚI: MENU QUỸ VÌ BIỂN ĐẢO -->
-                    <div class="nav-sep"></div>
-                    <div class="nav-label">Quỹ Vì Biển Đảo</div>
-
-                    <a href="/AdminQuyBienDao/ThongTin" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminQuyBienDao" && ViewContext.RouteData.Values["action"]?.ToString() == "ThongTin" ? "is-active" : "")">
-                        <i class="fas fa-university"></i>
-                        <span>Thông tin ủng hộ BĐ</span>
-                    </a>
-
-                    <a href="/AdminQuyBienDao/DanhSach" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminQuyBienDao" && ViewContext.RouteData.Values["action"]?.ToString() == "DanhSach" ? "is-active" : "")">
-                        <i class="fas fa-hand-holding-usd"></i>
-                        <span>Danh sách ủng hộ BĐ</span>
-                    </a>
-
-                    <a href="/AdminQuyBienDao/SoDu" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminQuyBienDao" && ViewContext.RouteData.Values["action"]?.ToString() == "SoDu" ? "is-active" : "")">
-                        <i class="fas fa-wallet"></i>
-                        <span>Số dư Quỹ Biển Đảo</span>
-                    </a>
-
-                    <a href="/AdminQuyBienDao/KetQua" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminQuyBienDao" && ViewContext.RouteData.Values["action"]?.ToString() == "KetQua" ? "is-active" : "")">
-                        <i class="fas fa-ship"></i>
-                        <span>Hoạt động Biển Đảo</span>
-                    </a>
-                    <!-- KẾT THÚC THÊM MỚI QUỸ VÌ BIỂN ĐẢO -->
-
-                    <!-- THÊM MỚI: QUỸ CỨU TRỢ -->
-                    <div class="nav-sep"></div>
-                    <div class="nav-label">Quỹ Cứu Trợ</div>
-
-                    <a href="/AdminQuyCuuTro/ThongTin" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminQuyCuuTro" && ViewContext.RouteData.Values["action"]?.ToString() == "ThongTin" ? "is-active" : "")">
-                        <i class="fas fa-hospital"></i>
-                        <span>Thông tin tiếp nhận CT</span>
-                    </a>
-
-                    <a href="/AdminQuyCuuTro/DanhSach" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminQuyCuuTro" && ViewContext.RouteData.Values["action"]?.ToString() == "DanhSach" ? "is-active" : "")">
-                        <i class="fas fa-hands-helping"></i>
-                        <span>Danh sách ủng hộ CT</span>
-                    </a>
-
-                    <a href="/AdminQuyCuuTro/SoDu" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminQuyCuuTro" && ViewContext.RouteData.Values["action"]?.ToString() == "SoDu" ? "is-active" : "")">
-                        <i class="fas fa-piggy-bank"></i>
-                        <span>Số dư Quỹ Cứu trợ</span>
-                    </a>
-
-                    <a href="/AdminQuyCuuTro/KetQua" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminQuyCuuTro" && ViewContext.RouteData.Values["action"]?.ToString() == "KetQua" ? "is-active" : "")">
-                        <i class="fas fa-truck-loading"></i>
-                        <span>Hoạt động Cứu trợ</span>
-                    </a>
-                    <!-- KẾT THÚC THÊM MỚI QUỸ CỨU TRỢ -->
                 }
 
                 <div class="nav-sep"></div>
@@ -359,17 +462,39 @@
             // HỆ THỐNG XỬ LÝ TOAST NOTIFICATION TỰ ĐỘNG ẨN
             document.addEventListener("DOMContentLoaded", function() {
                 var toasts = document.querySelectorAll('.admin-toast');
-
                 toasts.forEach(function(toast) {
-                    // Đếm ngược 3 giây (3000ms) thì bắt đầu chạy animation biến mất
                     setTimeout(function() {
                         toast.classList.add('fade-out');
-
-                        // Chờ thêm 0.5s để animation chạy xong rồi xóa luôn thẻ div cho sạch HTML
                         setTimeout(function() {
                             toast.remove();
                         }, 500);
                     }, 3000);
+                });
+            });
+
+            // ========================================================
+            // JAVASCRIPT CHO MENU THẢ XUỐNG (ACCORDION)
+            // ========================================================
+            document.addEventListener("DOMContentLoaded", function() {
+                var toggles = document.querySelectorAll('.nav-group-toggle');
+
+                toggles.forEach(function(toggle) {
+                    toggle.addEventListener('click', function() {
+                        var parentGroup = this.parentElement;
+
+                        // Đóng tất cả các menu khác (Nếu bạn muốn khi mở menu này thì menu kia đóng lại)
+                        // Bỏ comment đoạn dưới nếu muốn tính năng đó:
+                        /*
+                        document.querySelectorAll('.nav-group').forEach(function(group) {
+                            if (group !== parentGroup) {
+                                group.classList.remove('is-open');
+                            }
+                        });
+                        */
+
+                        // Bật/tắt menu hiện tại
+                        parentGroup.classList.toggle('is-open');
+                    });
                 });
             });
     </script>

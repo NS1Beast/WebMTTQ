@@ -20,7 +20,7 @@ namespace WebMTTQ.Controllers
         // Action hiển thị danh sách ngoài trang chủ
         public async Task<IActionResult> Index(string keyword, int? chuyenMucId, int page = 1)
         {
-            int pageSize = 10;
+            int pageSize = 15;
 
             var query = _context.VanBanTaiLieus
                 .Include(v => v.IdchuyenMucNavigation)

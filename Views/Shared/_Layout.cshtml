@@ -46,22 +46,27 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,700&family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap&subset=vietnamese" rel="stylesheet" />
+
+    <!-- THÊM THƯ VIỆN FONTAWESOME ĐỂ HIỂN THỊ ICON CHO MENU -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
     <link rel="icon" href="~/images/LogoGioiThieu/logoMTTQ.jpg" sizes="32x32" />
     <link rel="stylesheet" href="~/css/mttq.css" asp-append-version="true" />
 
-    <!-- CSS Tùy chỉnh cho Nút Lên Đầu Trang & Trợ Lý AI -->
     <style>
-            /* Nút Lên Đầu Trang */
+            /* ==============================================
+                       1. NÚT LÊN ĐẦU TRANG & TRỢ LÝ AI
+                       ============================================== */
             .m26-top {
                 position: fixed;
-                bottom: 100px; /* Khoảng cách cách đáy, nằm trên nút AI */
-                right: 30px; /* Căn lề phải bằng với nút AI */
+                bottom: 100px;
+                right: 30px;
                 width: 48px;
                 height: 48px;
-                background-color: #9a2123; /* Đỏ sẫm như ảnh image_848e00.png */
+                background-color: #9a2123;
                 color: #ffffff;
                 border: none;
-                border-radius: 14px; /* Bo góc vuông mềm mại */
+                border-radius: 14px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -69,7 +74,6 @@
                 z-index: 9998;
                 cursor: pointer;
                 transition: all 0.3s ease;
-                /* Lưu ý: Nếu file js có ẩn/hiện tự động khi scroll, nó sẽ can thiệp vào opacity/visibility */
             }
 
                 .m26-top:hover {
@@ -77,7 +81,6 @@
                     transform: translateY(-3px);
                 }
 
-            /* Nút Trợ Lý AI */
             .m26-ai-btn {
                 position: fixed;
                 bottom: 30px;
@@ -129,7 +132,177 @@
                 white-space: nowrap;
             }
 
-            /* Responsive cho Mobile: Đẩy đồng loạt cả 2 nút lên cao để không bị đè bởi Bottom Menu */
+            /* ==============================================
+                       2. CSS MOBILE MENU (PHONG CÁCH CARD GIỐNG ẢNH 2)
+                       ============================================== */
+            /* Nền menu gradient đỏ sẫm */
+            .m26-drawer-in {
+                background: linear-gradient(180deg, #7a0c16 0%, #3d0308 100%) !important;
+                color: #ffffff;
+            }
+
+            /* Chỉnh màu header của menu */
+            .m26-drawer-head {
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+            }
+
+                .m26-drawer-head .m26-drawer-brand span strong,
+                .m26-drawer-head .m26-drawer-brand span small {
+                    color: #ffffff !important;
+                }
+
+                .m26-drawer-head .x {
+                    color: #ffffff;
+                }
+
+            /* Reset padding list */
+            .m26-mnav {
+                list-style: none;
+                padding: 15px 0;
+                margin: 0;
+            }
+
+                .m26-mnav > li {
+                    border-bottom: none !important;
+                    margin-bottom: 12px;
+                    padding: 0 15px;
+                }
+
+                /* Thẻ a và thẻ toggle biến thành dạng Card mờ */
+                .m26-mnav a, .m-dropdown-toggle {
+                    display: flex !important;
+                    align-items: center;
+                    background: rgba(255, 255, 255, 0.08) !important; /* Nền mờ trong suốt */
+                    border: 1px solid rgba(255, 255, 255, 0.05);
+                    border-radius: 12px;
+                    padding: 10px 15px !important;
+                    color: #ffffff !important;
+                    font-weight: 600;
+                    font-size: 0.95rem;
+                    text-decoration: none;
+                    transition: all 0.3s ease;
+                    box-sizing: border-box;
+                    width: 100%;
+                }
+
+                    .m26-mnav a:active, .m-dropdown-toggle:active {
+                        background: rgba(255, 255, 255, 0.15) !important;
+                    }
+
+                    /* Span bọc chữ để dãn khoảng cách */
+                    .m26-mnav a span:not(.m-caret), .m-dropdown-toggle span:not(.m-caret) {
+                        flex-grow: 1;
+                    }
+
+            /* Khối icon vuông màu vàng bên trái */
+            .m26-mnav-icon {
+                width: 36px;
+                height: 36px;
+                background-color: #d49544; /* Vàng cam */
+                border-radius: 8px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-right: 15px;
+                color: #3d0308; /* Icon bên trong màu đỏ sẫm */
+                font-size: 1.1rem;
+                flex-shrink: 0;
+            }
+
+            /* Mũi tên bên phải */
+            .m26-mnav-arrow {
+                margin-left: auto;
+                font-size: 0.85rem;
+                color: rgba(255, 255, 255, 0.4);
+            }
+
+            /* Chỉnh riêng phần Toggle Dropdown */
+            .m-dropdown-toggle {
+                cursor: pointer;
+            }
+
+            .m-caret {
+                padding: 0 !important;
+                color: rgba(255, 255, 255, 0.4) !important;
+                transition: transform 0.3s;
+            }
+
+            .m-dropdown.open .m-caret {
+                color: #d49544 !important;
+                transform: rotate(180deg);
+            }
+
+            /* Menu con ẩn mặc định */
+            .m-dropdown-menu {
+                display: none;
+                list-style: none;
+                padding: 5px 0 0 0;
+                margin: 0;
+                background-color: transparent !important;
+                border-top: none !important;
+            }
+
+            .m-dropdown.open .m-dropdown-menu {
+                display: block;
+                animation: fadeInDown 0.3s ease forwards;
+            }
+
+            .m-dropdown-menu li {
+                margin-bottom: 6px !important;
+                padding: 0 !important;
+            }
+
+                .m-dropdown-menu li a {
+                    background: rgba(0, 0, 0, 0.15) !important; /* Nền tối hơn card mẹ */
+                    padding: 12px 15px 12px 65px !important; /* Thụt đầu dòng */
+                    font-size: 0.85rem !important;
+                    font-weight: 500 !important;
+                    border: none !important;
+                    border-radius: 10px;
+                }
+
+                    .m-dropdown-menu li a::before {
+                        display: none;
+                    }
+            /* Tắt dấu chấm cũ */
+
+            /* Làm mờ các phần tử ở footer của Menu */
+            .m26-drawer-foot {
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                background: transparent !important;
+            }
+
+            .drawer-cta {
+                background: #d49544 !important;
+                color: #3d0308 !important;
+                border-radius: 12px !important;
+                font-weight: bold;
+                border: none;
+            }
+
+            .m26-drawer-hot {
+                color: #ffffff !important;
+            }
+
+                .m26-drawer-hot b {
+                    color: #d49544 !important;
+                }
+
+            @@keyframes fadeInDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-5px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* ==============================================
+                       3. RESPONSIVE ĐIỆN THOẠI
+                       ============================================== */
             @@media (max-width: 768px) {
                 .m26-ai-btn {
                     bottom: 85px;
@@ -137,7 +310,7 @@
                 }
 
                 .m26-top {
-                    bottom: 155px; /* Giữ khoảng cách cố định (70px) so với nút AI trên mobile */
+                    bottom: 155px;
                     right: 15px;
                 }
             }
@@ -149,9 +322,7 @@
 
     <div id="m26-splash" role="status" aria-label="Đang tải">
         <div class="m26-splash-in">
-            <div class="m26-splash-badge">
-                <img src="~/images/LogoGioiThieu/logoMTTQ.jpg" alt="" width="82" height="82" />
-            </div>
+            <div class="m26-splash-badge"><img src="~/images/LogoGioiThieu/logoMTTQ.jpg" alt="" width="82" height="82" /></div>
             <span class="m26-splash-txt">@tenCoQuan</span>
         </div>
     </div>
@@ -203,17 +374,11 @@
                         <a href="#" class="nav-link dropdown-toggle @(isNews ? "is-active" : "")" role="button" aria-expanded="false">An sinh xã hội</a>
                         <ul class="dropdown-menu">
                             <li class="nav-item"><a class="dropdown-item" asp-controller="CongThongTinAnSXH" asp-action="Index">Quỹ “Vì người nghèo”</a></li>
-                            <a class="dropdown-item" asp-controller="QuyBienDao" asp-action="ViBienDaoQueHuongViTuyenDauTQ">
-                                Quỹ “Vì biển đảo quê hương, vì tuyến đầu Tổ quốc”
-                            </a>
-                            <a class="dropdown-item" asp-controller="QuyCuuTro" asp-action="Index">
-                                Quỹ “Cứu trợ”
-                            </a>
+                            <li class="nav-item"><a class="dropdown-item" asp-controller="QuyBienDao" asp-action="ViBienDaoQueHuongViTuyenDauTQ">Quỹ “Vì biển đảo quê hương, vì tuyến đầu Tổ quốc”</a></li>
+                            <li class="nav-item"><a class="dropdown-item" asp-controller="QuyCuuTro" asp-action="Index">Quỹ “Cứu trợ”</a></li>
                         </ul>
                     </li>
-               <li class="nav-item">
-    <a class="nav-link" asp-controller="VanBanTaiLieu" asp-action="Index">Văn bản và tài liệu</a>
-</li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="VanBanTaiLieu" asp-action="Index">Văn bản và tài liệu</a></li>
                 </ul>
 
                 <div class="m26-search" id="m26-search">
@@ -235,6 +400,9 @@
             </div>
         </header>
 
+        <!-- ==============================================
+             MÀN HÌNH MENU MOBILE
+             ============================================== -->
         <div class="m26-drawer" id="m26-drawer">
             <div class="m26-drawer-in">
                 <div class="m26-drawer-head">
@@ -249,16 +417,86 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6L6 18" /></svg>
                     </button>
                 </div>
+
                 <nav class="m26-drawer-nav">
                     <ul class="m26-mnav">
-                        <li><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
-                        <li><a asp-controller="About" asp-action="Index">Giới thiệu</a></li>
-                        <li><a asp-controller="CongThongTinAnSXH" asp-action="Index">Cổng an sinh xã hội</a></li>
-                        <li><a asp-controller="Home" asp-action="UnderConstruction">Văn bản và tài liệu</a></li>
-                        <li><a asp-controller="Home" asp-action="UnderConstruction">Tin tức</a></li>
-                        <li><a asp-controller="Home" asp-action="UnderConstruction">Dân chủ – pháp luật</a></li>
+                        <!-- 1. Trang chủ -->
+                        <li>
+                            <a asp-controller="Home" asp-action="Index">
+                                <div class="m26-mnav-icon"><i class="fas fa-home"></i></div>
+                                <span>Trang chủ</span>
+                                <i class="fas fa-chevron-right m26-mnav-arrow"></i>
+                            </a>
+                        </li>
+
+                        <!-- 2. Giới thiệu -->
+                        <li>
+                            <a asp-controller="About" asp-action="Index">
+                                <div class="m26-mnav-icon"><i class="fas fa-info-circle"></i></div>
+                                <span>Giới thiệu</span>
+                                <i class="fas fa-chevron-right m26-mnav-arrow"></i>
+                            </a>
+                        </li>
+
+                        <!-- 3. DROP DOWN: CỔNG AN SINH XÃ HỘI -->
+                        <li class="m-dropdown">
+                            <div class="m-dropdown-toggle">
+                                <div class="m26-mnav-icon"><i class="far fa-heart"></i></div>
+                                <span>Cổng an sinh xã hội</span>
+                                <span class="m-caret"><i class="fas fa-chevron-down"></i></span>
+                            </div>
+                            <ul class="m-dropdown-menu">
+                                <li><a asp-controller="CongThongTinAnSXH" asp-action="Index">Quỹ vì người nghèo</a></li>
+                                <li><a asp-controller="QuyBienDao" asp-action="ViBienDaoQueHuongViTuyenDauTQ">Quỹ vì biển đảo quê hương</a></li>
+                                <li><a asp-controller="QuyCuuTro" asp-action="Index">Quỹ cứu trợ</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- 4. Văn bản tài liệu -->
+                        <li>
+                            <a asp-controller="VanBanTaiLieu" asp-action="Index">
+                                <div class="m26-mnav-icon"><i class="far fa-file-alt"></i></div>
+                                <span>Văn bản và tài liệu</span>
+                                <i class="fas fa-chevron-right m26-mnav-arrow"></i>
+                            </a>
+                        </li>
+
+                        <!-- 5. DROP DOWN: TIN TỨC -->
+                        <li class="m-dropdown">
+                            <div class="m-dropdown-toggle">
+                                <div class="m26-mnav-icon"><i class="far fa-newspaper"></i></div>
+                                <span>Tin tức</span>
+                                <span class="m-caret"><i class="fas fa-chevron-down"></i></span>
+                            </div>
+                            <ul class="m-dropdown-menu">
+                                <li><a href="/News?category=mat-tran-to-quoc">Tin tức Mặt Trận Tổ Quốc</a></li>
+                                <li><a href="/News?category=doan-thanh-nien">Tin tức Đoàn Thanh niên</a></li>
+                                <li><a href="/News?category=hoi-lien-hiep-phu-nu">Tin tức Hội liên hiệp phụ nữ</a></li>
+                                <li><a href="/News?category=hoi-cuu-chien-binh">Tin tức Hội cựu chiến binh</a></li>
+                                <li><a href="/News?category=cong-doan">Tin tức Công đoàn</a></li>
+                            </ul>
+                        </li>
+
+                        <!-- 6. Dân chủ pháp luật -->
+                        <li>
+                            <a asp-controller="Home" asp-action="UnderConstruction">
+                                <div class="m26-mnav-icon"><i class="fas fa-balance-scale"></i></div>
+                                <span>Dân chủ – pháp luật</span>
+                                <i class="fas fa-chevron-right m26-mnav-arrow"></i>
+                            </a>
+                        </li>
+
+                        <!-- 7. Giám sát phản biện -->
+                        <li>
+                            <a asp-controller="Home" asp-action="UnderConstruction">
+                                <div class="m26-mnav-icon"><i class="far fa-eye"></i></div>
+                                <span>Giám sát và phản biện</span>
+                                <i class="fas fa-chevron-right m26-mnav-arrow"></i>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
+
                 <div class="m26-drawer-foot">
                     <a class="drawer-cta" asp-controller="GopY" asp-action="Index">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v12H7l-3 3V4Z" /></svg>
@@ -287,7 +525,7 @@
                     <div class="col">
                         <h5>Liên kết</h5>
                         <a asp-controller="About" asp-action="Index">Giới thiệu</a>
-                        <a asp-controller="Home" asp-action="UnderConstruction">Văn bản - Tài liệu</a>
+                        <a asp-controller="VanBanTaiLieu" asp-action="Index">Văn bản - Tài liệu</a>
                         <a asp-controller="CongThongTinAnSXH" asp-action="Index">Tiếp nhận ủng hộ</a>
                     </div>
                     <div class="col">
@@ -350,6 +588,31 @@
     </a>
 
     <script src="~/js/mttq.js" asp-append-version="true"></script>
+
+    <!-- MÃ JAVASCRIPT XỬ LÝ SỔ XUỐNG CỦA MOBILE MENU -->
+    <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                var dropdownToggles = document.querySelectorAll('.m-dropdown-toggle');
+
+                dropdownToggles.forEach(function(toggle) {
+                    toggle.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        var parentLi = this.parentElement;
+
+                        if (parentLi.classList.contains('open')) {
+                            parentLi.classList.remove('open');
+                        } else {
+                            // Tự động đóng các thẻ khác khi mở thẻ mới
+                            document.querySelectorAll('.m-dropdown').forEach(function(item) {
+                                item.classList.remove('open');
+                            });
+                            parentLi.classList.add('open');
+                        }
+                    });
+                });
+            });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

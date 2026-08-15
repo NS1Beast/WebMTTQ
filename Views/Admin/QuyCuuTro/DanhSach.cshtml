@@ -6,12 +6,25 @@
 
 <div class="admin-page-header">
     <div>
-        <h2>Danh sách Ủng hộ Cứu trợ</h2>
-        <div class="subtitle">Quản lý các cá nhân, tổ chức đóng góp cho Quỹ Vì Cứu trợ quê hương</div>
+        <h2>Danh sách ủng hộ</h2>
+        <div class="subtitle">Quản lý các lượt ủng hộ từ tổ chức, cá nhân</div>
     </div>
-    <a href="/Admin/QuyCuuTro/ThemDanhSach" class="admin-btn admin-btn-primary">
-        <i class="fas fa-plus"></i> Thêm lượt ủng hộ
-    </a>
+
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <!-- Nút xử lý Import Excel ngầm (Không làm xấu giao diện) -->
+        <form action="@Url.Action("ImportExcel")" method="post" enctype="multipart/form-data" id="formImportExcel_@ViewData["Title"].GetHashCode()" style="display:inline;">
+            @Html.AntiForgeryToken()
+            <input type="file" name="file" accept=".xlsx" style="display:none;" id="fileExcel_@ViewData["Title"].GetHashCode()" onchange="document.getElementById('formImportExcel_@ViewData["Title"].GetHashCode()').submit();" />
+            <button type="button" class="admin-btn" style="background-color: #28a745; color: white; border: none;" onclick="document.getElementById('fileExcel_@ViewData["Title"].GetHashCode()').click();">
+                <i class="fas fa-file-excel"></i> Nhập từ Excel
+            </button>
+        </form>
+
+        <!-- Nút thêm thủ công bằng tay (Đổi URL href tùy theo từng quỹ) -->
+        <a href="Url_To_Action_Create" class="admin-btn admin-btn-primary">
+            <i class="fas fa-plus"></i> Thêm lượt ủng hộ
+        </a>
+    </div>
 </div>
 
 <div class="admin-card">

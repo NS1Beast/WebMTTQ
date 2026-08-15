@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
 using System;
+using OfficeOpenXml;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -196,7 +197,143 @@ namespace WebMTTQ.Controllers
             TempData["SuccessMessage"] = "Thêm lượt ủng hộ thành công!";
             return RedirectToAction("DanhSach");
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ImportExcel(IFormFile file)
+        {
+            if (file == null || file.Length == 0 || !Path.GetExtension(file.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["ErrorMessage"] = "Vui lòng chọn file Excel định dạng .xlsx hợp lệ.";
+                return RedirectToAction("DanhSach");
+            }
 
+            using (var stream = new MemoryStream())
+            {
+                await file.CopyToAsync(stream);
+                using (var package = new ExcelPackage(stream))
+                {
+                    var worksheet = package.Workbook.Worksheets.FirstOrDefault();
+                    if (worksheet == null) return RedirectToAction("DanhSach");
+
+                    int rowCount = worksheet.Dimension.Rows;
+                    int colCount = worksheet.Dimension.Columns;
+
+                    // 1. TỰ ĐỘNG QUÉT TÌM DÒNG TIÊU ĐỀ (Phiên bản V2: Thông minh hơn, chống nhận nhầm)
+                    int colTen = 3, colThoiGian = 2, colSoTien = 4; // Vị trí dự phòng
+                    int startRow = 8; // Dòng bắt đầu dự phòng
+
+                    for (int r = 1; r <= 15; r++)
+                    {
+                        int matchCount = 0;
+                        int tempColTen = 0, tempColThoiGian = 0, tempColSoTien = 0;
+
+                        for (int c = 1; c <= colCount; c++)
+                        {
+                            var cellText = worksheet.Cells[r, c].Text?.Trim().ToLower() ?? "";
+
+                            // Gom chung các từ khóa hay dùng
+                            if (cellText.Contains("đơn vị") || cellText.Contains("cá nhân") || cellText.Contains("họ tên") || cellText.Contains("tên") || cellText.Contains("cơ quan"))
+                            { tempColTen = c; matchCount++; }
+                            else if (cellText.Contains("thời gian") || cellText.Contains("ngày ủng hộ") || cellText == "ngày")
+                            { tempColThoiGian = c; matchCount++; }
+                            else if (cellText.Contains("số tiền") || cellText.Contains("giá trị") || cellText.Contains("ủng hộ"))
+                            { tempColSoTien = c; matchCount++; }
+                        }
+
+                        // BẢO MẬT KÉP: Nếu 1 dòng có từ 2 cột trở lên khớp từ khóa, chắc chắn 100% đó là dòng tiêu đề!
+                        if (matchCount >= 2)
+                        {
+                            if (tempColTen > 0) colTen = tempColTen;
+                            if (tempColThoiGian > 0) colThoiGian = tempColThoiGian;
+                            if (tempColSoTien > 0) colSoTien = tempColSoTien;
+
+                            startRow = r + 1; // Dữ liệu sẽ nằm ngay dưới dòng tiêu đề
+                            break;
+                        }
+                    }
+
+                    int successCount = 0;
+                    for (int row = startRow; row <= rowCount; row++)
+                    {
+                        string ten = worksheet.Cells[row, colTen].Text?.Trim();
+                        if (string.IsNullOrEmpty(ten)) continue; // Bỏ qua nếu cột tên rỗng
+
+                        // 2. ĐỌC NGÀY THÁNG BỌC THÉP
+                        DateTime ngayUngHo = DateTime.Now;
+                        try
+                        {
+                            var cellDate = worksheet.Cells[row, colThoiGian].Value;
+                            if (cellDate is DateTime dt) { ngayUngHo = dt; }
+                            else if (cellDate is double d) { ngayUngHo = DateTime.FromOADate(d); }
+                            else
+                            {
+                                string dateText = worksheet.Cells[row, colThoiGian].Text?.Trim();
+                                if (!string.IsNullOrEmpty(dateText))
+                                {
+                                    string[] formats = { "dd/MM/yyyy", "d/M/yyyy", "dd/M/yyyy", "d/MM/yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
+                                    if (DateTime.TryParseExact(dateText, formats, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out DateTime parsedDate))
+                                        ngayUngHo = parsedDate;
+                                    else if (DateTime.TryParse(dateText, out parsedDate))
+                                        ngayUngHo = parsedDate;
+                                }
+                            }
+                        }
+                        catch { }
+
+                        // 3. ĐỌC SỐ TIỀN BỌC THÉP
+                        decimal soTien = 0;
+                        try
+                        {
+                            var cellTien = worksheet.Cells[row, colSoTien].Value;
+                            if (cellTien is double d) soTien = (decimal)d;
+                            else if (cellTien is decimal dec) soTien = dec;
+                            else if (cellTien is int i) soTien = i;
+                            else if (cellTien is long l) soTien = l;
+                            else
+                            {
+                                string tienText = worksheet.Cells[row, colSoTien].Text?.Replace(",", "").Replace(".", "").Replace("đ", "").Replace("d", "").Replace(" ", "");
+                                decimal.TryParse(tienText, out soTien);
+                            }
+                        }
+                        catch { }
+
+                        if (soTien <= 0) continue;
+
+                        // 4. LOGIC KIỂM TRA TRÙNG VÀ CỘNG DỒN CHO QUỸ CỨU TRỢ
+                        var isExistAll = await _context.DanhSachUngHoCuuTros.AnyAsync(x =>
+                            x.TenNguoiUngHo == ten &&
+                            x.NgayUngHo.HasValue && x.NgayUngHo.Value.Date == ngayUngHo.Date &&
+                            x.SoTien == soTien);
+                        if (isExistAll) continue;
+
+                        var existingRecord = await _context.DanhSachUngHoCuuTros.FirstOrDefaultAsync(x =>
+                            x.TenNguoiUngHo == ten &&
+                            x.NgayUngHo.HasValue && x.NgayUngHo.Value.Date == ngayUngHo.Date);
+
+                        if (existingRecord != null)
+                        {
+                            existingRecord.SoTien += soTien; // Cộng dồn nếu trùng Tên và Ngày
+                            _context.Update(existingRecord);
+                        }
+                        else
+                        {
+                            var newRecord = new DanhSachUngHoCuuTro
+                            {
+                                TenNguoiUngHo = ten,
+                                NgayUngHo = ngayUngHo,
+                                SoTien = soTien,
+                                HienThi = true
+                            };
+                            _context.DanhSachUngHoCuuTros.Add(newRecord);
+                        }
+                        successCount++;
+                    }
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = $"Đã tải lên và tự động xử lý thành công {successCount} dòng dữ liệu!";
+                }
+            }
+            return RedirectToAction("DanhSach");
+        }
         [HttpGet]
         public async Task<IActionResult> SuaDanhSach(int id)
         {
