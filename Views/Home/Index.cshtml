@@ -392,16 +392,23 @@
         color: var(--m26-ink, #1e1a1d); margin: 10px 0 8px;
     }
     .utilities-header p { color: #777; max-width: 560px; margin: 0 auto; line-height: 1.6; font-size: 0.95rem; }
-    .bento-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 20px; }
+    
+    /* Đổi sang Grid 2 cột: Cột trái to (1.4fr), Cột phải nhỏ (1fr) */
+    .bento-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; }
+    
     .bento-card {
         border-radius: 16px; padding: 32px; display: flex; flex-direction: column;
-        justify-content: space-between; min-height: 240px; position: relative;
+        justify-content: space-between; position: relative;
         overflow: hidden; transition: all 0.35s ease; text-decoration: none;
+        /* Đã gỡ bỏ min-height cố định để các ô tự động khớp chiều cao với nhau */
     }
     .bento-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,0.15); }
+    
     .bento-card-main {
         background: linear-gradient(145deg, #8b1a2b 0%, #6d1120 100%);
-        color: white; grid-row: span 2; min-height: 380px;
+        color: white; 
+        grid-row: span 2; /* Ép thẻ chính chiếm 2 hàng */
+        min-height: 100%; /* Kéo giãn vừa bằng 2 thẻ bên phải */
     }
     .bento-card-main::before {
         content: ''; position: absolute; inset: 0;
@@ -420,7 +427,11 @@
     .bento-card h3 { font-family: var(--font-display, "Playfair Display", serif); font-size: 1.35rem; font-weight: 800; margin: 0 0 10px; }
     .bento-card p { font-size: 0.9rem; line-height: 1.6; opacity: 0.85; margin: 0 0 20px; }
     .bento-card.main p { opacity: 0.9; }
-    .bento-card-secondary { background: #fff; border: 1px solid rgba(139,26,43,0.12); box-shadow: 0 4px 18px rgba(0,0,0,0.04); }
+    
+    .bento-card-secondary { 
+        background: #fff; border: 1px solid rgba(139,26,43,0.12); box-shadow: 0 4px 18px rgba(0,0,0,0.04); 
+        min-height: 200px; /* Giữ độ cao tối thiểu để nội dung không bị ép */
+    }
     .bento-card-secondary .bento-card-icon { background: #fdf6e3; color: #8b1a2b; }
     .bento-cta {
         display: inline-flex; align-items: center; gap: 8px; font-weight: 700;
@@ -486,7 +497,7 @@
         .featured-article { min-height: 400px; }
         .section-news-layout { grid-template-columns: 1fr; }
         .section-featured-article { min-height: 400px; }
-        .bento-grid { grid-template-columns: 1fr 1fr; }
+        .bento-grid { grid-template-columns: 1fr; }
         .bento-card-main { grid-row: span 1; min-height: 240px; }
         .timeline-vertical { margin-left: 40px; }
         .timeline-vertical::before { left: 5px; }
