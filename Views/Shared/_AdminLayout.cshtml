@@ -176,7 +176,7 @@
                     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
 
                     // Logic kiểm tra Active cho từng Group
-                    bool isNoiDungActive = currentController == "AdminNews" || currentController == "AdminVanBanTaiLieu" || currentController == "AdminTrangChu";
+bool isNoiDungActive = currentController == "AdminNews" || currentController == "AdminVanBanTaiLieu" || currentController == "AdminTrangChu" || currentController == "AdminBanner" || currentController == "AdminTimeline";
                     bool isNguoiNgheoActive = currentController == "AdminThongTin" || currentController == "AdminDanhSachUngHo" || currentController == "AdminSoDuQuy" || currentController == "AdminKetQuaChamLo" || currentController == "AdminDiaDiemBanDo";
                     bool isBienDaoActive = currentController == "AdminQuyBienDao";
                     bool isCuuTroActive = currentController == "AdminQuyCuuTro";
@@ -194,7 +194,7 @@
                 <div class="nav-sep"></div>
 
                 <!-- GROUP 1: QUẢN LÝ NỘI DUNG -->
-                <div class="nav-group @(isNoiDungActive ? "is-open" : "")">
+                    <div class="nav-group @(isNoiDungActive ? "is-open" : "")">
                     <div class="nav-group-toggle">
                         <span>Quản lý nội dung</span>
                         <i class="fas fa-chevron-down caret"></i>
@@ -213,7 +213,7 @@
                         </a>
                         @if (coQuyen(WebMTTQ.Models.ModuleQuyen.TrangChu))
                         {
-                            <a href="/AdminTrangChu/Index" class="@(currentController == "AdminTrangChu" ? "is-active" : "")">
+                            <a href="/AdminTrangChu/Index" class="@(currentController == "AdminTrangChu" || currentController == "AdminBanner" || currentController == "AdminTimeline" ? "is-active" : "")">
                                 <i class="fas fa-home"></i>
                                 <span>Cài đặt Trang chủ</span>
                             </a>
@@ -352,13 +352,6 @@
                 <div class="nav-sep"></div>
 
                 <!-- CÁC CHỨC NĂNG LẺ CÒN LẠI -->
-                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.Banner))
-                {
-                    <a href="/AdminBanner/Index" class="@(currentController == "AdminBanner" ? "is-active" : "")">
-                        <i class="fas fa-images"></i>
-                        <span>Quản lý Banner</span>
-                    </a>
-                }
                 @if (coQuyen(WebMTTQ.Models.ModuleQuyen.CauHinh))
                 {
                     <a href="/AdminCauHinh/Index" class="@(currentController == "AdminCauHinh" ? "is-active" : "")">

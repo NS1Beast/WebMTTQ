@@ -23,7 +23,7 @@ public partial class DataMTTQContext : DbContext
     public DbSet<DanhSachUngHo> DanhSachUngHos { get; set; }
     public DbSet<KetQuaChamLo> KetQuaChamLos { get; set; }
 
-    public  DbSet<NguoiDanCanTroGiup> NguoiDanCanTroGiups { get; set; }
+    public DbSet<NguoiDanCanTroGiup> NguoiDanCanTroGiups { get; set; }
     public virtual DbSet<ChuyenMuc> ChuyenMucs { get; set; }
     public virtual DbSet<DanhMucQuy> DanhMucQuies { get; set; }
     public virtual DbSet<DiaDiemBanDo> DiaDiemBanDos { get; set; }
@@ -33,6 +33,8 @@ public partial class DataMTTQContext : DbContext
     public DbSet<Banner> Banners { get; set; }
     public DbSet<TrangChuMuc> TrangChuMucs { get; set; }
     public DbSet<TrangChuTinTuc> TrangChuTinTucs { get; set; }
+    public DbSet<TimelineSection> TimelineSections { get; set; }
+    public DbSet<TimelineItem> TimelineItems { get; set; }
     public virtual DbSet<KhoanDongGop> KhoanDongGops { get; set; }
     public virtual DbSet<LuotTraoTang> LuotTraoTangs { get; set; }
     public virtual DbSet<NguoiCanGiupDo> NguoiCanGiupDos { get; set; }
@@ -53,11 +55,11 @@ public partial class DataMTTQContext : DbContext
     public DbSet<SoDuQuyCuuTro> SoDuQuyCuuTros { get; set; }
     public DbSet<DanhSachUngHoCuuTro> DanhSachUngHoCuuTros { get; set; }
     public DbSet<KetQuaHoatDongCuuTro> KetQuaHoatDongCuuTros { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=.;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");
-    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    // => optionsBuilder.UseSqlServer("Server=DESKTOP-C5LJ9BM\\SQL2025_DEV;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<BaiViet>(entity =>
@@ -113,7 +115,6 @@ public partial class DataMTTQContext : DbContext
         {
             entity.HasKey(e => e.IddiaDiem).HasName("PK__DiaDiemB__3DD0D654483F5641");
 
-            // ĐÃ THÊM 2 DÒNG NÀY ĐỂ ÉP KIỂU DỮ LIỆU TỌA ĐỘ CHO EF CORE TRÁNH LỖI OUT OF RANGE
             entity.Property(e => e.ViDo).HasColumnType("decimal(12, 8)");
             entity.Property(e => e.KinhDo).HasColumnType("decimal(12, 8)");
 
@@ -227,8 +228,6 @@ public partial class DataMTTQContext : DbContext
             entity.Property(e => e.NgayTao).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.TrangThai).HasDefaultValue("HoatDong");
 
-            // Unique index trên Email nhưng chỉ áp dụng khi Email IS NOT NULL
-            // (cho phép nhiều user không có email - NULL)
             entity.HasIndex(e => e.Email)
                 .IsUnique()
                 .HasDatabaseName("UQ__NguoiDun__A9D105348E5266DA")
@@ -275,6 +274,25 @@ public partial class DataMTTQContext : DbContext
 
             entity.Property(e => e.DaXoa).HasDefaultValue(false);
             entity.Property(e => e.ThuTu).HasDefaultValue(0);
+        });
+
+        modelBuilder.Entity<TimelineSection>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.IsEnabled).HasDefaultValue(true);
+        });
+
+        modelBuilder.Entity<TimelineItem>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.IsEnabled).HasDefaultValue(true);
+            entity.Property(e => e.SortOrder).HasDefaultValue(0);
+
+            entity.HasOne(d => d.TimelineSection)
+                .WithMany(p => p.Items)
+                .HasForeignKey(d => d.IdTimelineSection)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_TimelineItem_TimelineSection");
         });
 
         modelBuilder.Entity<VaiTro>(entity =>

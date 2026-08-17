@@ -9,9 +9,6 @@ namespace WebMTTQ.Models
         [Key]
         public int IdBanner { get; set; }
 
-        [StringLength(500)]
-        public string? TieuDe { get; set; }
-
         [StringLength(1000)]
         public string? HinhAnh { get; set; }
 
@@ -21,10 +18,6 @@ namespace WebMTTQ.Models
         public int ThuTu { get; set; }
 
         public bool TrangThai { get; set; } = true;
-
-        /// <summary>Mô tả / chú thích hiển thị trên banner</summary>
-        [StringLength(1000)]
-        public string? MoTa { get; set; }
 
         /// <summary>Hiệu ứng chuyển: slide, fade, zoom</summary>
         [StringLength(50)]

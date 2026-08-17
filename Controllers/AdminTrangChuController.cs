@@ -134,6 +134,333 @@ namespace WebMTTQ.Controllers
         }
 
         // ============================================================
+        // BANNER MANAGEMENT (sub-feature of TrangChu settings)
+        // ============================================================
+
+        // GET: /AdminTrangChu/Banner
+        public async Task<IActionResult> Banner()
+        {
+            var banners = await _context.Banners.OrderBy(b => b.ThuTu).ToListAsync();
+            return View("~/Views/Admin/Banner/Index.cshtml", banners);
+        }
+
+        // GET: /AdminTrangChu/BannerCreate
+        [HttpGet]
+        public IActionResult BannerCreate()
+        {
+            return View("~/Views/Admin/Banner/Create.cshtml");
+        }
+
+        // POST: /AdminTrangChu/BannerCreate
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BannerCreate(Banner banner, IFormFile FileAnh)
+        {
+            ModelState.Remove("HinhAnh");
+
+            if (ModelState.IsValid)
+            {
+                if (FileAnh != null && FileAnh.Length > 0)
+                {
+                    if (FileAnh.Length > 3 * 1024 * 1024)
+                    {
+                        ModelState.AddModelError("HinhAnh", "Kích thước ảnh không được vượt quá 3MB.");
+                        return View("~/Views/Admin/Banner/Create.cshtml", banner);
+                    }
+
+                    string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "banners");
+                    if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(FileAnh.FileName);
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await FileAnh.CopyToAsync(fileStream);
+                    }
+
+                    banner.HinhAnh = "/uploads/banners/" + uniqueFileName;
+                }
+                else
+                {
+                    ModelState.AddModelError("HinhAnh", "Vui lòng chọn ảnh Banner.");
+                    return View("~/Views/Admin/Banner/Create.cshtml", banner);
+                }
+
+                _context.Banners.Add(banner);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Thêm Banner thành công!";
+                return RedirectToAction(nameof(Banner));
+            }
+            return View("~/Views/Admin/Banner/Create.cshtml", banner);
+        }
+
+        // GET: /AdminTrangChu/BannerEdit/5
+        [HttpGet]
+        public async Task<IActionResult> BannerEdit(int id)
+        {
+            var banner = await _context.Banners.FindAsync(id);
+            if (banner == null) return NotFound();
+            return View("~/Views/Admin/Banner/Edit.cshtml", banner);
+        }
+
+        // POST: /AdminTrangChu/BannerEdit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> BannerEdit(int id, Banner banner, IFormFile FileAnh)
+        {
+            if (id != banner.IdBanner) return NotFound();
+            ModelState.Remove("HinhAnh");
+
+            if (ModelState.IsValid)
+            {
+                var existingBanner = await _context.Banners.FindAsync(id);
+                if (existingBanner == null) return NotFound();
+
+                existingBanner.LienKet = banner.LienKet;
+                existingBanner.ThuTu = banner.ThuTu;
+                existingBanner.TrangThai = banner.TrangThai;
+                existingBanner.HieuUng = banner.HieuUng;
+                existingBanner.TocDo = banner.TocDo;
+                existingBanner.ThoiGianDung = banner.ThoiGianDung;
+                existingBanner.MauNen = banner.MauNen;
+
+                if (FileAnh != null && FileAnh.Length > 0)
+                {
+                    if (FileAnh.Length > 3 * 1024 * 1024)
+                    {
+                        ModelState.AddModelError("HinhAnh", "Kích thước ảnh không được vượt quá 3MB.");
+                        return View("~/Views/Admin/Banner/Edit.cshtml", existingBanner);
+                    }
+
+                    string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "banners");
+                    if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
+
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(FileAnh.FileName);
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await FileAnh.CopyToAsync(fileStream);
+                    }
+
+                    existingBanner.HinhAnh = "/uploads/banners/" + uniqueFileName;
+                }
+
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Cập nhật Banner thành công!";
+                return RedirectToAction(nameof(Banner));
+            }
+            return View("~/Views/Admin/Banner/Edit.cshtml", banner);
+        }
+
+        // POST: /AdminTrangChu/BannerDelete/5
+        [HttpPost]
+        public async Task<IActionResult> BannerDelete(int id)
+        {
+            var banner = await _context.Banners.FindAsync(id);
+            if (banner != null)
+            {
+                _context.Banners.Remove(banner);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Xóa Banner thành công!";
+            }
+            return RedirectToAction(nameof(Banner));
+        }
+
+        // POST: /AdminTrangChu/BannerToggleStatus/5
+        [HttpPost]
+        public async Task<IActionResult> BannerToggleStatus(int id)
+        {
+            var banner = await _context.Banners.FindAsync(id);
+            if (banner != null)
+            {
+                banner.TrangThai = !banner.TrangThai;
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = banner.TrangThai ? "Đã hiển thị Banner" : "Đã ẩn Banner";
+            }
+            return RedirectToAction(nameof(Banner));
+        }
+
+        // ============================================================
+        // TIMELINE MANAGEMENT (sub-feature of TrangChu settings)
+        // ============================================================
+
+        // GET: /AdminTrangChu/Timeline
+        public async Task<IActionResult> Timeline()
+        {
+            var section = await _context.TimelineSections
+                .Include(s => s.Items)
+                .FirstOrDefaultAsync();
+
+            if (section == null)
+            {
+                section = new TimelineSection
+                {
+                    IsEnabled = true,
+                    Eyebrow = "CÁC CÔNG TRÌNH SỐ",
+                    Title = "Hành trình chuyển đổi số"
+                };
+                _context.TimelineSections.Add(section);
+                await _context.SaveChangesAsync();
+            }
+
+            section.Items = section.Items.OrderBy(i => i.SortOrder).ToList();
+            return View("~/Views/Admin/Timeline/Index.cshtml", section);
+        }
+
+        // POST: /AdminTrangChu/TimelineSaveSettings
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TimelineSaveSettings(int id, bool IsEnabled, string? Eyebrow, string? Title)
+        {
+            var section = await _context.TimelineSections.FindAsync(id);
+            if (section == null) return NotFound();
+
+            section.IsEnabled = IsEnabled;
+            section.Eyebrow = Eyebrow ?? "";
+            section.Title = Title ?? "";
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Đã cập nhật cài đặt Section!";
+            return RedirectToAction(nameof(Timeline));
+        }
+
+        // GET: /AdminTrangChu/TimelineItemCreate
+        [HttpGet]
+        public async Task<IActionResult> TimelineItemCreate()
+        {
+            var section = await _context.TimelineSections.FirstOrDefaultAsync();
+            if (section == null) return NotFound();
+
+            ViewBag.SectionId = section.Id;
+            return View("~/Views/Admin/Timeline/ItemCreate.cshtml");
+        }
+
+        // POST: /AdminTrangChu/TimelineItemCreate
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TimelineItemCreate(int sectionId, string TimeLabel, string Title, string? Description)
+        {
+            var section = await _context.TimelineSections.FindAsync(sectionId);
+            if (section == null) return NotFound();
+
+            if (string.IsNullOrWhiteSpace(TimeLabel) || string.IsNullOrWhiteSpace(Title))
+            {
+                ModelState.AddModelError("", "TimeLabel và Title là bắt buộc.");
+                ViewBag.SectionId = sectionId;
+                return View("~/Views/Admin/Timeline/ItemCreate.cshtml");
+            }
+
+            var maxOrder = await _context.TimelineItems
+                .Where(i => i.IdTimelineSection == sectionId)
+                .MaxAsync(i => (int?)i.SortOrder) ?? 0;
+
+            var item = new TimelineItem
+            {
+                IdTimelineSection = sectionId,
+                TimeLabel = TimeLabel.Trim(),
+                Title = Title.Trim(),
+                Description = Description?.Trim(),
+                IsEnabled = true,
+                SortOrder = maxOrder + 1
+            };
+
+            _context.TimelineItems.Add(item);
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Thêm Timeline Item thành công!";
+            return RedirectToAction(nameof(Timeline));
+        }
+
+        // GET: /AdminTrangChu/TimelineItemEdit/5
+        [HttpGet]
+        public async Task<IActionResult> TimelineItemEdit(int id)
+        {
+            var item = await _context.TimelineItems
+                .Include(i => i.TimelineSection)
+                .FirstOrDefaultAsync(i => i.Id == id);
+            if (item == null) return NotFound();
+
+            return View("~/Views/Admin/Timeline/ItemEdit.cshtml", item);
+        }
+
+        // POST: /AdminTrangChu/TimelineItemEdit
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TimelineItemEdit(int id, string TimeLabel, string Title, string? Description, bool IsEnabled)
+        {
+            var item = await _context.TimelineItems.FindAsync(id);
+            if (item == null) return NotFound();
+
+            if (string.IsNullOrWhiteSpace(TimeLabel) || string.IsNullOrWhiteSpace(Title))
+            {
+                ModelState.AddModelError("", "TimeLabel và Title là bắt buộc.");
+                return View("~/Views/Admin/Timeline/ItemEdit.cshtml", item);
+            }
+
+            item.TimeLabel = TimeLabel.Trim();
+            item.Title = Title.Trim();
+            item.Description = Description?.Trim();
+            item.IsEnabled = IsEnabled;
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Cập nhật Timeline Item thành công!";
+            return RedirectToAction(nameof(Timeline));
+        }
+
+        // POST: /AdminTrangChu/TimelineItemDelete/5
+        [HttpPost]
+        public async Task<IActionResult> TimelineItemDelete(int id)
+        {
+            var item = await _context.TimelineItems.FindAsync(id);
+            if (item != null)
+            {
+                _context.TimelineItems.Remove(item);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Xóa Timeline Item thành công!";
+            }
+            return RedirectToAction(nameof(Timeline));
+        }
+
+        // POST: /AdminTrangChu/TimelineItemToggle/5
+        [HttpPost]
+        public async Task<IActionResult> TimelineItemToggle(int id)
+        {
+            var item = await _context.TimelineItems.FindAsync(id);
+            if (item != null)
+            {
+                item.IsEnabled = !item.IsEnabled;
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = item.IsEnabled ? "Đã hiển thị item" : "Đã ẩn item";
+            }
+            return RedirectToAction(nameof(Timeline));
+        }
+
+        // POST: /AdminTrangChu/TimelineUpdateSort
+        [HttpPost]
+        public async Task<IActionResult> TimelineUpdateSort([FromBody] List<SortItem> items)
+        {
+            if (items == null || items.Count == 0) return Json(new { success = false });
+
+            foreach (var si in items)
+            {
+                var item = await _context.TimelineItems.FindAsync(si.id);
+                if (item != null)
+                {
+                    item.SortOrder = si.order;
+                }
+            }
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
+        }
+
+        public class SortItem
+        {
+            public int id { get; set; }
+            public int order { get; set; }
+        }
+
+        // ============================================================
         // CRUD for TrangChuTinTuc (individual news items within a section)
         // ============================================================
 

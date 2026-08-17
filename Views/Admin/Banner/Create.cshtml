@@ -7,24 +7,13 @@
 
 <div class="admin-card" style="background:#fff; padding:30px; border-radius:12px; max-width: 900px; margin: 0 auto; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
     <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
-        <a href="@Url.Action("Index", "AdminBanner")" style="color: #666; text-decoration: none; font-size: 1.2rem;">
+        <a href="@Url.Action("Banner", "AdminTrangChu")" style="color: #666; text-decoration: none; font-size: 1.2rem;">
             <i class="fas fa-arrow-left"></i>
         </a>
         <h2 style="margin: 0; color: #333;">Thêm Banner Trang Chủ</h2>
     </div>
 
-    <form asp-action="Create" method="post" enctype="multipart/form-data">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-            <div>
-                <label style="display: block; font-weight: bold; margin-bottom: 8px;">Tiêu đề Banner <span style="color:red;">*</span></label>
-                <input asp-for="TieuDe" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;" required placeholder="Nhập tiêu đề (vd: Chào mừng đại hội...)" />
-            </div>
-            <div>
-                <label style="display: block; font-weight: bold; margin-bottom: 8px;">Mô tả / Chú thích</label>
-                <input asp-for="MoTa" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px;" placeholder="Mô tả ngắn hiển thị trên banner..." />
-            </div>
-        </div>
-
+    <form asp-action="BannerCreate" asp-controller="AdminTrangChu" method="post" enctype="multipart/form-data">
         <div style="margin-bottom: 20px;">
             <label style="display: block; font-weight: bold; margin-bottom: 8px;">Chọn Hình ảnh (Tối đa 3MB) <span style="color:red;">*</span></label>
             <input type="file" name="FileAnh" id="FileAnh" accept="image/*" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;" required />
@@ -89,7 +78,7 @@
         </div>
 
         <div style="display: flex; gap: 15px; justify-content: flex-end;">
-            <a href="@Url.Action("Index", "AdminBanner")" style="background: #6c757d; color: white; padding: 12px 25px; border-radius: 6px; text-decoration: none; font-weight: bold;">Hủy / Quay lại</a>
+            <a href="@Url.Action("Banner", "AdminTrangChu")" style="background: #6c757d; color: white; padding: 12px 25px; border-radius: 6px; text-decoration: none; font-weight: bold;">Hủy / Quay lại</a>
             <button type="submit" style="background: #28a745; color: white; border: none; padding: 12px 25px; border-radius: 6px; font-weight: bold; cursor: pointer;">
                 <i class="fas fa-save"></i> Lưu Banner
             </button>

@@ -1,0 +1,59 @@
+@model WebMTTQ.Models.TimelineItem
+
+@{
+    ViewData["Title"] = "Sửa mốc thời gian";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div style="max-width:800px; margin:0 auto; background:#fff; border-radius:12px; padding:30px; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+    <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px; border-bottom:1px solid #eee; padding-bottom:15px;">
+        <a href="@Url.Action("Timeline", "AdminTrangChu")" style="color:#666; text-decoration:none; font-size:1.2rem;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 style="margin:0; color:#333;">Sửa mốc thời gian</h2>
+    </div>
+
+    <form asp-action="TimelineItemEdit" asp-controller="AdminTrangChu" method="post">
+        <input type="hidden" name="id" value="@Model.Id" />
+
+        <div style="margin-bottom:20px;">
+            <label style="display:block; font-weight:bold; margin-bottom:8px;">Nhãn thời gian <span style="color:red;">*</span></label>
+            <input type="text" name="TimeLabel" value="@Model.TimeLabel" maxlength="50" class="form-control" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;" required />
+            <small style="color:#888;">Nhập tự do, tối đa 50 ký tự.</small>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <label style="display:block; font-weight:bold; margin-bottom:8px;">Tiêu đề <span style="color:red;">*</span></label>
+            <input type="text" name="Title" value="@Model.Title" maxlength="300" class="form-control" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;" required />
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <label style="display:block; font-weight:bold; margin-bottom:8px;">Mô tả</label>
+            <textarea name="Description" maxlength="250" rows="4" class="form-control" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">@Model.Description</textarea>
+            <div style="text-align:right; font-size:0.8rem; color:#888; margin-top:4px;"><span id="descCount">@(Model.Description?.Length ?? 0)</span>/250</div>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <label style="display:flex; align-items:center; gap:8px; font-weight:600; cursor:pointer;">
+                <input type="checkbox" name="IsEnabled" value="true" @(Model.IsEnabled ? "checked" : "") style="width:18px;height:18px;" />
+                Hiển thị mốc thời gian này
+            </label>
+        </div>
+
+        <div style="display:flex; gap:15px; justify-content:flex-end; margin-top:25px;">
+            <a href="@Url.Action("Timeline", "AdminTrangChu")" style="background:#6c757d; color:white; padding:12px 25px; border-radius:6px; text-decoration:none; font-weight:bold;">Hủy / Quay lại</a>
+            <button type="submit" style="background:#17a2b8; color:white; border:none; padding:12px 25px; border-radius:6px; font-weight:bold; cursor:pointer;">
+                <i class="fas fa-save"></i> Lưu thay đổi
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const desc = document.querySelector('textarea[name="Description"]');
+    if (desc) {
+        desc.addEventListener('input', function() {
+            document.getElementById('descCount').textContent = this.value.length;
+        });
+    }
+</script>

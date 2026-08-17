@@ -29,7 +29,7 @@ namespace WebMTTQ.Controllers
                 .ThenByDescending(s => s.NgayTao)
                 .ToListAsync();
 
-            // Load TrangChuTinTuc items cho các mục loại "tin-tuc"
+            // Load TrangChuTinTuc items cho các mục loại "tin-tuc" (tối đa 6 tin: 1 tin to + 5 tin nhỏ)
             var sectionNews = new Dictionary<int, List<TrangChuTinTuc>>();
             foreach (var sec in sections.Where(s => s.Loai == "tin-tuc" && s.TrangThai))
             {
@@ -37,15 +37,39 @@ namespace WebMTTQ.Controllers
                     .Where(t => t.IdTrangChuMuc == sec.Id && t.TrangThai)
                     .OrderBy(t => t.ThuTu)
                     .ThenByDescending(t => t.NgayTao)
+                    .Take(6)
                     .ToListAsync();
                 sectionNews[sec.Id] = tinTucs;
             }
+
+            // Timeline Section
+            var timeline = await _context.TimelineSections
+                .Include(s => s.Items)
+                .FirstOrDefaultAsync();
+            if (timeline != null && timeline.IsEnabled)
+            {
+                timeline.Items = timeline.Items
+                    .Where(i => i.IsEnabled)
+                    .OrderBy(i => i.SortOrder)
+                    .ToList();
+            }
+
+            // Featured News (bài viết nổi bật)
+            var featuredNews = await _context.BaiViets
+                .Include(b => b.IdchuyenMucNavigation)
+                .Where(b => b.DaXoa == false && b.TrangThai == "DaDang")
+                .OrderByDescending(b => b.LaTinNoiBat)
+                .ThenByDescending(b => b.NgayXuatBan)
+                .Take(5)
+                .ToListAsync();
 
             var model = new HomePageViewModel
             {
                 Banners = danhSachBanner,
                 Sections = sections,
-                SectionNews = sectionNews
+                SectionNews = sectionNews,
+                Timeline = timeline,
+                FeaturedNews = featuredNews
             };
 
             return View(model);

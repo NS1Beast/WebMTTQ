@@ -10,7 +10,7 @@ using System;
 
 namespace WebMTTQ.Controllers
 {
-    [KiemTraQuyen(ModuleQuyen.Banner, "Xem")]
+    [KiemTraQuyen(ModuleQuyen.TrangChu, "Xem")]
     public class AdminBannerController : BaseAdminController
     {
         private readonly DataMTTQContext _context;
@@ -112,8 +112,6 @@ namespace WebMTTQ.Controllers
                 if (existingBanner == null) return NotFound();
 
                 // Cập nhật các thông tin văn bản
-                existingBanner.TieuDe = banner.TieuDe;
-                existingBanner.MoTa = banner.MoTa;
                 existingBanner.LienKet = banner.LienKet;
                 existingBanner.ThuTu = banner.ThuTu;
                 existingBanner.TrangThai = banner.TrangThai;
@@ -162,6 +160,20 @@ namespace WebMTTQ.Controllers
                 _context.Banners.Remove(banner);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Xóa Banner thành công!";
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        // 7. BẬT/TẮT BANNER
+        [HttpPost]
+        public async Task<IActionResult> ToggleStatus(int id)
+        {
+            var banner = await _context.Banners.FindAsync(id);
+            if (banner != null)
+            {
+                banner.TrangThai = !banner.TrangThai;
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = banner.TrangThai ? "Đã hiển thị Banner" : "Đã ẩn Banner";
             }
             return RedirectToAction(nameof(Index));
         }

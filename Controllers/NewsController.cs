@@ -147,7 +147,7 @@ namespace WebMTTQ.Controllers
                 ImageUrl = GetImageUrl(article),
                 VideoUrl = article.VideoUrl,
                 Date = article.NgayXuatBan?.ToString("dd/MM/yyyy") ?? "",
-                Author = article.IdnguoiDungNavigation?.HoTen ?? "MTTQ xã Phú Hòa Đông",
+                Author = article.IdnguoiDungNavigation?.HoTen ?? "MTTQ Phường Tân Định",
                 ViewCount = article.LuotXem ?? 0,
                 CategoryName = article.IdchuyenMucNavigation?.TenChuyenMuc ?? "Tin tức",
                 CategorySlug = article.IdchuyenMucNavigation?.DuongDan ?? "",

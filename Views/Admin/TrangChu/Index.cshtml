@@ -5,15 +5,34 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
+<style>
+    .tc-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 0; }
+    .tc-tab {
+        padding: 12px 24px; border-radius: 8px 8px 0 0; text-decoration: none;
+        font-weight: 600; font-size: 0.95rem; color: #666; background: #f8f9fa;
+        border: 1px solid #eee; border-bottom: none; transition: all 0.3s;
+        display: inline-flex; align-items: center; gap: 8px;
+    }
+    .tc-tab:hover { background: #e9ecef; color: #333; }
+    .tc-tab.active { background: #8b1a2b; color: white; border-color: #8b1a2b; }
+</style>
+
 <div class="admin-card" style="background:#fff; padding:25px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
         <div>
-            <h2 style="margin: 0; color: #333; font-size: 1.5rem;">Quản lý Mục Trang chủ</h2>
-            <p style="margin: 5px 0 0; color: #888; font-size: 0.9rem;">Thêm các mục nội dung hiển thị trên trang chủ (tin tức, hình ảnh, thông tin...)</p>
+            <h2 style="margin: 0; color: #333; font-size: 1.5rem;">Cài đặt Trang chủ</h2>
+            <p style="margin: 5px 0 0; color: #888; font-size: 0.9rem;">Quản lý các mục nội dung, banner và hành trình chuyển đổi số trên trang chủ</p>
         </div>
         <a href="@Url.Action("Create", "AdminTrangChu")" class="btn" style="background: #28a745; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 8px;">
             <i class="fas fa-plus"></i> Thêm mục mới
         </a>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tc-tabs">
+        <a href="@Url.Action("Index", "AdminTrangChu")" class="tc-tab active"><i class="fas fa-layer-group"></i> Mục nội dung</a>
+        <a href="@Url.Action("Banner", "AdminTrangChu")" class="tc-tab"><i class="fas fa-images"></i> Quản lý Banner</a>
+        <a href="@Url.Action("Timeline", "AdminTrangChu")" class="tc-tab"><i class="fas fa-stream"></i> Hành trình chuyển đổi số</a>
     </div>
 
     @if (TempData["SuccessMessage"] != null)

@@ -1,0 +1,53 @@
+@model WebMTTQ.Models.TimelineItem
+
+@{
+    ViewData["Title"] = "Thêm mốc thời gian";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div style="max-width:800px; margin:0 auto; background:#fff; border-radius:12px; padding:30px; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+    <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px; border-bottom:1px solid #eee; padding-bottom:15px;">
+        <a href="@Url.Action("Timeline", "AdminTrangChu")" style="color:#666; text-decoration:none; font-size:1.2rem;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 style="margin:0; color:#333;">Thêm mốc thời gian</h2>
+    </div>
+
+    <form asp-action="TimelineItemCreate" asp-controller="AdminTrangChu" method="post">
+        <input type="hidden" name="sectionId" value="@(ViewBag.SectionId ?? 0)" />
+
+        <div style="margin-bottom:20px;">
+            <label style="display:block; font-weight:bold; margin-bottom:8px;">Nhãn thời gian <span style="color:red;">*</span></label>
+            <input type="text" name="TimeLabel" maxlength="50" class="form-control" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;" required placeholder="VD: 12/8/2025 hoặc Dự kiến 7/2026" />
+            <small style="color:#888;">Nhập tự do, tối đa 50 ký tự.</small>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <label style="display:block; font-weight:bold; margin-bottom:8px;">Tiêu đề <span style="color:red;">*</span></label>
+            <input type="text" name="Title" maxlength="300" class="form-control" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;" required />
+            <small style="color:#888;">50-100 ký tự, tối đa 300 ký tự.</small>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <label style="display:block; font-weight:bold; margin-bottom:8px;">Mô tả</label>
+            <textarea name="Description" maxlength="250" rows="4" class="form-control" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;" placeholder="Mô tả bằng văn bản thuần, tối đa 250 ký tự..."></textarea>
+            <div style="text-align:right; font-size:0.8rem; color:#888; margin-top:4px;"><span id="descCount">0</span>/250</div>
+        </div>
+
+        <div style="display:flex; gap:15px; justify-content:flex-end; margin-top:25px;">
+            <a href="@Url.Action("Timeline", "AdminTrangChu")" style="background:#6c757d; color:white; padding:12px 25px; border-radius:6px; text-decoration:none; font-weight:bold;">Hủy / Quay lại</a>
+            <button type="submit" style="background:#28a745; color:white; border:none; padding:12px 25px; border-radius:6px; font-weight:bold; cursor:pointer;">
+                <i class="fas fa-save"></i> Lưu
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const desc = document.querySelector('textarea[name="Description"]');
+    if (desc) {
+        desc.addEventListener('input', function() {
+            document.getElementById('descCount').textContent = this.value.length;
+        });
+    }
+</script>
