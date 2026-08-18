@@ -8,7 +8,7 @@ using OfficeOpenXml;
 namespace WebMTTQ.Controllers
 {
     [Route("admin/danhsachungho")]
-    [KiemTraQuyen(ModuleQuyen.DanhSachUngHo, "Xem")]
+    [KiemTraQuyen(ModuleQuyen.DanhSachUngHo)]
     public class AdminDanhSachUngHoController : BaseAdminController
     {
         private readonly DataMTTQContext _context;

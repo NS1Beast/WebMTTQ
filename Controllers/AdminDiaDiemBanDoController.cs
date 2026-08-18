@@ -9,7 +9,7 @@ using System;
 
 namespace WebMTTQ.Controllers
 {
-    [KiemTraQuyen(ModuleQuyen.DiaDiemBanDo, "Xem")]
+    [KiemTraQuyen(ModuleQuyen.DiaDiemBanDo)]
     public class AdminDiaDiemBanDoController : BaseAdminController
     {
         private readonly DataMTTQContext _context;

@@ -6,7 +6,7 @@ using WebMTTQ.Services;
 namespace WebMTTQ.Controllers
 {
     [Route("AdminCauHinh")]
-    [KiemTraQuyen(ModuleQuyen.CauHinh, "Xem")]
+    [KiemTraQuyen(ModuleQuyen.CauHinh)]
     public class AdminCauHinhController : BaseAdminController
     {
         private readonly ISystemSettingsService _settings;

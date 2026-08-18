@@ -21,11 +21,9 @@ namespace WebMTTQ.Services
             }
 
             // Tìm vai trò Quản trị viên (Admin) - có toàn quyền
+            // Chỉ khớp CHÍNH XÁC tên "Quản trị viên" hoặc "Admin" (không phân biệt hoa thường)
             var allRoles = await context.VaiTros.AsNoTracking().ToListAsync();
-            var adminRole = allRoles.FirstOrDefault(v =>
-                v.TenVaiTro.Contains("Quản trị", StringComparison.OrdinalIgnoreCase) ||
-                v.TenVaiTro.Contains("Quan tri", StringComparison.OrdinalIgnoreCase) ||
-                v.TenVaiTro.Contains("Admin", StringComparison.OrdinalIgnoreCase));
+            var adminRole = allRoles.FirstOrDefault(v => QuyenHelper.IsAdminVaiTro(v.TenVaiTro));
 
             // Nếu không có vai trò Admin, tạo mới
             if (adminRole == null)

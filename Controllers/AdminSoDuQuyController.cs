@@ -28,10 +28,12 @@ namespace WebMTTQ.Controllers
         }
 
         [Route("Create")]
+        [KiemTraQuyen(ModuleQuyen.SoDuQuy, "Them")]
         public IActionResult Create() => View("~/Views/Admin/SoDuQuy/Create.cshtml");
 
         [HttpPost("Create")]
         [ValidateAntiForgeryToken]
+        [KiemTraQuyen(ModuleQuyen.SoDuQuy, "Them")]
         public async Task<IActionResult> Create(SoDuQuyViNguoiNgheo model)
         {
             if (ModelState.IsValid)
@@ -48,6 +50,7 @@ namespace WebMTTQ.Controllers
         }
 
         [Route("Edit/{id}")]
+        [KiemTraQuyen(ModuleQuyen.SoDuQuy, "Sua")]
         public async Task<IActionResult> Edit(int id)
         {
             var item = await _context.SoDuQuyViNguoiNgheos.FindAsync(id);
@@ -57,6 +60,7 @@ namespace WebMTTQ.Controllers
 
         [HttpPost("Edit/{id}")]
         [ValidateAntiForgeryToken]
+        [KiemTraQuyen(ModuleQuyen.SoDuQuy, "Sua")]
         public async Task<IActionResult> Edit(int id, SoDuQuyViNguoiNgheo model)
         {
             if (id != model.Id) return NotFound();
@@ -74,6 +78,7 @@ namespace WebMTTQ.Controllers
         }
 
         [HttpPost("Delete/{id}")]
+        [KiemTraQuyen(ModuleQuyen.SoDuQuy, "Xoa")]
         public async Task<IActionResult> Delete(int id)
         {
             var item = await _context.SoDuQuyViNguoiNgheos.FindAsync(id);

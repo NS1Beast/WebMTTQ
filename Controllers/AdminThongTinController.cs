@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace WebMTTQ.Controllers
 {
     [Route("admin/thongtinungho")]
-    [KiemTraQuyen(ModuleQuyen.ThongTinUngHo, "Xem")]
+    [KiemTraQuyen(ModuleQuyen.ThongTinUngHo)]
     public class AdminThongTinController : BaseAdminController
     {
         private readonly DataMTTQContext _context;

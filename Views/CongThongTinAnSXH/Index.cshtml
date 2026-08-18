@@ -1564,17 +1564,30 @@
                     {
                         <div style="background:#f8d7da; color:#721c24; padding:15px; border-radius:12px; margin-bottom:20px;">@TempData["ErrorMessage"]</div>
                     }
-                    <form action="@Url.Action("GuiYeuCauTroGiup", "CongThongTinAnSXH")" method="post">
+                    <form action="@Url.Action("GuiYeuCauTroGiup", "CongThongTinAnSXH")" method="post" id="troGiupForm">
                         @Html.AntiForgeryToken()
                         <div class="asxh-row">
-                            <div class="asxh-col-6 form-group"><label class="form-label">Họ tên *</label><input type="text" name="HoTen" class="form-control" required></div>
-                            <div class="asxh-col-6 form-group"><label class="form-label">Điện thoại *</label><input type="text" name="SoDienThoai" class="form-control" required></div>
+                            <div class="asxh-col-6 form-group"><label class="form-label">Họ tên *</label><input type="text" name="HoTen" class="form-control" maxlength="255" required></div>
+                            <div class="asxh-col-6 form-group"><label class="form-label">Điện thoại *</label><input type="tel" name="SoDienThoai" class="form-control" maxlength="20" required></div>
                         </div>
                         <div class="form-group"><label class="form-label">Mức độ ưu tiên</label><select name="MucDoUuTien" class="form-select"><option value="Bình thường">Bình thường</option><option value="Khẩn cấp">Khẩn cấp</option></select></div>
-                        <div class="form-group"><label class="form-label">Địa chỉ *</label><input type="text" name="DiaChi" class="form-control" required></div>
-                        <div class="form-group"><label class="form-label">Nội dung *</label><textarea name="NoiDung" class="form-control" rows="4" required placeholder="Mô tả hoàn cảnh..."></textarea></div>
-                        <button type="submit" class="btn-submit">Gửi thông tin trợ giúp</button>
+                        <div class="form-group"><label class="form-label">Địa chỉ *</label><input type="text" name="DiaChi" class="form-control" maxlength="500" required></div>
+                        <div class="form-group"><label class="form-label">Nội dung *</label><textarea name="NoiDung" class="form-control" rows="4" maxlength="10000" required placeholder="Mô tả hoàn cảnh..."></textarea></div>
+                        <button type="submit" class="btn-submit" id="btnSubmitTroGiup">Gửi thông tin trợ giúp</button>
                     </form>
+                    <script>
+                        // Chống double-click: disable submit button khi đang gửi
+                        document.addEventListener('DOMContentLoaded', function() {
+                            var form = document.getElementById('troGiupForm');
+                            var submitBtn = document.getElementById('btnSubmitTroGiup');
+                            if (form && submitBtn) {
+                                form.addEventListener('submit', function() {
+                                    submitBtn.disabled = true;
+                                    submitBtn.textContent = 'Đang gửi...';
+                                });
+                            }
+                        });
+                    </script>
                 </div>
             </div>
         </div>

@@ -281,7 +281,21 @@
                 </div>
             }
 
-            <form asp-action="GuiGopY" asp-controller="GopY" method="post" enctype="multipart/form-data">
+            <!-- Hiển thị lỗi validation từ backend -->
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <strong>Vui lòng kiểm tra lại thông tin:</strong>
+                    <ul style="margin: 8px 0 0 20px; padding: 0;">
+                        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                        {
+                            <li style="margin-bottom: 4px;">@error.ErrorMessage</li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            <form asp-action="GuiGopY" asp-controller="GopY" method="post" enctype="multipart/form-data" id="gyForm">
                 @Html.AntiForgeryToken()
 
                 <div class="gy-row">
@@ -300,35 +314,35 @@
                     <!-- Tiêu đề -->
                     <div class="gy-col-12 gy-form-group">
                         <label class="gy-label">Tiêu đề góp ý <span class="gy-req">*</span></label>
-                        <input asp-for="TieuDe" type="text" class="gy-control" required />
+                        <input asp-for="TieuDe" type="text" class="gy-control" maxlength="500" required />
                     </div>
 
                     <!-- Họ tên & Điện thoại -->
                     <div class="gy-col-6 gy-form-group">
                         <label class="gy-label">Họ tên người gửi <span class="gy-req">*</span></label>
-                        <input asp-for="HoTen" type="text" class="gy-control" required />
+                        <input asp-for="HoTen" type="text" class="gy-control" maxlength="100" required />
                     </div>
                     <div class="gy-col-6 gy-form-group">
                         <label class="gy-label">Điện thoại <span class="gy-req">*</span></label>
-                        <input asp-for="SoDienThoai" type="tel" class="gy-control" required />
+                        <input asp-for="SoDienThoai" type="tel" class="gy-control" maxlength="20" required />
                     </div>
 
                     <!-- Email -->
                     <div class="gy-col-12 gy-form-group">
                         <label class="gy-label">Email <span class="gy-hint">(không bắt buộc)</span></label>
-                        <input asp-for="Email" type="email" class="gy-control" />
+                        <input asp-for="Email" type="email" class="gy-control" maxlength="100" />
                     </div>
 
                     <!-- Địa chỉ -->
                     <div class="gy-col-12 gy-form-group">
                         <label class="gy-label">Địa chỉ <span class="gy-req">*</span></label>
-                        <input asp-for="DiaChi" type="text" class="gy-control" required />
+                        <input asp-for="DiaChi" type="text" class="gy-control" maxlength="250" required />
                     </div>
 
                     <!-- Nội dung -->
                     <div class="gy-col-12 gy-form-group">
                         <label class="gy-label">Nội dung <span class="gy-req">*</span></label>
-                        <textarea asp-for="NoiDung" class="gy-control" required></textarea>
+                        <textarea asp-for="NoiDung" class="gy-control" maxlength="10000" required></textarea>
                     </div>
 
                     <!-- Đính kèm file -->
@@ -345,10 +359,25 @@
 
                 <!-- Buttons -->
                 <div class="gy-actions">
-                    <button type="submit" class="btn-submit">Gửi góp ý</button>
+                    <button type="submit" class="btn-submit" id="btnSubmitGopY">Gửi góp ý</button>
                     <button type="reset" class="btn-reset">Nhập lại</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+    // Chống double-click: disable submit button khi đang gửi
+    document.addEventListener('DOMContentLoaded', function() {
+        var form = document.getElementById('gyForm');
+        var submitBtn = document.getElementById('btnSubmitGopY');
+
+        if (form && submitBtn) {
+            form.addEventListener('submit', function() {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Đang gửi...';
+            });
+        }
+    });
+</script>

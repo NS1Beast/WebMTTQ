@@ -48,14 +48,19 @@ namespace WebMTTQ.Models
     public static class QuyenHelper
     {
         /// <summary>
-        /// Kiểm tra một VaiTro có phải là Admin không (toàn quyền).
+        /// Kiểm tra một VaiTro có phải là Admin hệ thống không (toàn quyền).
+        /// Chỉ khớp CHÍNH XÁC tên vai trò "Quản trị viên" hoặc "Admin" (không phân biệt hoa thường).
+        /// KHÔNG dùng Contains vì sẽ khiến các vai trò khác có tên chứa "Admin"/"Quản trị"
+        /// (vd: "Quản trị nội dung", "Biên tập viên Admin") bị nhầm thành vai trò Admin hệ thống.
         /// </summary>
         public static bool IsAdminVaiTro(string? tenVaiTro)
         {
-            return !string.IsNullOrEmpty(tenVaiTro) &&
-                   (tenVaiTro.Contains("Admin", StringComparison.OrdinalIgnoreCase) ||
-                    tenVaiTro.Contains("Quản trị", StringComparison.OrdinalIgnoreCase) ||
-                    tenVaiTro.Contains("Quan tri", StringComparison.OrdinalIgnoreCase));
+            if (string.IsNullOrEmpty(tenVaiTro)) return false;
+
+            var normalized = tenVaiTro.Trim();
+            return normalized.Equals("Admin", StringComparison.OrdinalIgnoreCase) ||
+                   normalized.Equals("Quản trị viên", StringComparison.OrdinalIgnoreCase) ||
+                   normalized.Equals("Quan tri vien", StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>

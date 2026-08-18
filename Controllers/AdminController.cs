@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WebMTTQ.Models;
 
 namespace WebMTTQ.Controllers
 {

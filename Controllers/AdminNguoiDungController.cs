@@ -27,11 +27,10 @@ namespace WebMTTQ.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string? tuKhoa, int? idVaiTro)
         {
-            // Chỉ admin mới có quyền quản lý người dùng
-            if (!PhanQuyenHelper.IsAdmin(HttpContext.Session))
+            // Cần quyền QuanLyNguoiDung để xem danh sách người dùng
+            if (!PhanQuyenHelper.CoQuyenXem(HttpContext.Session, ModuleQuyen.QuanLyNguoiDung))
             {
-                TempData["ErrorMessage"] = "Bạn không có quyền truy cập vào chức năng này!";
-                return RedirectToAction("Index", "Home");
+                return StatusCode(StatusCodes.Status403Forbidden);
             }
 
             var query = _context.NguoiDungs
@@ -52,6 +51,9 @@ namespace WebMTTQ.Controllers
             var users = await query.OrderByDescending(u => u.NgayTao).ToListAsync();
             var listVaiTro = await _context.VaiTros.Where(v => v.DaXoa == null || v.DaXoa == false).ToListAsync();
 
+            // Lấy ID người dùng hiện tại để đánh dấu "chính mình"
+            var currentUserId = int.Parse(HttpContext.Session.GetString("AdminUserId") ?? "0");
+
             var model = new QuanLyNguoiDungIndexViewModel
             {
                 TuKhoa = tuKhoa,
@@ -67,7 +69,8 @@ namespace WebMTTQ.Controllers
                     TenVaiTro = u.IdvaiTroNavigation?.TenVaiTro,
                     TrangThai = u.TrangThai,
                     NgayTao = u.NgayTao,
-                    LaAdmin = QuyenHelper.IsAdminVaiTro(u.IdvaiTroNavigation?.TenVaiTro)
+                    LaAdmin = QuyenHelper.IsAdminVaiTro(u.IdvaiTroNavigation?.TenVaiTro),
+                    LaChinhMinh = u.IdnguoiDung == currentUserId
                 }).ToList()
             };
 
@@ -89,10 +92,9 @@ namespace WebMTTQ.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            if (!PhanQuyenHelper.IsAdmin(HttpContext.Session))
+            if (!PhanQuyenHelper.CoQuyenThem(HttpContext.Session, ModuleQuyen.QuanLyNguoiDung))
             {
-                TempData["ErrorMessage"] = "Bạn không có quyền truy cập vào chức năng này!";
-                return RedirectToAction("Index", "Home");
+                return StatusCode(StatusCodes.Status403Forbidden);
             }
 
             var model = new TaoNguoiDungViewModel
@@ -107,10 +109,9 @@ namespace WebMTTQ.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TaoNguoiDungViewModel model)
         {
-            if (!PhanQuyenHelper.IsAdmin(HttpContext.Session))
+            if (!PhanQuyenHelper.CoQuyenThem(HttpContext.Session, ModuleQuyen.QuanLyNguoiDung))
             {
-                TempData["ErrorMessage"] = "Bạn không có quyền truy cập vào chức năng này!";
-                return RedirectToAction("Index", "Home");
+                return StatusCode(StatusCodes.Status403Forbidden);
             }
 
             model.VaiTros = await GetVaiTros();
@@ -123,6 +124,18 @@ namespace WebMTTQ.Controllers
 
             if (ModelState.IsValid)
             {
+                // Chống role escalation: User không phải Admin không được tạo user với role Admin
+                var currentUserIsAdmin = PhanQuyenHelper.IsAdmin(HttpContext.Session);
+                if (!currentUserIsAdmin)
+                {
+                    var selectedRole = model.VaiTros.FirstOrDefault(v => v.IdvaiTro == model.IdVaiTro);
+                    if (selectedRole != null && QuyenHelper.IsAdminVaiTro(selectedRole.TenVaiTro))
+                    {
+                        TempData["ErrorMessage"] = "Bạn không có quyền gán vai trò quản trị viên cho người dùng mới!";
+                        return View("~/Views/Admin/NguoiDung/Create.cshtml", model);
+                    }
+                }
+
                 // Email nullable: nếu không nhập thì để NULL
                 // (tránh vi phạm UNIQUE constraint trên Email vì nhiều user có thể không có email)
                 var emailValue = string.IsNullOrWhiteSpace(model.Email) ? null : model.Email.Trim();
@@ -159,10 +172,9 @@ namespace WebMTTQ.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            if (!PhanQuyenHelper.IsAdmin(HttpContext.Session))
+            if (!PhanQuyenHelper.CoQuyenSua(HttpContext.Session, ModuleQuyen.QuanLyNguoiDung))
             {
-                TempData["ErrorMessage"] = "Bạn không có quyền truy cập vào chức năng này!";
-                return RedirectToAction("Index", "Home");
+                return StatusCode(StatusCodes.Status403Forbidden);
             }
 
             var user = await _context.NguoiDungs
@@ -170,6 +182,24 @@ namespace WebMTTQ.Controllers
                 .FirstOrDefaultAsync(u => u.IdnguoiDung == id && (u.DaXoa == null || u.DaXoa == false));
 
             if (user == null) return NotFound();
+
+            // Chống tương tác với tài khoản Admin: Chỉ Admin mới được sửa tài khoản Admin
+            var currentUserIsAdmin = PhanQuyenHelper.IsAdmin(HttpContext.Session);
+            var targetIsAdmin = QuyenHelper.IsAdminVaiTro(user.IdvaiTroNavigation?.TenVaiTro);
+            if (targetIsAdmin && !currentUserIsAdmin)
+            {
+                TempData["ErrorMessage"] = "Bạn không có quyền chỉnh sửa tài khoản quản trị viên!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Admin không được sửa chính tài khoản của mình qua trang quản lý
+            // (chỉ được sửa thông tin cá nhân qua trang cá nhân)
+            var currentUserId = int.Parse(HttpContext.Session.GetString("AdminUserId") ?? "0");
+            if (user.IdnguoiDung == currentUserId)
+            {
+                TempData["ErrorMessage"] = "Bạn không thể chỉnh sửa tài khoản của chính mình qua trang quản lý người dùng!";
+                return RedirectToAction(nameof(Index));
+            }
 
             var model = new SuaNguoiDungViewModel
             {
@@ -191,10 +221,9 @@ namespace WebMTTQ.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, SuaNguoiDungViewModel model)
         {
-            if (!PhanQuyenHelper.IsAdmin(HttpContext.Session))
+            if (!PhanQuyenHelper.CoQuyenSua(HttpContext.Session, ModuleQuyen.QuanLyNguoiDung))
             {
-                TempData["ErrorMessage"] = "Bạn không có quyền truy cập vào chức năng này!";
-                return RedirectToAction("Index", "Home");
+                return StatusCode(StatusCodes.Status403Forbidden);
             }
 
             if (id != model.IdnguoiDung) return NotFound();
@@ -206,6 +235,47 @@ namespace WebMTTQ.Controllers
                 .FirstOrDefaultAsync(u => u.IdnguoiDung == id && (u.DaXoa == null || u.DaXoa == false));
 
             if (user == null) return NotFound();
+
+            // Chống tương tác với tài khoản Admin: Chỉ Admin mới được sửa tài khoản Admin
+            var currentUserIsAdmin = PhanQuyenHelper.IsAdmin(HttpContext.Session);
+            var targetIsAdmin = QuyenHelper.IsAdminVaiTro(user.IdvaiTroNavigation?.TenVaiTro);
+            if (targetIsAdmin && !currentUserIsAdmin)
+            {
+                TempData["ErrorMessage"] = "Bạn không có quyền chỉnh sửa tài khoản quản trị viên!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Admin không được sửa chính tài khoản của mình qua trang quản lý
+            var currentUserId = int.Parse(HttpContext.Session.GetString("AdminUserId") ?? "0");
+            if (user.IdnguoiDung == currentUserId)
+            {
+                TempData["ErrorMessage"] = "Bạn không thể chỉnh sửa tài khoản của chính mình qua trang quản lý người dùng!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Chống role escalation: Nếu user đang được sửa có vai trò Admin và người sửa không phải Admin
+            // thì không cho phép thay đổi vai trò.
+            if (!currentUserIsAdmin)
+            {
+                // Nếu người sửa cố gán quyền Admin cho user khác → chặn
+                var targetRole = model.VaiTros.FirstOrDefault(v => v.IdvaiTro == model.IdVaiTro);
+                if (targetRole != null && QuyenHelper.IsAdminVaiTro(targetRole.TenVaiTro))
+                {
+                    TempData["ErrorMessage"] = "Bạn không có quyền gán vai trò quản trị viên!";
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            else
+            {
+                // Admin không được hạ quyền chính mình (đã chặn ở trên vì không cho sửa chính mình)
+                // Admin không được hạ quyền tài khoản Admin khác xuống role thường
+                var targetRole = model.VaiTros.FirstOrDefault(v => v.IdvaiTro == model.IdVaiTro);
+                if (targetIsAdmin && targetRole != null && !QuyenHelper.IsAdminVaiTro(targetRole.TenVaiTro))
+                {
+                    TempData["ErrorMessage"] = "Không thể hạ quyền tài khoản quản trị viên xuống vai trò thường!";
+                    return RedirectToAction(nameof(Index));
+                }
+            }
 
             // Không cho phép chỉnh sửa tên đăng nhập (đã cố định)
             model.TenDangNhap = user.TenDangNhap;
@@ -249,16 +319,25 @@ namespace WebMTTQ.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            if (!PhanQuyenHelper.IsAdmin(HttpContext.Session))
+            if (!PhanQuyenHelper.CoQuyenXoa(HttpContext.Session, ModuleQuyen.QuanLyNguoiDung))
             {
-                TempData["ErrorMessage"] = "Bạn không có quyền truy cập vào chức năng này!";
-                return RedirectToAction("Index", "Home");
+                return StatusCode(StatusCodes.Status403Forbidden);
             }
 
-            var user = await _context.NguoiDungs.FindAsync(id);
+            var user = await _context.NguoiDungs
+                .Include(u => u.IdvaiTroNavigation)
+                .FirstOrDefaultAsync(u => u.IdnguoiDung == id);
+
             if (user == null)
             {
                 TempData["ErrorMessage"] = "Không tìm thấy người dùng này!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // TUYỆT ĐỐI KHÔNG cho phép xóa tài khoản có vai trò Admin
+            if (QuyenHelper.IsAdminVaiTro(user.IdvaiTroNavigation?.TenVaiTro))
+            {
+                TempData["ErrorMessage"] = "Không thể xóa tài khoản quản trị viên! Tài khoản Admin là bất khả xâm phạm.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -287,10 +366,9 @@ namespace WebMTTQ.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
-            if (!PhanQuyenHelper.IsAdmin(HttpContext.Session))
+            if (!PhanQuyenHelper.CoQuyenXem(HttpContext.Session, ModuleQuyen.QuanLyNguoiDung))
             {
-                TempData["ErrorMessage"] = "Bạn không có quyền truy cập vào chức năng này!";
-                return RedirectToAction("Index", "Home");
+                return StatusCode(StatusCodes.Status403Forbidden);
             }
 
             var user = await _context.NguoiDungs
@@ -299,10 +377,20 @@ namespace WebMTTQ.Controllers
 
             if (user == null) return NotFound();
 
+            // Chống tương tác với tài khoản Admin: Chỉ Admin mới được xem chi tiết tài khoản Admin
+            var currentUserIsAdmin = PhanQuyenHelper.IsAdmin(HttpContext.Session);
+            var targetIsAdmin = QuyenHelper.IsAdminVaiTro(user.IdvaiTroNavigation?.TenVaiTro);
+            if (targetIsAdmin && !currentUserIsAdmin)
+            {
+                TempData["ErrorMessage"] = "Bạn không có quyền xem chi tiết tài khoản quản trị viên!";
+                return RedirectToAction(nameof(Index));
+            }
+
             // Lấy quyền từ vai trò của user
             var quyens = await _quyenService.GetQuyenCuaNguoiDungAsync(id);
             ViewBag.Quyens = quyens;
             ViewBag.IsAdmin = QuyenHelper.IsAdminVaiTro(user.IdvaiTroNavigation?.TenVaiTro);
+            ViewBag.LaChinhMinh = user.IdnguoiDung == int.Parse(HttpContext.Session.GetString("AdminUserId") ?? "0");
 
             return View("~/Views/Admin/NguoiDung/Details.cshtml", user);
         }
@@ -315,10 +403,9 @@ namespace WebMTTQ.Controllers
         [HttpGet]
         public async Task<IActionResult> VaiTro()
         {
-            if (!PhanQuyenHelper.IsAdmin(HttpContext.Session))
+            if (!PhanQuyenHelper.CoQuyenXem(HttpContext.Session, ModuleQuyen.QuanLyNguoiDung))
             {
-                TempData["ErrorMessage"] = "Bạn không có quyền truy cập vào chức năng này!";
-                return RedirectToAction("Index", "Home");
+                return StatusCode(StatusCodes.Status403Forbidden);
             }
 
             var vaiTros = await _context.VaiTros
@@ -342,10 +429,9 @@ namespace WebMTTQ.Controllers
         [HttpGet]
         public IActionResult VaiTroCreate()
         {
-            if (!PhanQuyenHelper.IsAdmin(HttpContext.Session))
+            if (!PhanQuyenHelper.CoQuyenThem(HttpContext.Session, ModuleQuyen.QuanLyNguoiDung))
             {
-                TempData["ErrorMessage"] = "Bạn không có quyền truy cập vào chức năng này!";
-                return RedirectToAction("Index", "Home");
+                return StatusCode(StatusCodes.Status403Forbidden);
             }
 
             var model = new VaiTroViewModel
@@ -360,10 +446,9 @@ namespace WebMTTQ.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> VaiTroCreate(VaiTroViewModel model)
         {
-            if (!PhanQuyenHelper.IsAdmin(HttpContext.Session))
+            if (!PhanQuyenHelper.CoQuyenThem(HttpContext.Session, ModuleQuyen.QuanLyNguoiDung))
             {
-                TempData["ErrorMessage"] = "Bạn không có quyền truy cập vào chức năng này!";
-                return RedirectToAction("Index", "Home");
+                return StatusCode(StatusCodes.Status403Forbidden);
             }
 
             model.Modules = ParseModulesFromForm(Request);
@@ -405,10 +490,9 @@ namespace WebMTTQ.Controllers
         [HttpGet]
         public async Task<IActionResult> VaiTroEdit(int id)
         {
-            if (!PhanQuyenHelper.IsAdmin(HttpContext.Session))
+            if (!PhanQuyenHelper.CoQuyenSua(HttpContext.Session, ModuleQuyen.QuanLyNguoiDung))
             {
-                TempData["ErrorMessage"] = "Bạn không có quyền truy cập vào chức năng này!";
-                return RedirectToAction("Index", "Home");
+                return StatusCode(StatusCodes.Status403Forbidden);
             }
 
             var vaiTro = await _context.VaiTros.FindAsync(id);
@@ -431,10 +515,9 @@ namespace WebMTTQ.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> VaiTroEdit(int id, VaiTroViewModel model)
         {
-            if (!PhanQuyenHelper.IsAdmin(HttpContext.Session))
+            if (!PhanQuyenHelper.CoQuyenSua(HttpContext.Session, ModuleQuyen.QuanLyNguoiDung))
             {
-                TempData["ErrorMessage"] = "Bạn không có quyền truy cập vào chức năng này!";
-                return RedirectToAction("Index", "Home");
+                return StatusCode(StatusCodes.Status403Forbidden);
             }
 
             if (id != model.IdvaiTro) return NotFound();
@@ -443,6 +526,25 @@ namespace WebMTTQ.Controllers
 
             var vaiTro = await _context.VaiTros.FindAsync(id);
             if (vaiTro == null) return NotFound();
+
+            // Chống hack: Chỉ Admin mới được sửa role Admin
+            var currentUserIsAdmin = PhanQuyenHelper.IsAdmin(HttpContext.Session);
+            var targetIsAdminRole = QuyenHelper.IsAdminVaiTro(vaiTro.TenVaiTro) || QuyenHelper.IsAdminVaiTro(model.TenVaiTro);
+            if (targetIsAdminRole && !currentUserIsAdmin)
+            {
+                TempData["ErrorMessage"] = "Bạn không có quyền chỉnh sửa vai trò quản trị viên!";
+                return RedirectToAction(nameof(VaiTro));
+            }
+
+            // Chống bypass: Không cho phép đổi tên role Admin thành tên khác
+            // (để tránh mất quyền Admin và bypass kiểm tra IsAdminVaiTro)
+            var roleIsCurrentlyAdmin = QuyenHelper.IsAdminVaiTro(vaiTro.TenVaiTro);
+            var roleWillBeAdmin = QuyenHelper.IsAdminVaiTro(model.TenVaiTro);
+            if (roleIsCurrentlyAdmin && !roleWillBeAdmin)
+            {
+                TempData["ErrorMessage"] = "Không thể đổi tên vai trò Quản trị viên hệ thống! Tên vai trò Admin là bất khả xâm phạm.";
+                return RedirectToAction(nameof(VaiTro));
+            }
 
             if (ModelState.IsValid)
             {
@@ -472,10 +574,17 @@ namespace WebMTTQ.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> VaiTroDelete(int id)
         {
-            if (!PhanQuyenHelper.IsAdmin(HttpContext.Session))
+            if (!PhanQuyenHelper.CoQuyenXoa(HttpContext.Session, ModuleQuyen.QuanLyNguoiDung))
             {
-                TempData["ErrorMessage"] = "Bạn không có quyền truy cập vào chức năng này!";
-                return RedirectToAction("Index", "Home");
+                return StatusCode(StatusCodes.Status403Forbidden);
+            }
+
+            // Chống xóa role Admin hệ thống
+            var vaiTroToCheck = await _context.VaiTros.FindAsync(id);
+            if (vaiTroToCheck != null && QuyenHelper.IsAdminVaiTro(vaiTroToCheck.TenVaiTro))
+            {
+                TempData["ErrorMessage"] = "Không thể xóa vai trò Quản trị viên hệ thống!";
+                return RedirectToAction(nameof(VaiTro));
             }
 
             var vaiTro = await _context.VaiTros.FindAsync(id);

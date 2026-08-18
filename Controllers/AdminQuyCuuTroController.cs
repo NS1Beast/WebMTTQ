@@ -15,7 +15,8 @@ namespace WebMTTQ.Controllers
     // Chấp nhận cả 2 loại đường dẫn (có dấu gạch chéo và không có dấu gạch chéo)!
     [Route("AdminQuyCuuTro/[action]/{id?}")]
     [Route("Admin/QuyCuuTro/[action]/{id?}")]
-    public class AdminQuyCuuTroController : Controller
+    [KiemTraQuyen(ModuleQuyen.ThongTinUngHo)]
+    public class AdminQuyCuuTroController : BaseAdminController
     {
         private readonly DataMTTQContext _context;
         private readonly IWebHostEnvironment _env;

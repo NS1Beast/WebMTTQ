@@ -67,9 +67,11 @@ namespace WebMTTQ.Controllers
             ViewBag.Keyword = keyword;
             ViewBag.ChuyenMucId = chuyenMucId;
 
-            // ĐOẠN QUAN TRỌNG ĐỂ FIX LỖI:
-            // Lấy danh sách chuyên mục và gán đúng tên cột "IdchuyenMuc"
-            var listChuyenMuc = await _context.ChuyenMucs.Where(c => c.DaXoa != true || c.DaXoa == null).ToListAsync();
+            // Lấy danh sách chuyên mục VĂN BẢN TÀI LIỆU (không lấy chuyên mục tin tức)
+            var listChuyenMuc = await _context.ChuyenMucs
+                .Where(c => (c.DaXoa != true || c.DaXoa == null) && c.LoaiChuyenMuc == LoaiChuyenMucConstants.VanBanTaiLieu)
+                .OrderBy(c => c.ThuTu)
+                .ToListAsync();
             ViewBag.ChuyenMucs = new SelectList(listChuyenMuc, "IdchuyenMuc", "TenChuyenMuc", chuyenMucId);
 
             return View(data);

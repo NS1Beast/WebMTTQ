@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace WebMTTQ.Controllers
 {
-    [KiemTraQuyen(ModuleQuyen.TrangChu, "Xem")]
+    [KiemTraQuyen(ModuleQuyen.TrangChu)]
     public class AdminTrangChuController : BaseAdminController
     {
         private readonly DataMTTQContext _context;

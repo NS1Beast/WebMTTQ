@@ -1,0 +1,45 @@
+@model WebMTTQ.Models.ChuyenMuc
+
+@{
+    ViewData["Title"] = "Thêm chuyên mục văn bản";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="admin-card" style="background:#fff; padding:30px; border-radius:12px; max-width: 700px; margin: 0 auto; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+        <a href="@Url.Action("Categories", "AdminVanBanTaiLieu")" style="color: #666; text-decoration: none; font-size: 1.2rem;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 style="margin: 0; color: #333; font-size: 1.4rem;">Thêm chuyên mục văn bản mới</h2>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <div asp-validation-summary="All"></div>
+        </div>
+    }
+
+    <form asp-action="CategoryCreate" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label asp-for="TenChuyenMuc" style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">Tên chuyên mục <span style="color:red;">*</span></label>
+            <input asp-for="TenChuyenMuc" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" placeholder="VD: Văn bản chỉ đạo, Nghị quyết, Biểu mẫu..." required />
+            <span asp-validation-for="TenChuyenMuc" style="color: #dc3545; font-size: 0.85rem;"></span>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label asp-for="ThuTu" style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">Thứ tự hiển thị</label>
+            <input asp-for="ThuTu" class="form-control" type="number" min="0" value="0" style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" />
+            <small style="color: #888;">Số càng nhỏ hiển thị càng trước.</small>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid #eee; padding-top: 20px;">
+            <a href="@Url.Action("Categories", "AdminVanBanTaiLieu")" class="btn" style="padding: 10px 24px; border: 1px solid #ddd; border-radius: 6px; text-decoration: none; color: #666; font-weight: 500;">Hủy</a>
+            <button type="submit" class="btn" style="padding: 10px 24px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                <i class="fas fa-save"></i> Lưu chuyên mục
+            </button>
+        </div>
+    </form>
+</div>

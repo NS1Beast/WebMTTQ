@@ -2,6 +2,7 @@
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Chỉnh sửa vai trò";
+    var isAdminRole = WebMTTQ.Models.QuyenHelper.IsAdminVaiTro(Model.TenVaiTro);
 }
 
 <div class="admin-page-header" style="margin-bottom: 20px;">
@@ -21,8 +22,19 @@
     <div style="max-width: 800px; background:#fff; border:1px solid #eae5e1; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
         <div class="admin-form-group">
             <label class="admin-form-label">Tên vai trò <span style="color:#dc2626;">*</span></label>
-            <input asp-for="TenVaiTro" class="admin-form-control" />
-            <span asp-validation-for="TenVaiTro" style="color:#dc2626; font-size:0.75rem;"></span>
+            @if (isAdminRole)
+            {
+                <input asp-for="TenVaiTro" class="admin-form-control" disabled style="background:#f8f8f8; color:#999; cursor:not-allowed;" />
+                <input type="hidden" asp-for="TenVaiTro" />
+                <span style="font-size:0.72rem; color:#8b1a2b; display:block; margin-top:4px;">
+                    <i class="fas fa-lock"></i> Tên vai trò Quản trị viên hệ thống không thể thay đổi.
+                </span>
+            }
+            else
+            {
+                <input asp-for="TenVaiTro" class="admin-form-control" />
+                <span asp-validation-for="TenVaiTro" style="color:#dc2626; font-size:0.75rem;"></span>
+            }
         </div>
 
         <hr style="border:none; border-top:1px solid #eae5e1; margin:20px 0;" />

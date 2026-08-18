@@ -10,7 +10,8 @@ using Microsoft.AspNetCore.Hosting;
 using System.IO;
 namespace WebMTTQ.Controllers
 {
-    public class AdminQuyBienDaoController : Controller
+    [KiemTraQuyen(ModuleQuyen.ThongTinUngHo)]
+    public class AdminQuyBienDaoController : BaseAdminController
     {
         private readonly DataMTTQContext _context;
         private readonly IWebHostEnvironment _env;

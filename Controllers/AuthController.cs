@@ -71,7 +71,30 @@ namespace WebMTTQ.Controllers
 
                 // Lấy quyền truy cập và lưu vào session
                 var quyens = await _quyenService.GetQuyenCuaNguoiDungAsync(user.IdnguoiDung);
-                PhanQuyenHelper.SaveQuyenToSession(HttpContext.Session, quyens, isAdmin, tenVaiTro);
+                
+                // Tính version giống logic trong PhanQuyenHelper.RefreshSessionQuyenIfNeededAsync
+                // để đảm bảo nhất quán giữa login và refresh.
+                long roleVersion = 0;
+                if (user.IdvaiTroNavigation?.NgayCapNhat.HasValue == true)
+                {
+                    roleVersion = user.IdvaiTroNavigation.NgayCapNhat.Value.Ticks;
+                }
+                else if (user.IdvaiTroNavigation?.NgayTao.HasValue == true)
+                {
+                    roleVersion = user.IdvaiTroNavigation.NgayTao.Value.Ticks;
+                }
+                else
+                {
+                    // Legacy role: cả NgayCapNhat và NgayTao đều null
+                    // Dùng count VaiTroQuyen + roleId factor làm version
+                    var quyenCount = await _context.VaiTroQuyens.CountAsync(q => q.IdVaiTro == (user.IdvaiTro ?? 0));
+                    long roleIdFactor = (long)(user.IdvaiTro ?? 0) * 1000000;
+                    roleVersion = roleIdFactor + quyenCount + 1;
+                }
+
+                PhanQuyenHelper.SaveQuyenToSession(
+                    HttpContext.Session, quyens, isAdmin, tenVaiTro, 
+                    user.IdvaiTro ?? 0, roleVersion);
 
                 return RedirectToAction("Index", "Admin");
             }
@@ -110,6 +133,7 @@ namespace WebMTTQ.Controllers
 
             // Kiểm tra email có tồn tại trong hệ thống không
             var user = await _context.NguoiDungs
+                .Include(u => u.IdvaiTroNavigation)
                 .FirstOrDefaultAsync(u => u.Email == model.Email
                                        && (u.DaXoa == null || u.DaXoa == false));
 
@@ -118,6 +142,14 @@ namespace WebMTTQ.Controllers
                 // Không tiết lộ email có tồn tại hay không vì lý do bảo mật
                 TempData["InfoMessage"] = "Nếu email này tồn tại trong hệ thống, mã OTP sẽ được gửi đến email của bạn.";
                 // Vẫn redirect tới trang xác nhận OTP để tránh lộ thông tin
+                return RedirectToAction(nameof(XacNhanOtp), new { email = model.Email });
+            }
+
+            // TUYỆT ĐỐI KHÔNG cho phép đặt lại mật khẩu tài khoản Admin qua email
+            // (chỉ Admin mới có thể đổi mật khẩu cho chính mình qua trang cá nhân)
+            if (QuyenHelper.IsAdminVaiTro(user.IdvaiTroNavigation?.TenVaiTro))
+            {
+                TempData["InfoMessage"] = "Nếu email này tồn tại trong hệ thống, mã OTP sẽ được gửi đến email của bạn.";
                 return RedirectToAction(nameof(XacNhanOtp), new { email = model.Email });
             }
 
@@ -259,6 +291,7 @@ namespace WebMTTQ.Controllers
 
             // Tìm và cập nhật mật khẩu
             var user = await _context.NguoiDungs
+                .Include(u => u.IdvaiTroNavigation)
                 .FirstOrDefaultAsync(u => u.Email == model.Email
                                        && (u.DaXoa == null || u.DaXoa == false));
 
@@ -266,6 +299,13 @@ namespace WebMTTQ.Controllers
             {
                 TempData["ErrorMessage"] = "Không tìm thấy tài khoản với email này.";
                 return RedirectToAction(nameof(QuenMatKhau));
+            }
+
+            // TUYỆT ĐỐI KHÔNG cho phép đặt lại mật khẩu tài khoản Admin qua email
+            if (QuyenHelper.IsAdminVaiTro(user.IdvaiTroNavigation?.TenVaiTro))
+            {
+                TempData["ErrorMessage"] = "Tài khoản quản trị viên không thể đặt lại mật khẩu qua email. Vui lòng liên hệ quản trị viên hệ thống.";
+                return RedirectToAction(nameof(Login));
             }
 
             user.MatKhau = PasswordHelper.HashPassword(model.MatKhauMoi);
@@ -279,13 +319,5 @@ namespace WebMTTQ.Controllers
         // ================================================
         // HELPERS
         // ================================================
-
-        private bool IsAdminVaiTro(string? tenVaiTro)
-        {
-            return !string.IsNullOrEmpty(tenVaiTro) &&
-                   (tenVaiTro.Contains("Admin", StringComparison.OrdinalIgnoreCase) ||
-                    tenVaiTro.Contains("Quản trị", StringComparison.OrdinalIgnoreCase) ||
-                    tenVaiTro.Contains("Quan tri", StringComparison.OrdinalIgnoreCase));
-        }
     }
 }

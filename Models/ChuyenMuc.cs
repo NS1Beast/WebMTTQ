@@ -6,6 +6,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace WebMTTQ.Models;
 
+/// <summary>
+/// Hằng số loại chuyên mục - dùng để phân biệt chuyên mục của Tin tức và Văn bản tài liệu
+/// </summary>
+public static class LoaiChuyenMucConstants
+{
+    /// <summary>Chuyên mục dùng cho Tin tức (Bảng BaiViet)</summary>
+    public const string TinTuc = "TinTuc";
+
+    /// <summary>Chuyên mục dùng cho Văn bản tài liệu (Bảng VanBanTaiLieu)</summary>
+    public const string VanBanTaiLieu = "VanBanTaiLieu";
+}
+
 [Table("ChuyenMuc")]
 [Index("DuongDan", Name = "IDX_ChuyenMuc_DuongDan")]
 public partial class ChuyenMuc
@@ -24,6 +36,11 @@ public partial class ChuyenMuc
     [Column("IDChuyenMucCha")]
     public int? IdchuyenMucCha { get; set; }
 
+    /// <summary>
+    /// Loại chuyên mục: 
+    /// - "TinTuc" = Chuyên mục cho Tin tức (BaiViet)
+    /// - "VanBanTaiLieu" = Chuyên mục cho Văn bản tài liệu (VanBanTaiLieu)
+    /// </summary>
     [StringLength(50)]
     public string? LoaiChuyenMuc { get; set; }
 

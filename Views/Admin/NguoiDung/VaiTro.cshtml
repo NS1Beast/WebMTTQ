@@ -63,15 +63,24 @@
                         <td>@(vaiTro.NgayTao?.ToString("dd/MM/yyyy") ?? "-")</td>
                         <td>
                             <div style="display:flex; gap:6px; align-items:center;">
-                                <a href="/AdminNguoiDung/VaiTro/Edit/@vaiTro.IdvaiTro" class="admin-btn-icon" title="Chỉnh sửa" style="padding:6px 10px; border-radius:8px; font-size:0.8rem; background:rgba(245,158,11,0.1); color:#d97706;">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form asp-action="VaiTroDelete" asp-route-id="@vaiTro.IdvaiTro" method="post" style="margin:0;" onsubmit="return confirm('Bạn chắc chắn muốn xóa vai trò này?');">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="admin-btn-icon" title="Xóa" style="padding:6px 10px; border-radius:8px; font-size:0.8rem; background:rgba(239,68,68,0.1); color:#dc2626; border:none; cursor:pointer;">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
+                                @if (!isAdmin)
+                                {
+                                    <a href="/AdminNguoiDung/VaiTro/Edit/@vaiTro.IdvaiTro" class="admin-btn-icon" title="Chỉnh sửa" style="padding:6px 10px; border-radius:8px; font-size:0.8rem; background:rgba(245,158,11,0.1); color:#d97706;">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form asp-action="VaiTroDelete" asp-route-id="@vaiTro.IdvaiTro" method="post" style="margin:0;" onsubmit="return confirm('Bạn chắc chắn muốn xóa vai trò này?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="admin-btn-icon" title="Xóa" style="padding:6px 10px; border-radius:8px; font-size:0.8rem; background:rgba(239,68,68,0.1); color:#dc2626; border:none; cursor:pointer;">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span style="display:inline-block; padding:6px 10px; border-radius:8px; font-size:0.7rem; background:rgba(139,26,43,0.08); color:#8b1a2b; font-weight:600;">
+                                        <i class="fas fa-lock"></i> Bất khả xâm phạm
+                                    </span>
+                                }
                             </div>
                         </td>
                     </tr>

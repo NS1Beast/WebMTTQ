@@ -183,13 +183,10 @@ bool isNoiDungActive = currentController == "AdminNews" || currentController == 
                     bool isTuongTacActive = currentController == "AdminNguoiDanCanTroGiup" || currentController == "AdminGopY";
                 }
 
-                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.Dashboard))
-                {
-                    <a href="/admin" class="@(currentAction == "Index" && currentController == "Admin" ? "is-active" : "")">
-                        <i class="fas fa-chart-pie"></i>
-                        <span>Dashboard</span>
-                    </a>
-                }
+                <a href="/admin" class="@(currentAction == "Index" && currentController == "Admin" ? "is-active" : "")">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
 
                 <div class="nav-sep"></div>
 
@@ -207,15 +204,18 @@ bool isNoiDungActive = currentController == "AdminNews" || currentController == 
                                 <span>Quản lý Tin tức</span>
                             </a>
                         }
-                        <a href="/AdminVanBanTaiLieu/Index" class="@(currentController == "AdminVanBanTaiLieu" ? "is-active" : "")">
-                            <i class="fas fa-file-signature"></i>
-                            <span>Văn bản & Tài liệu</span>
-                        </a>
                         @if (coQuyen(WebMTTQ.Models.ModuleQuyen.TrangChu))
                         {
                             <a href="/AdminTrangChu/Index" class="@(currentController == "AdminTrangChu" || currentController == "AdminBanner" || currentController == "AdminTimeline" ? "is-active" : "")">
                                 <i class="fas fa-home"></i>
                                 <span>Cài đặt Trang chủ</span>
+                            </a>
+                        }
+                        @if (coQuyen(WebMTTQ.Models.ModuleQuyen.VanBanTaiLieu))
+                        {
+                            <a href="/AdminVanBanTaiLieu/Index" class="@(currentController == "AdminVanBanTaiLieu" ? "is-active" : "")">
+                                <i class="fas fa-file-signature"></i>
+                                <span>Văn bản & Tài liệu</span>
                             </a>
                         }
                     </div>
@@ -268,8 +268,8 @@ bool isNoiDungActive = currentController == "AdminNews" || currentController == 
                     </div>
                 </div>
 
-                <!-- GROUP 3: QUỸ VÌ BIỂN ĐẢO (CHỈ DÀNH CHO ADMIN) -->
-                @if (isAdmin)
+                <!-- GROUP 3: QUỸ VÌ BIỂN ĐẢO -->
+                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.ThongTinUngHo))
                 {
                     <div class="nav-group @(isBienDaoActive ? "is-open" : "")">
                         <div class="nav-group-toggle">
@@ -360,7 +360,7 @@ bool isNoiDungActive = currentController == "AdminNews" || currentController == 
                     </a>
                 }
 
-                @if (isAdmin)
+                @if (coQuyen(WebMTTQ.Models.ModuleQuyen.QuanLyNguoiDung))
                 {
                     <a href="/AdminNguoiDung/Index" class="@(currentController == "AdminNguoiDung" ? "is-active" : "")">
                         <i class="fas fa-users"></i>

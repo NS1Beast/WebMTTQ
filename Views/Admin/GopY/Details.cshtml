@@ -34,6 +34,13 @@
                 <div class="admin-detail-label">Ngày gửi</div>
                 <div class="admin-detail-value">@(Model.NgayGui?.ToString("dd/MM/yyyy HH:mm"))</div>
             </div>
+            @if (Model.IdnguoiXuLyNavigation != null)
+            {
+                <div class="admin-detail-item">
+                    <div class="admin-detail-label">Người xử lý</div>
+                    <div class="admin-detail-value"><strong>@Model.IdnguoiXuLyNavigation.HoTen</strong></div>
+                </div>
+            }
             <div class="admin-detail-item">
                 <div class="admin-detail-label">Số điện thoại</div>
                 <div class="admin-detail-value"><strong>@Model.SoDienThoai</strong></div>
@@ -88,6 +95,7 @@
                         <option value="Chưa xử lý" selected="@(Model.TrangThai == "Chưa xử lý" ? "selected" : null)">Chưa xử lý</option>
                         <option value="Đang xử lý" selected="@(Model.TrangThai == "Đang xử lý" ? "selected" : null)">Đang xử lý</option>
                         <option value="Đã xử lý" selected="@(Model.TrangThai == "Đã xử lý" ? "selected" : null)">Đã xử lý</option>
+                        <option value="Từ chối" selected="@(Model.TrangThai == "Từ chối" ? "selected" : null)">Từ chối</option>
                     </select>
                 </div>
 

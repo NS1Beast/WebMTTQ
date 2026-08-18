@@ -27,9 +27,9 @@
         && ViewContext.RouteData.Values["controller"]?.ToString() == "About";
     var isNews = ViewContext.RouteData.Values["controller"]?.ToString() == "News";
 
-    // Lấy danh sách chuyên mục tin tức hiển thị (tối đa 10)
+    // Lấy danh sách chuyên mục TIN TỨC hiển thị (tối đa 10) - không lấy chuyên mục văn bản
     var newsCategories = _context.ChuyenMucs
-        .Where(c => c.DaXoa == false && c.HienThi == true)
+        .Where(c => c.DaXoa == false && c.HienThi == true && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc)
         .OrderBy(c => c.ThuTu)
         .ThenBy(c => c.TenChuyenMuc)
         .Take(10)

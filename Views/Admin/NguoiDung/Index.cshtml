@@ -107,15 +107,30 @@
                                 <a href="/AdminNguoiDung/Details/@user.IdnguoiDung" class="admin-btn-icon" title="Xem chi tiet" style="padding:6px 10px; border-radius:8px; font-size:0.8rem; background:rgba(59,130,246,0.1); color:#2563eb;">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="/AdminNguoiDung/Edit/@user.IdnguoiDung" class="admin-btn-icon" title="Chinh sua" style="padding:6px 10px; border-radius:8px; font-size:0.8rem; background:rgba(245,158,11,0.1); color:#d97706;">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <form asp-action="Delete" asp-route-id="@user.IdnguoiDung" method="post" style="margin:0;" onsubmit="return confirm('Ban chac chan muon xoa nguoi dung nay?');">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="admin-btn-icon" title="Xoa" style="padding:6px 10px; border-radius:8px; font-size:0.8rem; background:rgba(239,68,68,0.1); color:#dc2626; border:none; cursor:pointer;">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </form>
+                                @if (!user.LaAdmin && !user.LaChinhMinh)
+                                {
+                                    <a href="/AdminNguoiDung/Edit/@user.IdnguoiDung" class="admin-btn-icon" title="Chinh sua" style="padding:6px 10px; border-radius:8px; font-size:0.8rem; background:rgba(245,158,11,0.1); color:#d97706;">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form asp-action="Delete" asp-route-id="@user.IdnguoiDung" method="post" style="margin:0;" onsubmit="return confirm('Ban chac chan muon xoa nguoi dung nay?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="admin-btn-icon" title="Xoa" style="padding:6px 10px; border-radius:8px; font-size:0.8rem; background:rgba(239,68,68,0.1); color:#dc2626; border:none; cursor:pointer;">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                }
+                                else if (user.LaAdmin)
+                                {
+                                    <span style="display:inline-block; padding:6px 10px; border-radius:8px; font-size:0.7rem; background:rgba(139,26,43,0.08); color:#8b1a2b; font-weight:600;">
+                                        <i class="fas fa-lock"></i> Bat kha xam pham
+                                    </span>
+                                }
+                                else if (user.LaChinhMinh)
+                                {
+                                    <span style="display:inline-block; padding:6px 10px; border-radius:8px; font-size:0.7rem; background:rgba(16,185,129,0.08); color:#059669; font-weight:600;">
+                                        <i class="fas fa-user-check"></i> Chinh minh
+                                    </span>
+                                }
                             </div>
                         </td>
                     </tr>

@@ -238,6 +238,26 @@ namespace WebMTTQ.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> GuiYeuCauTroGiup(NguoiDanCanTroGiup model)
         {
+            // === Chống spam: kiểm tra thời gian giữa các lần gửi (tối thiểu 30 giây) ===
+            var lastSubmitKey = $"TroGiup_LastSubmit_{HttpContext.Connection.RemoteIpAddress}";
+            var lastSubmit = HttpContext.Session.GetString(lastSubmitKey);
+            if (!string.IsNullOrEmpty(lastSubmit) && long.TryParse(lastSubmit, out var lastTicks))
+            {
+                var lastTime = new DateTime(lastTicks);
+                if ((DateTime.Now - lastTime).TotalSeconds < 30)
+                {
+                    TempData["ErrorMessage"] = "Bạn vừa gửi yêu cầu trợ giúp. Vui lòng chờ 30 giây trước khi gửi lại.";
+                    return RedirectToAction("Index", null, "nhu-cau-tro-giup");
+                }
+            }
+
+            // === Sanitize dữ liệu đầu vào ===
+            if (model.HoTen != null) model.HoTen = model.HoTen.Trim();
+            if (model.SoDienThoai != null) model.SoDienThoai = model.SoDienThoai.Trim();
+            if (model.DiaChi != null) model.DiaChi = model.DiaChi.Trim();
+            if (model.NoiDung != null) model.NoiDung = model.NoiDung.Trim();
+            if (model.MucDoUuTien != null) model.MucDoUuTien = model.MucDoUuTien.Trim();
+
             if (ModelState.IsValid)
             {
                 model.NgayGui = DateTime.Now;
@@ -247,12 +267,15 @@ namespace WebMTTQ.Controllers
                 _context.NguoiDanCanTroGiups.Add(model);
                 await _context.SaveChangesAsync();
 
+                // Lưu thời gian gửi cuối cùng để chống spam
+                HttpContext.Session.SetString(lastSubmitKey, DateTime.Now.Ticks.ToString());
+
                 // Trả về thông báo thành công
                 TempData["SuccessMessage"] = "Gửi thông tin thành công! UBMTTQ sẽ liên hệ với bạn trong thời gian sớm nhất.";
                 return RedirectToAction("Index", null, "nhu-cau-tro-giup"); // Trở lại trang chủ và cuộn đúng vị trí form
             }
 
-            TempData["ErrorMessage"] = "Vui lòng điền đầy đủ thông tin bắt buộc.";
+            TempData["ErrorMessage"] = "Vui lòng điền đầy đủ thông tin bắt buộc và đúng định dạng.";
             return RedirectToAction("Index", null, "nhu-cau-tro-giup");
         }
     }

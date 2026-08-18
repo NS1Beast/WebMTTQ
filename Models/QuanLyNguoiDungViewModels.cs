@@ -19,6 +19,7 @@ namespace WebMTTQ.Models
         public const string TinTuc = "tintuc";
         public const string CauHinh = "cauhinh";
         public const string QuanLyNguoiDung = "quanlynguoidung";
+        public const string VanBanTaiLieu = "vanbantailieu";
 
         public static List<ModuleInfo> GetAllModules()
         {
@@ -34,6 +35,7 @@ namespace WebMTTQ.Models
                 new ModuleInfo { MaModule = NguoiDanCanTroGiup, TenModule = "Yêu cầu trợ giúp", Icon = "fa-life-ring", MoTa = "Quản lý yêu cầu trợ giúp" },
                 new ModuleInfo { MaModule = GopY, TenModule = "Hộp thư góp ý", Icon = "fa-envelope-open-text", MoTa = "Quản lý hộp thư góp ý" },
                 new ModuleInfo { MaModule = TinTuc, TenModule = "Quản lý Tin tức", Icon = "fa-newspaper", MoTa = "Quản lý bài viết và chuyên mục tin tức" },
+                new ModuleInfo { MaModule = VanBanTaiLieu, TenModule = "Văn bản & Tài liệu", Icon = "fa-file-signature", MoTa = "Quản lý văn bản và tài liệu" },
                 new ModuleInfo { MaModule = CauHinh, TenModule = "Cài đặt hệ thống", Icon = "fa-cog", MoTa = "Cấu hình hệ thống" },
                 new ModuleInfo { MaModule = QuanLyNguoiDung, TenModule = "Quản lý người dùng", Icon = "fa-users", MoTa = "Quản lý tài khoản và phân quyền" }
             };
@@ -71,6 +73,7 @@ namespace WebMTTQ.Models
         public DateTime? NgayTao { get; set; }
         public int SoModuleDuocQuyen { get; set; }
         public bool LaAdmin { get; set; }
+        public bool LaChinhMinh { get; set; }
     }
 
     // ================================================

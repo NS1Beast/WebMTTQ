@@ -21,9 +21,9 @@ namespace WebMTTQ.Controllers
         {
             const int pageSize = 10;
 
-            // Lấy danh sách chuyên mục chưa xóa và đang hiển thị - tối đa 10 cho dropdown
+            // Lấy danh sách chuyên mục TIN TỨC chưa xóa và đang hiển thị - tối đa 10 cho dropdown
             var categories = await _context.ChuyenMucs
-                .Where(c => c.DaXoa == false && c.HienThi == true)
+                .Where(c => c.DaXoa == false && c.HienThi == true && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc)
                 .OrderBy(c => c.ThuTu)
                 .ThenBy(c => c.TenChuyenMuc)
                 .Take(10)
@@ -40,7 +40,7 @@ namespace WebMTTQ.Controllers
             {
                 var cat = categories.FirstOrDefault(c => c.DuongDan == category)
                     ?? await _context.ChuyenMucs
-                        .FirstOrDefaultAsync(c => c.DuongDan == category && c.DaXoa == false);
+                        .FirstOrDefaultAsync(c => c.DuongDan == category && c.DaXoa == false && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc);
                 if (cat != null)
                 {
                     categoryId = cat.IdchuyenMuc;
@@ -122,9 +122,9 @@ namespace WebMTTQ.Controllers
             article.LuotXem = (article.LuotXem ?? 0) + 1;
             await _context.SaveChangesAsync();
 
-            // Lấy danh sách chuyên mục cho dropdown
+            // Lấy danh sách chuyên mục TIN TỨC cho dropdown
             var categories = await _context.ChuyenMucs
-                .Where(c => c.DaXoa == false && c.HienThi == true)
+                .Where(c => c.DaXoa == false && c.HienThi == true && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc)
                 .OrderBy(c => c.ThuTu)
                 .Take(10)
                 .ToListAsync();

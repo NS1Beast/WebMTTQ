@@ -7,7 +7,7 @@ using System;
 
 namespace WebMTTQ.Controllers
 {
-    [KiemTraQuyen(ModuleQuyen.TrangChu, "Xem")]
+    [KiemTraQuyen(ModuleQuyen.TrangChu)]
     public class AdminTimelineController : BaseAdminController
     {
         private readonly DataMTTQContext _context;

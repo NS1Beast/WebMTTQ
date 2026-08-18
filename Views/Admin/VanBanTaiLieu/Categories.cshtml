@@ -1,0 +1,117 @@
+@model IEnumerable<WebMTTQ.Models.ChuyenMuc>
+
+@{
+    ViewData["Title"] = "Quản lý Chuyên mục Văn bản";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var docCounts = ViewBag.DocCounts as Dictionary<int, int> ?? new();
+}
+
+<div class="admin-card" style="background:#fff; padding:25px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <h2 style="margin: 0; color: #333; font-size: 1.5rem;">
+            <i class="fas fa-folder"></i> Quản lý Chuyên mục Văn bản
+        </h2>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="@Url.Action("Index", "AdminVanBanTaiLieu")" style="color: #6c757d; text-decoration: none; padding: 8px 16px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem;">
+                <i class="fas fa-arrow-left"></i> Quay lại văn bản
+            </a>
+            <a href="@Url.Action("CategoryCreate", "AdminVanBanTaiLieu")" class="btn" style="background: #28a745; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold;">
+                <i class="fas fa-plus"></i> Thêm chuyên mục
+            </a>
+        </div>
+    </div>
+
+    <div style="background: #e8f4fd; color: #0c5460; padding: 12px 15px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem;">
+        <i class="fas fa-info-circle"></i> Chuyên mục văn bản tài liệu được tách riêng khỏi chuyên mục tin tức. Sử dụng nút "Ẩn/Hiện" để kiểm soát hiển thị trên trang công khai.
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="table-responsive" style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; min-width: 700px;">
+            <thead>
+                <tr style="background: #f8f9fa; text-align: left; border-bottom: 2px solid #ddd;">
+                    <th style="padding: 15px;">Tên chuyên mục</th>
+                    <th style="padding: 15px;">Đường dẫn</th>
+                    <th style="padding: 15px; width: 80px;">Thứ tự</th>
+                    <th style="padding: 15px; width: 100px;">Số văn bản</th>
+                    <th style="padding: 15px; width: 100px;">Hiển thị</th>
+                    <th style="padding: 15px; text-align: center; min-width: 180px;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        var docCount = docCounts.GetValueOrDefault(item.IdchuyenMuc, 0);
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 15px; font-weight: bold;">@item.TenChuyenMuc</td>
+                            <td style="padding: 15px; color: #666; font-size: 0.85rem;">@item.DuongDan</td>
+                            <td style="padding: 15px; text-align: center;">@(item.ThuTu ?? 0)</td>
+                            <td style="padding: 15px; text-align: center;">
+                                <span style="background: #e9ecef; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem;">@docCount</span>
+                                @if (docCount > 0)
+                                {
+                                    <div style="font-size: 0.7rem; color: #dc3545; margin-top: 4px;">@docCount văn bản</div>
+                                }
+                            </td>
+                            <td style="padding: 15px;">
+                                @if (item.HienThi == true)
+                                {
+                                    <span style="background: #d4edda; color: #155724; padding: 5px 10px; border-radius: 20px; font-size: 0.85rem;">Hiển thị</span>
+                                }
+                                else
+                                {
+                                    <span style="background: #f8d7da; color: #721c24; padding: 5px 10px; border-radius: 20px; font-size: 0.85rem;">Đang ẩn</span>
+                                }
+                            </td>
+                            <td style="padding: 15px; text-align: center;">
+                                <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                                    <a href="@Url.Action("CategoryEdit", "AdminVanBanTaiLieu", new { id = item.IdchuyenMuc })" style="color: #17a2b8; text-decoration: none; padding: 5px 12px; border: 1px solid #17a2b8; border-radius: 4px; font-size: 0.85rem;">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </a>
+                                    <form asp-action="CategoryToggleStatus" asp-route-id="@item.IdchuyenMuc" method="post" style="display:inline;">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" style="color: @(item.HienThi == true ? "#ffc107" : "#28a745"); background: none; border: 1px solid @(item.HienThi == true ? "#ffc107" : "#28a745"); cursor: pointer; font-size: 0.85rem; padding: 5px 12px; border-radius: 4px;">
+                                            <i class="fas @(item.HienThi == true ? "fa-eye-slash" : "fa-eye")"></i> @(item.HienThi == true ? "Ẩn" : "Hiện")
+                                        </button>
+                                    </form>
+                                    <form asp-action="CategoryDelete" asp-route-id="@item.IdchuyenMuc" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa chuyên mục này?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" style="color: #dc3545; background: none; border: 1px solid #dc3545; cursor: pointer; font-size: 0.85rem; padding: 5px 12px; border-radius: 4px;">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: #888;">
+                            <div style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <p style="font-size: 1.1rem; margin-bottom: 5px;">Chưa có chuyên mục văn bản nào.</p>
+                            <p style="font-size: 0.9rem;">Nhấn nút "Thêm chuyên mục" để bắt đầu.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
