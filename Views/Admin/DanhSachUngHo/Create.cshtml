@@ -16,7 +16,7 @@
 
 <div class="admin-card" style="max-width: 600px;">
     <div class="admin-card-body">
-        <form asp-action="Create" method="post">
+        <form asp-action="Create" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn lưu lượt ủng hộ mới này?');">
             <div class="admin-form-group">
                 <label class="admin-form-label">Đơn vị / Cá nhân <span class="required">*</span></label>
                 <input asp-for="TenNguoiUngHo" class="admin-form-control" placeholder="Nhập tên người/đơn vị ủng hộ" required />

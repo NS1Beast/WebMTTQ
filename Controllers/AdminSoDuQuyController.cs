@@ -21,9 +21,10 @@ namespace WebMTTQ.Controllers
         [Route("")]
         public async Task<IActionResult> Index()
         {
-            // Sắp xếp ngày mới nhất lên đầu
-            // Thêm AsNoTracking
-            var list = await _context.SoDuQuyViNguoiNgheos.AsNoTracking().OrderByDescending(x => x.NgayCapNhat).ToListAsync();
+            var list = await _context.SoDuQues.AsNoTracking()
+                .Where(x => x.LoaiQuy == "NguoiNgheo")
+                .OrderByDescending(x => x.NgayCapNhat)
+                .ToListAsync();
             return View("~/Views/Admin/SoDuQuy/Index.cshtml", list);
         }
 
@@ -34,15 +35,15 @@ namespace WebMTTQ.Controllers
         [HttpPost("Create")]
         [ValidateAntiForgeryToken]
         [KiemTraQuyen(ModuleQuyen.SoDuQuy, "Them")]
-        public async Task<IActionResult> Create(SoDuQuyViNguoiNgheo model)
+        public async Task<IActionResult> Create(SoDuQuy model)
         {
             if (ModelState.IsValid)
             {
-                // Tự động gán ngày hiện tại
                 model.NgayCapNhat = DateTime.Now;
-                _context.SoDuQuyViNguoiNgheos.Add(model);
+                model.LoaiQuy = "NguoiNgheo";
+                model.TongTonQuy = (model.TienMat ?? 0) + (model.TienGuiNganHang ?? 0);
+                _context.SoDuQues.Add(model);
                 await _context.SaveChangesAsync();
-                // THÊM DÒNG NÀY
                 TempData["SuccessMessage"] = "Thêm số dư quỹ thành công!";
                 return RedirectToAction(nameof(Index));
             }
@@ -53,7 +54,7 @@ namespace WebMTTQ.Controllers
         [KiemTraQuyen(ModuleQuyen.SoDuQuy, "Sua")]
         public async Task<IActionResult> Edit(int id)
         {
-            var item = await _context.SoDuQuyViNguoiNgheos.FindAsync(id);
+            var item = await _context.SoDuQues.FindAsync(id);
             if (item == null) return NotFound();
             return View("~/Views/Admin/SoDuQuy/Edit.cshtml", item);
         }
@@ -61,16 +62,20 @@ namespace WebMTTQ.Controllers
         [HttpPost("Edit/{id}")]
         [ValidateAntiForgeryToken]
         [KiemTraQuyen(ModuleQuyen.SoDuQuy, "Sua")]
-        public async Task<IActionResult> Edit(int id, SoDuQuyViNguoiNgheo model)
+        public async Task<IActionResult> Edit(int id, SoDuQuy model)
         {
             if (id != model.Id) return NotFound();
             if (ModelState.IsValid)
             {
-                // Tự động cập nhật ngày hiện tại khi sửa
-                model.NgayCapNhat = DateTime.Now;
-                _context.Update(model);
+                var existingItem = await _context.SoDuQues.FindAsync(id);
+                if (existingItem == null) return NotFound();
+
+                existingItem.NgayCapNhat = DateTime.Now;
+                existingItem.TienMat = model.TienMat;
+                existingItem.TienGuiNganHang = model.TienGuiNganHang;
+                existingItem.TongTonQuy = (model.TienMat ?? 0) + (model.TienGuiNganHang ?? 0);
+
                 await _context.SaveChangesAsync();
-                // THÊM DÒNG NÀY
                 TempData["SuccessMessage"] = "Cập nhật số dư quỹ thành công!";
                 return RedirectToAction(nameof(Index));
             }
@@ -81,12 +86,11 @@ namespace WebMTTQ.Controllers
         [KiemTraQuyen(ModuleQuyen.SoDuQuy, "Xoa")]
         public async Task<IActionResult> Delete(int id)
         {
-            var item = await _context.SoDuQuyViNguoiNgheos.FindAsync(id);
-            if (item != null)
+            var item = await _context.SoDuQues.FindAsync(id);
+            if (item != null && item.LoaiQuy == "NguoiNgheo")
             {
-                _context.SoDuQuyViNguoiNgheos.Remove(item);
+                _context.SoDuQues.Remove(item);
                 await _context.SaveChangesAsync();
-                // THÊM DÒNG NÀY TRONG KHỐI IF
                 TempData["SuccessMessage"] = "Đã xóa số dư quỹ thành công!";
             }
             return RedirectToAction(nameof(Index));

@@ -28,8 +28,6 @@ public partial class DanhMucQuy
     [StringLength(50)]
     public string? TrangThai { get; set; }
 
-    public bool? DaXoa { get; set; }
-
     [InverseProperty("IdquyNavigation")]
     public virtual ICollection<KhoanDongGop> KhoanDongGops { get; set; } = new List<KhoanDongGop>();
 

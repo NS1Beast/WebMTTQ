@@ -29,6 +29,4 @@ public partial class ThanhPhanGiaoDien
     public string? ViTri { get; set; }
 
     public int? ThuTu { get; set; }
-
-    public bool? DaXoa { get; set; }
 }

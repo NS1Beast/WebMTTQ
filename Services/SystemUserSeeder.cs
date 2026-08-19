@@ -32,7 +32,6 @@ namespace WebMTTQ.Services
                 {
                     TenVaiTro = "Quản trị viên",
                     QuyenHan = QuyenBitmask.ToanQuyen, // 15 = toàn quyền
-                    DaXoa = false,
                     NgayTao = DateTime.Now,
                     NgayCapNhat = DateTime.Now
                 };
@@ -50,7 +49,6 @@ namespace WebMTTQ.Services
                 SoDienThoai = null,
                 IdvaiTro = adminRole.IdvaiTro,
                 TrangThai = "HoatDong",
-                DaXoa = false,
                 NgayTao = DateTime.Now,
                 NgayCapNhat = DateTime.Now
             };

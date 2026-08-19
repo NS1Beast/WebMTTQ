@@ -14,7 +14,7 @@
     </a>
 </div>
 
-<form asp-action="VaiTroCreate" method="post">
+<form asp-action="VaiTroCreate" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn tạo vai trò mới này?');">
     @Html.AntiForgeryToken()
 
     <div style="max-width: 800px; background:#fff; border:1px solid #eae5e1; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">

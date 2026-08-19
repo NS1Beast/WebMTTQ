@@ -22,7 +22,6 @@ namespace WebMTTQ.Controllers
         public async Task<IActionResult> Index()
         {
             var data = await _context.NguoiDanCanTroGiups
-                                     .Where(x => x.DaXoa != true)
                                      .OrderByDescending(x => x.NgayGui)
                                      .AsNoTracking()
                                      .ToListAsync();
@@ -33,7 +32,7 @@ namespace WebMTTQ.Controllers
         [KiemTraQuyen(ModuleQuyen.NguoiDanCanTroGiup, "Xem")]
         public async Task<IActionResult> Edit(int id)
         {
-            var item = await _context.NguoiDanCanTroGiups.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id && (x.DaXoa != true));
+            var item = await _context.NguoiDanCanTroGiups.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
             if (item == null) return NotFound();
 
             return View("~/Views/Admin/NguoiDanCanTroGiup/Edit.cshtml", item);
@@ -65,7 +64,7 @@ namespace WebMTTQ.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // 3. XÓA MỀM
+        // 3. XÓA CỨNG
         [HttpPost]
         [ValidateAntiForgeryToken]
         [KiemTraQuyen(ModuleQuyen.NguoiDanCanTroGiup, "Xoa")]
@@ -74,7 +73,7 @@ namespace WebMTTQ.Controllers
             var item = await _context.NguoiDanCanTroGiups.FindAsync(id);
             if (item != null)
             {
-                item.DaXoa = true;
+                _context.NguoiDanCanTroGiups.Remove(item);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Đã xóa yêu cầu trợ giúp thành công!";
             }

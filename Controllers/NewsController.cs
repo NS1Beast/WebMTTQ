@@ -23,7 +23,7 @@ namespace WebMTTQ.Controllers
 
             // Lấy danh sách chuyên mục TIN TỨC chưa xóa và đang hiển thị - tối đa 10 cho dropdown
             var categories = await _context.ChuyenMucs
-                .Where(c => c.DaXoa == false && c.HienThi == true && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc)
+                .Where(c => c.HienThi == true && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc)
                 .OrderBy(c => c.ThuTu)
                 .ThenBy(c => c.TenChuyenMuc)
                 .Take(10)
@@ -31,7 +31,7 @@ namespace WebMTTQ.Controllers
 
             // Bài viết trong chuyên mục
             IQueryable<BaiViet> query = _context.BaiViets
-                .Where(b => b.DaXoa == false && b.TrangThai == "DaDang");
+                .Where(b => b.TrangThai == "DaDang");
 
             int? categoryId = null;
             string currentCategoryName = "Tin tức";
@@ -40,7 +40,7 @@ namespace WebMTTQ.Controllers
             {
                 var cat = categories.FirstOrDefault(c => c.DuongDan == category)
                     ?? await _context.ChuyenMucs
-                        .FirstOrDefaultAsync(c => c.DuongDan == category && c.DaXoa == false && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc);
+                        .FirstOrDefaultAsync(c => c.DuongDan == category && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc);
                 if (cat != null)
                 {
                     categoryId = cat.IdchuyenMuc;
@@ -62,7 +62,6 @@ namespace WebMTTQ.Controllers
 
             // Lấy văn bản mới cho sidebar
             var recentDocs = await _context.VanBanTaiLieus
-                .Where(v => v.DaXoa == false)
                 .OrderByDescending(v => v.NgayBanHanh)
                 .Take(5)
                 .Select(v => new SidebarDocItem
@@ -114,7 +113,7 @@ namespace WebMTTQ.Controllers
             var article = await _context.BaiViets
                 .Include(b => b.IdchuyenMucNavigation)
                 .Include(b => b.IdnguoiDungNavigation)
-                .FirstOrDefaultAsync(b => b.IdbaiViet == id && b.DaXoa == false && b.TrangThai == "DaDang");
+                .FirstOrDefaultAsync(b => b.IdbaiViet == id && b.TrangThai == "DaDang");
 
             if (article == null) return NotFound();
 
@@ -124,14 +123,14 @@ namespace WebMTTQ.Controllers
 
             // Lấy danh sách chuyên mục TIN TỨC cho dropdown
             var categories = await _context.ChuyenMucs
-                .Where(c => c.DaXoa == false && c.HienThi == true && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc)
+                .Where(c => c.HienThi == true && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc)
                 .OrderBy(c => c.ThuTu)
                 .Take(10)
                 .ToListAsync();
 
             // Lấy bài viết liên quan (cùng chuyên mục)
             var relatedArticles = await _context.BaiViets
-                .Where(b => b.DaXoa == false && b.TrangThai == "DaDang"
+                .Where(b => b.TrangThai == "DaDang"
                     && b.IdchuyenMuc == article.IdchuyenMuc
                     && b.IdbaiViet != article.IdbaiViet)
                 .OrderByDescending(b => b.NgayXuatBan)

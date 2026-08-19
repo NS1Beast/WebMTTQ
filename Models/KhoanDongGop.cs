@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 namespace WebMTTQ.Models;
 
 [Table("KhoanDongGop")]
-[Index("DaXoa", Name = "IDX_KhoanDongGop_DaXoa")]
 public partial class KhoanDongGop
 {
     [Key]
@@ -37,8 +36,6 @@ public partial class KhoanDongGop
 
     [StringLength(50)]
     public string? TrangThai { get; set; }
-
-    public bool? DaXoa { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime? NgayUngHo { get; set; }

@@ -24,8 +24,6 @@ public partial class ChuongTrinhHoTro
     [StringLength(50)]
     public string? TrangThai { get; set; }
 
-    public bool? DaXoa { get; set; }
-
     [InverseProperty("IdchuongTrinhNavigation")]
     public virtual ICollection<LuotTraoTang> LuotTraoTangs { get; set; } = new List<LuotTraoTang>();
 }

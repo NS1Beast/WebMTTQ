@@ -19,7 +19,7 @@
 
 <div class="admin-card">
     <div class="admin-card-body">
-        <form asp-action="Create" enctype="multipart/form-data" method="post">
+        <form asp-action="Create" enctype="multipart/form-data" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn thêm điểm an sinh mới này?');">
             <div style="display:flex;gap:24px;flex-wrap:wrap;">
                 <!-- Cột 1: Thông tin -->
                 <div style="flex:1;min-width:320px;">

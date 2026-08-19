@@ -20,7 +20,7 @@
         </div>
     }
 
-    <form asp-action="CategoryCreate" method="post">
+    <form asp-action="CategoryCreate" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn thêm chuyên mục văn bản mới này?');">
         @Html.AntiForgeryToken()
 
         <div class="form-group" style="margin-bottom: 20px;">

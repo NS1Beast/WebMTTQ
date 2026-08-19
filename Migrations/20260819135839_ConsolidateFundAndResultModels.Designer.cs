@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebMTTQ.Models;
 
@@ -11,9 +12,11 @@ using WebMTTQ.Models;
 namespace WebMTTQ.Migrations
 {
     [DbContext(typeof(DataMTTQContext))]
-    partial class DataMTTQContextModelSnapshot : ModelSnapshot
+    [Migration("20260819135839_ConsolidateFundAndResultModels")]
+    partial class ConsolidateFundAndResultModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

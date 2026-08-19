@@ -85,7 +85,7 @@
         <div style="margin-top:24px;padding:24px;background:#fcfaf9;border-radius:var(--admin-radius-sm);border:1px solid var(--admin-line);">
             <h5 style="margin:0 0 20px;font-weight:600;color:var(--admin-ink);">Cập nhật xử lý</h5>
 
-            <form asp-action="XuLy" asp-controller="AdminGopY" method="post">
+            <form asp-action="XuLy" asp-controller="AdminGopY" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn cập nhật trạng thái xử lý cho góp ý này?');">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="id" value="@Model.IdgopY" />
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebMTTQ.Models;
 
@@ -11,9 +12,11 @@ using WebMTTQ.Models;
 namespace WebMTTQ.Migrations
 {
     [DbContext(typeof(DataMTTQContext))]
-    partial class DataMTTQContextModelSnapshot : ModelSnapshot
+    [Migration("20260819121453_RemoveSoftDeleteColumns")]
+    partial class RemoveSoftDeleteColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -641,48 +644,6 @@ namespace WebMTTQ.Migrations
                     b.ToTable("KetQuaChamLo");
                 });
 
-            modelBuilder.Entity("WebMTTQ.Models.KetQuaHoatDong", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("DonViUngHo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("KinhPhi")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("LoaiHoatDong")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int?>("Nam")
-                        .HasColumnType("int");
-
-                    b.Property<string>("NoiDung")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhanLoaiDonVi")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("SoLuongHo")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Thang")
-                        .HasColumnType("int");
-
-                    b.Property<bool?>("TrangThai")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("KetQuaHoatDong");
-                });
-
             modelBuilder.Entity("WebMTTQ.Models.KetQuaHoatDongBienDao", b =>
                 {
                     b.Property<int>("Id")
@@ -1196,38 +1157,6 @@ namespace WebMTTQ.Migrations
                     b.HasIndex("IdnguoiDung");
 
                     b.ToTable("NhatKyHeThong");
-                });
-
-            modelBuilder.Entity("WebMTTQ.Models.SoDuQuy", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("LoaiQuy")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime?>("NgayCapNhat")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal?>("TienGuiNganHang")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("TienMat")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("TongTonQuy")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SoDuQuy");
                 });
 
             modelBuilder.Entity("WebMTTQ.Models.SoDuQuyBienDao", b =>

@@ -69,7 +69,8 @@ namespace WebMTTQ.Controllers
                 //                                .ToListAsync();
 
                 // 4. LẤY SỐ DƯ QUỸ (Chỉ lấy 1 dòng mới nhất, không Tracking)
-                ViewBag.SoDuQuy = await _context.SoDuQuyBienDaos
+                ViewBag.SoDuQuy = await _context.SoDuQues
+                                                .Where(x => x.LoaiQuy == "BienDao")
                                                 .AsNoTracking()
                                                 .OrderByDescending(x => x.NgayCapNhat)
                                                 .FirstOrDefaultAsync();
@@ -78,8 +79,8 @@ namespace WebMTTQ.Controllers
                 int currentYear = DateTime.Now.Year;
                 if (!_cache.TryGetValue("HoatDongBienDaoCache", out HoatDongBienDaoCacheDto? hoatDongData) || hoatDongData == null)
                 {
-                    var dsHoatDong = await _context.KetQuaHoatDongBienDaos
-                                            .Where(x => x.TrangThai == true && x.Nam == currentYear)
+                    var dsHoatDong = await _context.KetQuaHoatDongs
+                                            .Where(x => x.LoaiHoatDong == "BienDao" && x.TrangThai == true && x.Nam == currentYear)
                                             .AsNoTracking()
                                             .ToListAsync();
                     hoatDongData = new HoatDongBienDaoCacheDto

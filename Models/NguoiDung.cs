@@ -43,8 +43,6 @@ public partial class NguoiDung
     [StringLength(50)]
     public string? TrangThai { get; set; }
 
-    public bool? DaXoa { get; set; }
-
     [Column(TypeName = "datetime")]
     public DateTime? NgayTao { get; set; }
 

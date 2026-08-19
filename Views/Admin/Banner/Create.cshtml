@@ -13,7 +13,7 @@
         <h2 style="margin: 0; color: #333;">Thêm Banner Trang Chủ</h2>
     </div>
 
-    <form asp-action="BannerCreate" asp-controller="AdminTrangChu" method="post" enctype="multipart/form-data">
+    <form asp-action="BannerCreate" asp-controller="AdminTrangChu" method="post" enctype="multipart/form-data" onsubmit="return confirm('Bạn có chắc chắn muốn thêm Banner mới này?');">
         <div style="margin-bottom: 20px;">
             <label style="display: block; font-weight: bold; margin-bottom: 8px;">Chọn Hình ảnh (Tối đa 3MB) <span style="color:red;">*</span></label>
             <input type="file" name="FileAnh" id="FileAnh" accept="image/*" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;" required />

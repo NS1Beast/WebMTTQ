@@ -28,7 +28,6 @@ namespace WebMTTQ.Controllers
         public async Task<IActionResult> Index()
         {
             var data = await _context.DiaDiemBanDos.AsNoTracking()
-                                     .Where(x => x.DaXoa != true)
                                      .OrderByDescending(x => x.IddiaDiem)
                                      .ToListAsync();
 
@@ -56,8 +55,6 @@ namespace WebMTTQ.Controllers
                 model.ViDo = Math.Round(model.ViDo, 6);
                 model.KinhDo = Math.Round(model.KinhDo, 6);
 
-                model.DaXoa = false;
-
                 if (HinhAnhUpload != null && HinhAnhUpload.Length > 0)
                 {
                     using (var ms = new MemoryStream())
@@ -82,7 +79,7 @@ namespace WebMTTQ.Controllers
         }
 
         // ==========================================
-        // 4. XÓA MỀM (POST)
+        // 4. XÓA CỨNG (POST)
         // ==========================================
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
@@ -90,12 +87,11 @@ namespace WebMTTQ.Controllers
             var item = await _context.DiaDiemBanDos.FindAsync(id);
             if (item != null)
             {
-                item.DaXoa = true; // Xóa mềm
+                _context.DiaDiemBanDos.Remove(item);
                 await _context.SaveChangesAsync();
                 // ---> QUAN TRỌNG: XÓA CACHE BẢN ĐỒ NGAY SAU KHI XÓA THÀNH CÔNG <---
                 _cache.Remove("BanDoData");
 
-                // THÊM DÒNG NÀY
                 TempData["SuccessMessage"] = "Đã xóa địa điểm thành công!";
             }
             return RedirectToAction(nameof(Index));
@@ -145,7 +141,6 @@ namespace WebMTTQ.Controllers
                     }
                 }
 
-                model.DaXoa = false;
                 _context.Update(model);
                 await _context.SaveChangesAsync();
                 // ---> QUAN TRỌNG: XÓA CACHE BẢN ĐỒ NGAY SAU KHI SỬA THÀNH CÔNG <---

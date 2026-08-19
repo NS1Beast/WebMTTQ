@@ -69,7 +69,6 @@ namespace WebMTTQ.Controllers
                 // Kiểm tra thêm nội dung không chỉ toàn khoảng trắng
                 model.NgayGui = DateTime.Now;
                 model.TrangThai = "Chưa xử lý";
-                model.DaXoa = false;
 
                 // === Xử lý file đính kèm an toàn ===
                 if (tepDinhKem != null && tepDinhKem.Length > 0)

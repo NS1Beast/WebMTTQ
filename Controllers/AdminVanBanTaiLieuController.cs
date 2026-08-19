@@ -32,14 +32,13 @@ namespace WebMTTQ.Controllers
             ViewData["Title"] = "Quản lý Văn bản & Tài liệu";
             var data = await _context.VanBanTaiLieus
                 .Include(v => v.IdchuyenMucNavigation)
-                .Where(x => x.DaXoa != true)
                 .OrderByDescending(x => x.NgayBanHanh)
                 .ThenByDescending(x => x.IdvanBan)
                 .ToListAsync();
 
             // Lấy danh sách chuyên mục để chuyển đổi văn bản
             var categories = await _context.ChuyenMucs
-                .Where(c => c.DaXoa != true && c.LoaiChuyenMuc == LoaiChuyenMucConstants.VanBanTaiLieu)
+                .Where(c => c.LoaiChuyenMuc == LoaiChuyenMucConstants.VanBanTaiLieu)
                 .OrderBy(c => c.ThuTu)
                 .ThenBy(c => c.TenChuyenMuc)
                 .ToListAsync();
@@ -54,7 +53,7 @@ namespace WebMTTQ.Controllers
             ViewData["Title"] = "Thêm Văn bản mới";
             // Chỉ lấy chuyên mục loại "VanBanTaiLieu"
             ViewBag.ChuyenMucs = new SelectList(
-                _context.ChuyenMucs.Where(c => c.DaXoa != true && c.LoaiChuyenMuc == LoaiChuyenMucConstants.VanBanTaiLieu),
+                _context.ChuyenMucs.Where(c => c.LoaiChuyenMuc == LoaiChuyenMucConstants.VanBanTaiLieu),
                 "IdchuyenMuc", "TenChuyenMuc");
             return View("~/Views/Admin/VanBanTaiLieu/Create.cshtml");
         }
@@ -73,7 +72,6 @@ namespace WebMTTQ.Controllers
                 model.DungLuong = FileUpload.Length;
             }
 
-            model.DaXoa = false;
             _context.VanBanTaiLieus.Add(model);
             await _context.SaveChangesAsync();
 
@@ -85,12 +83,12 @@ namespace WebMTTQ.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var item = await _context.VanBanTaiLieus.FindAsync(id);
-            if (item == null || item.DaXoa == true) return NotFound();
+            if (item == null) return NotFound();
 
             ViewData["Title"] = "Cập nhật Văn bản";
             // Chỉ lấy chuyên mục loại "VanBanTaiLieu"
             ViewBag.ChuyenMucs = new SelectList(
-                _context.ChuyenMucs.Where(c => c.DaXoa != true && c.LoaiChuyenMuc == LoaiChuyenMucConstants.VanBanTaiLieu),
+                _context.ChuyenMucs.Where(c => c.LoaiChuyenMuc == LoaiChuyenMucConstants.VanBanTaiLieu),
                 "IdchuyenMuc", "TenChuyenMuc", item.IdchuyenMuc);
             return View("~/Views/Admin/VanBanTaiLieu/Edit.cshtml", item);
         }
@@ -118,7 +116,6 @@ namespace WebMTTQ.Controllers
                 model.DungLuong = existingItem.DungLuong;
             }
 
-            model.DaXoa = existingItem.DaXoa;
             _context.VanBanTaiLieus.Update(model);
             await _context.SaveChangesAsync();
 
@@ -132,7 +129,7 @@ namespace WebMTTQ.Controllers
             var item = await _context.VanBanTaiLieus.FindAsync(id);
             if (item != null)
             {
-                item.DaXoa = true;
+                _context.VanBanTaiLieus.Remove(item);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Đã xóa văn bản thành công!";
             }
@@ -149,7 +146,7 @@ namespace WebMTTQ.Controllers
         public async Task<IActionResult> MoveCategory(int id, int newCategoryId)
         {
             var vanBan = await _context.VanBanTaiLieus.FindAsync(id);
-            if (vanBan == null || vanBan.DaXoa == true)
+            if (vanBan == null)
             {
                 TempData["ErrorMessage"] = "Không tìm thấy văn bản cần chuyển!";
                 return RedirectToAction("Index");
@@ -157,8 +154,7 @@ namespace WebMTTQ.Controllers
 
             // Kiểm tra chuyên mục mới tồn tại
             var newCategory = await _context.ChuyenMucs
-                .FirstOrDefaultAsync(c => c.IdchuyenMuc == newCategoryId 
-                    && c.DaXoa != true 
+                .FirstOrDefaultAsync(c => c.IdchuyenMuc == newCategoryId
                     && c.LoaiChuyenMuc == LoaiChuyenMucConstants.VanBanTaiLieu);
             if (newCategory == null)
             {
@@ -175,7 +171,7 @@ namespace WebMTTQ.Controllers
 
             // Kiểm tra có ít nhất 2 chuyên mục (đã validate ở client, nhưng check lại server)
             var totalCategories = await _context.ChuyenMucs
-                .CountAsync(c => c.DaXoa != true && c.LoaiChuyenMuc == LoaiChuyenMucConstants.VanBanTaiLieu);
+                .CountAsync(c => c.LoaiChuyenMuc == LoaiChuyenMucConstants.VanBanTaiLieu);
             if (totalCategories < 2)
             {
                 TempData["ErrorMessage"] = "Cần ít nhất 2 chuyên mục để chuyển văn bản qua lại!";
@@ -199,14 +195,13 @@ namespace WebMTTQ.Controllers
         {
             ViewData["Title"] = "Quản lý Chuyên mục Văn bản";
             var categories = await _context.ChuyenMucs
-                .Where(c => c.DaXoa != true && c.LoaiChuyenMuc == LoaiChuyenMucConstants.VanBanTaiLieu)
+                .Where(c => c.LoaiChuyenMuc == LoaiChuyenMucConstants.VanBanTaiLieu)
                 .OrderBy(c => c.ThuTu)
                 .ThenBy(c => c.TenChuyenMuc)
                 .ToListAsync();
 
             // Đếm số văn bản cho mỗi chuyên mục
             var docCounts = await _context.VanBanTaiLieus
-                .Where(v => v.DaXoa != true)
                 .GroupBy(v => v.IdchuyenMuc)
                 .Select(g => new { Id = g.Key ?? 0, Count = g.Count() })
                 .ToDictionaryAsync(x => x.Id, x => x.Count);
@@ -229,20 +224,18 @@ namespace WebMTTQ.Controllers
         public async Task<IActionResult> CategoryCreate(ChuyenMuc chuyenMuc)
         {
             ModelState.Remove("DuongDan");
-            ModelState.Remove("DaXoa");
             ModelState.Remove("HienThi");
 
             if (ModelState.IsValid)
             {
                 chuyenMuc.DuongDan = GenerateSlug(chuyenMuc.TenChuyenMuc);
-                chuyenMuc.DaXoa = false;
                 chuyenMuc.HienThi = true;
                 chuyenMuc.ThuTu = chuyenMuc.ThuTu ?? 0;
                 chuyenMuc.LoaiChuyenMuc = LoaiChuyenMucConstants.VanBanTaiLieu;
 
                 // Kiểm tra trùng đường dẫn
                 var exists = await _context.ChuyenMucs
-                    .AnyAsync(c => c.DuongDan == chuyenMuc.DuongDan && c.DaXoa == false);
+                    .AnyAsync(c => c.DuongDan == chuyenMuc.DuongDan);
                 if (exists)
                 {
                     chuyenMuc.DuongDan = chuyenMuc.DuongDan + "-" + Guid.NewGuid().ToString("N").Substring(0, 6);
@@ -277,7 +270,6 @@ namespace WebMTTQ.Controllers
             if (existing == null || existing.LoaiChuyenMuc != LoaiChuyenMucConstants.VanBanTaiLieu) return NotFound();
 
             ModelState.Remove("DuongDan");
-            ModelState.Remove("DaXoa");
 
             if (ModelState.IsValid)
             {
@@ -303,14 +295,14 @@ namespace WebMTTQ.Controllers
             {
                 // Kiểm tra có văn bản không
                 var hasDocs = await _context.VanBanTaiLieus
-                    .AnyAsync(v => v.IdchuyenMuc == id && v.DaXoa != true);
+                    .AnyAsync(v => v.IdchuyenMuc == id);
                 if (hasDocs)
                 {
                     TempData["ErrorMessage"] = $"Không thể xóa chuyên mục \"{chuyenMuc.TenChuyenMuc}\" vì vẫn còn văn bản trong chuyên mục này! Vui lòng chuyển hoặc xóa văn bản trước.";
                     return RedirectToAction(nameof(Categories));
                 }
 
-                chuyenMuc.DaXoa = true;
+                _context.ChuyenMucs.Remove(chuyenMuc);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Xóa chuyên mục văn bản thành công!";
             }

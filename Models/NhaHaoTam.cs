@@ -30,8 +30,6 @@ public partial class NhaHaoTam
     [StringLength(500)]
     public string? DiaChi { get; set; }
 
-    public bool? DaXoa { get; set; }
-
     [InverseProperty("IdnhaHaoTamNavigation")]
     public virtual ICollection<KhoanDongGop> KhoanDongGops { get; set; } = new List<KhoanDongGop>();
 }

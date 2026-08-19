@@ -57,7 +57,7 @@ namespace WebMTTQ.Controllers
             // Featured News (bài viết nổi bật)
             var featuredNews = await _context.BaiViets
                 .Include(b => b.IdchuyenMucNavigation)
-                .Where(b => b.DaXoa == false && b.TrangThai == "DaDang")
+                .Where(b => b.TrangThai == "DaDang")
                 .OrderByDescending(b => b.LaTinNoiBat)
                 .ThenByDescending(b => b.NgayXuatBan)
                 .Take(5)

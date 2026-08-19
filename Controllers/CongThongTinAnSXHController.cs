@@ -64,7 +64,8 @@ namespace WebMTTQ.Controllers
                                                 .ToListAsync();
 
                 // 4. LẤY SỐ DƯ QUỸ (Chỉ lấy 1 dòng mới nhất, không Tracking)
-                ViewBag.SoDuQuy = await _context.SoDuQuyViNguoiNgheos
+                ViewBag.SoDuQuy = await _context.SoDuQues
+                                                .Where(x => x.LoaiQuy == "NguoiNgheo")
                                                 .AsNoTracking()
                                                 .OrderByDescending(x => x.NgayCapNhat)
                                                 .FirstOrDefaultAsync();
@@ -124,7 +125,6 @@ namespace WebMTTQ.Controllers
                     {
                         var rawData = await _context.DiaDiemBanDos
                                                     .AsNoTracking()
-                                                    .Where(x => x.DaXoa != true)
                                                     .OrderByDescending(x => x.NgayThucHien)
                                                     .ToListAsync();
 
@@ -262,7 +262,6 @@ namespace WebMTTQ.Controllers
             {
                 model.NgayGui = DateTime.Now;
                 model.TrangThai = "Chưa xử lý";
-                model.DaXoa = false;
 
                 _context.NguoiDanCanTroGiups.Add(model);
                 await _context.SaveChangesAsync();

@@ -70,8 +70,6 @@ public partial class HopThuGopY
     [Display(Name = "Ngày gửi")]
     public DateTime? NgayGui { get; set; }
 
-    public bool? DaXoa { get; set; }
-
     [ForeignKey("IdnguoiXuLy")]
     [InverseProperty("HopThuGopies")]
     public virtual NguoiDung? IdnguoiXuLyNavigation { get; set; }

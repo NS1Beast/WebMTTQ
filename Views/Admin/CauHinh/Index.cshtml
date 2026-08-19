@@ -342,14 +342,8 @@
                     </div>
                     <div class="admin-form-group">
                         <label class="admin-form-label">SMTP Password</label>
-                        <div class="password-field-wrapper">
-                            <input asp-for="SmtpPassword" type="password" class="admin-form-control" placeholder="@(Model.SmtpPassword_Display == "**************" ? "**************" : "Nhập mật khẩu SMTP")" autocomplete="off" />
-                            @if (Model.SmtpPassword_Display == "**************")
-                            {
-                                <span class="field-status configured">Đã cấu hình</span>
-                            }
-                        </div>
-                        <span class="admin-form-hint">Để trống nếu không muốn thay đổi mật khẩu hiện tại.</span>
+                        <input asp-for="SmtpPassword" type="text" class="admin-form-control" placeholder="Nhập mật khẩu SMTP" autocomplete="off" />
+                        <span class="admin-form-hint">Mật khẩu SMTP dùng để gửi email OTP.</span>
                     </div>
                 </div>
                 <div class="admin-form-row">

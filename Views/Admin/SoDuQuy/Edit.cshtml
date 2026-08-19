@@ -1,4 +1,4 @@
-﻿@model WebMTTQ.Models.SoDuQuyViNguoiNgheo
+﻿@model WebMTTQ.Models.SoDuQuy
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Cập nhật số dư quỹ";
@@ -16,7 +16,7 @@
 
 <div class="admin-card" style="max-width: 600px;">
     <div class="admin-card-body">
-        <form asp-action="Edit" method="post">
+        <form asp-action="Edit" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn lưu các thay đổi của bản ghi số dư này?');">
             <input type="hidden" asp-for="Id" />
 
             <div class="admin-form-group">

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<WebMTTQ.Models.SoDuQuyViNguoiNgheo>
+﻿@model IEnumerable<WebMTTQ.Models.SoDuQuy>
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Số dư Quỹ Vì người nghèo";
@@ -31,10 +31,10 @@
                     @foreach (var item in Model)
                     {
                         <tr class="@(item == Model.First() ? "admin-table-highlight" : "")">
-                            <td>@item.NgayCapNhat.ToString("dd/MM/yyyy HH:mm")</td>
-                            <td class="cell-right"><span class="admin-money green">@item.TienMat.ToString("N0")đ</span></td>
-                            <td class="cell-right"><span class="admin-money blue">@item.TienGuiNganHang.ToString("N0")đ</span></td>
-                            <td class="cell-right"><span class="admin-money red">@item.TongTonQuy.ToString("N0")đ</span></td>
+                            <td>@item.NgayCapNhat?.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="cell-right"><span class="admin-money green">@item.TienMat?.ToString("N0")đ</span></td>
+                            <td class="cell-right"><span class="admin-money blue">@item.TienGuiNganHang?.ToString("N0")đ</span></td>
+                            <td class="cell-right"><span class="admin-money red">@item.TongTonQuy?.ToString("N0")đ</span></td>
                             <td class="cell-actions">
                                 <a href="/admin/soduquy/Edit/@item.Id" class="admin-btn admin-btn-warning admin-btn-sm">
                                     <i class="fas fa-edit"></i> Sửa

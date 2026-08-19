@@ -22,8 +22,6 @@ public partial class DoanTheToChuc
     [Unicode(false)]
     public string? MauSacHienThi { get; set; }
 
-    public bool? DaXoa { get; set; }
-
     [InverseProperty("IddonViNavigation")]
     public virtual ICollection<DiaDiemBanDo> DiaDiemBanDos { get; set; } = new List<DiaDiemBanDo>();
 }

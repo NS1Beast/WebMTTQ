@@ -8,20 +8,23 @@
 <style>
     .tl-settings { background:#fff; border-radius:12px; padding:25px; box-shadow:0 4px 15px rgba(0,0,0,0.05); margin-bottom:25px; }
     .tl-items { background:#fff; border-radius:12px; padding:25px; box-shadow:0 4px 15px rgba(0,0,0,0.05); }
-    .tl-card { background:#f8f9fa; border:1px solid #e0e0e0; border-radius:10px; padding:15px 20px; margin-bottom:10px; cursor:grab; display:flex; align-items:center; gap:15px; transition:all .3s; }
+    .tl-card { background:#f8f9fa; border:1px solid #e0e0e0; border-radius:10px; padding:15px 20px; margin-bottom:10px; display:flex; align-items:center; gap:15px; transition:all .3s; }
     .tl-card:hover { box-shadow:0 4px 12px rgba(0,0,0,0.1); }
-    .tl-card.dragging { opacity:0.5; }
-    .tl-drag-handle { color:#aaa; font-size:1.2rem; cursor:grab; }
     .tl-time { font-weight:700; color:#8b1a2b; background:rgba(139,26,43,0.08); padding:6px 14px; border-radius:20px; font-size:0.85rem; white-space:nowrap; }
     .tl-content { flex:1; min-width:0; }
     .tl-content h4 { margin:0 0 4px; font-size:0.95rem; font-weight:700; color:#222; }
     .tl-content p { margin:0; font-size:0.85rem; color:#666; }
-    .tl-actions { display:flex; gap:8px; white-space:nowrap; }
+    .tl-actions { display:flex; align-items:center; gap:8px; white-space:nowrap; }
     .tl-btn { border:none; background:none; cursor:pointer; font-size:0.9rem; padding:4px 8px; border-radius:5px; text-decoration:none; }
     .tl-btn:hover { background:#e9ecef; }
+    .tl-btn:disabled { opacity:0.3; cursor:not-allowed; }
     .badge { padding:4px 10px; border-radius:15px; font-size:0.75rem; font-weight:600; }
     .badge-on { background:#d4edda; color:#155724; }
     .badge-off { background:#f8d7da; color:#721c24; }
+    .tl-sort-btns { display:flex; flex-direction:column; gap:2px; }
+    .tl-sort-btn { border:none; background:#e9ecef; color:#555; width:28px; height:24px; border-radius:4px; cursor:pointer; font-size:0.7rem; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+    .tl-sort-btn:hover:not(:disabled) { background:#8b1a2b; color:#fff; }
+    .tl-sort-btn:disabled { opacity:0.3; cursor:not-allowed; }
 </style>
 
 <style>
@@ -89,16 +92,35 @@
     <div class="tl-items">
         <h3 style="margin:0 0 20px; font-size:1.1rem; color:#555; display:flex; align-items:center; gap:8px;">
             <i class="fas fa-stream"></i> Danh sách mốc thời gian
-            <small style="color:#888; font-weight:normal;">(Kéo thả để sắp xếp)</small>
+            <small style="color:#888; font-weight:normal;">(Sử dụng mũi tên lên/xuống để sắp xếp)</small>
         </h3>
 
-        @if (Model.Items != null && Model.Items.Any())
+        @{
+            var sortedItems = Model.Items?.OrderBy(i => i.SortOrder).ToList() ?? new List<WebMTTQ.Models.TimelineItem>();
+            var totalCount = sortedItems.Count;
+        }
+
+        @if (totalCount > 0)
         {
             <div id="timelineList">
-                @foreach (var item in Model.Items.OrderBy(i => i.SortOrder))
+                @for (int i = 0; i < totalCount; i++)
                 {
+                    var item = sortedItems[i];
+                    var isFirst = i == 0;
+                    var isLast = i == totalCount - 1;
                     <div class="tl-card" data-id="@item.Id">
-                        <div class="tl-drag-handle"><i class="fas fa-grip-vertical"></i></div>
+                        <div class="tl-sort-btns">
+                            <form asp-action="TimelineItemMoveUp" asp-controller="AdminTrangChu" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                <button type="submit" class="tl-sort-btn" title="Di chuyển lên" @(isFirst ? "disabled" : "")>
+                                    <i class="fas fa-chevron-up"></i>
+                                </button>
+                            </form>
+                            <form asp-action="TimelineItemMoveDown" asp-controller="AdminTrangChu" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                <button type="submit" class="tl-sort-btn" title="Di chuyển xuống" @(isLast ? "disabled" : "")>
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </form>
+                        </div>
                         <span class="tl-time">@item.TimeLabel</span>
                         <div class="tl-content">
                             <h4>@item.Title</h4>
@@ -109,7 +131,7 @@
                         </div>
                         <span class="badge @(item.IsEnabled ? "badge-on" : "badge-off")">@(item.IsEnabled ? "Hiển thị" : "Ẩn")</span>
                         <div class="tl-actions">
-                            <form asp-action="TimelineItemToggle" asp-controller="AdminTrangChu" asp-route-id="@item.Id" method="post" style="display:inline;">
+                            <form asp-action="TimelineItemToggle" asp-controller="AdminTrangChu" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái hiển thị mốc thời gian @item.TimeLabel?');">
                                 <button type="submit" class="tl-btn" title="Bật/tắt"><i class="fas fa-eye@(item.IsEnabled ? "-slash" : "")"></i></button>
                             </form>
                             <a href="@Url.Action("TimelineItemEdit", "AdminTrangChu", new { id = item.Id })" class="tl-btn" title="Sửa"><i class="fas fa-edit" style="color:#17a2b8;"></i></a>
@@ -131,67 +153,3 @@
         }
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const list = document.getElementById('timelineList');
-            if (!list) return;
-
-            let dragged = null;
-
-            list.addEventListener('dragstart', function(e) {
-                dragged = e.target.closest('.tl-card');
-                if (dragged) {
-                    dragged.classList.add('dragging');
-                    e.dataTransfer.effectAllowed = 'move';
-                }
-            });
-
-            list.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                const afterElement = getDragAfterElement(list, e.clientY);
-                if (afterElement == null) {
-                    list.appendChild(dragged);
-                } else {
-                    list.insertBefore(dragged, afterElement);
-                }
-            });
-
-            list.addEventListener('dragend', function(e) {
-                e.preventDefault();
-                if (dragged) {
-                    dragged.classList.remove('dragging');
-                    saveOrder();
-                    dragged = null;
-                }
-            });
-
-            function getDragAfterElement(container, y) {
-                const cards = [...container.querySelectorAll('.tl-card:not(.dragging)')];
-                return cards.reduce(function(closest, child) {
-                    const box = child.getBoundingClientRect();
-                    const offset = y - box.top - box.height / 2;
-                    if (offset < 0 && offset > closest.offset) {
-                        return { offset: offset, element: child };
-                    } else {
-                        return closest;
-                    }
-                }, { offset: Number.NEGATIVE_INFINITY }).element;
-            }
-
-            function saveOrder() {
-                const items = [...list.querySelectorAll('.tl-card')].map(function(card, index) {
-                    return { id: parseInt(card.dataset.id), order: index + 1 };
-                });
-                fetch('@Url.Action("TimelineUpdateSort", "AdminTrangChu")', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(items)
-                }).then(r => r.json()).then(d => {
-                    if (d.success) console.log('Order saved');
-                }).catch(err => console.error('Error saving order', err));
-            }
-        });
-    </script>
-}

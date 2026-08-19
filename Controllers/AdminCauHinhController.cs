@@ -55,7 +55,7 @@ namespace WebMTTQ.Controllers
                 SmtpPort = await _settings.GetIntAsync("SmtpPort"),
                 SmtpUseSsl = await _settings.GetBooleanAsync("SmtpUseSsl"),
                 SmtpUsername = await _settings.GetValueAsync("SmtpUsername"),
-                SmtpPassword_Display = await _settings.ExistsAsync("SmtpPassword") ? "**************" : string.Empty,
+                SmtpPassword = await _settings.GetEncryptedValueAsync("SmtpPassword"),
                 SmtpFromEmail = await _settings.GetValueAsync("SmtpFromEmail"),
                 SmtpFromName = await _settings.GetValueAsync("SmtpFromName"),
 
@@ -114,10 +114,7 @@ namespace WebMTTQ.Controllers
                 await _settings.SetValueAsync("SmtpPort", model.SmtpPort.ToString(), "SMTP Port");
                 await _settings.SetValueAsync("SmtpUseSsl", model.SmtpUseSsl ? "1" : "0", "Bật SSL/TLS cho SMTP");
                 await _settings.SetValueAsync("SmtpUsername", model.SmtpUsername, "SMTP Username");
-                if (!string.IsNullOrEmpty(model.SmtpPassword))
-                {
-                    await _settings.SetEncryptedValueAsync("SmtpPassword", model.SmtpPassword, "SMTP Password (mã hóa)");
-                }
+                await _settings.SetValueAsync("SmtpPassword", model.SmtpPassword, "SMTP Password");
                 await _settings.SetValueAsync("SmtpFromEmail", model.SmtpFromEmail, "Email gửi (From)");
                 await _settings.SetValueAsync("SmtpFromName", model.SmtpFromName, "Tên hiển thị (From)");
 

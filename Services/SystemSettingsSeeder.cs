@@ -70,7 +70,7 @@ namespace WebMTTQ.Services
             AddIfNotExists("SmtpPort", "587", "SMTP Port");
             AddIfNotExists("SmtpUseSsl", "1", "Bật SSL/TLS cho SMTP");
             AddIfNotExists("SmtpUsername", "", "SMTP Username");
-            AddIfNotExists("SmtpPassword", "", "SMTP Password (mã hóa)");
+            AddIfNotExists("SmtpPassword", "", "SMTP Password");
             AddIfNotExists("SmtpFromEmail", "", "Email gửi (From)");
             AddIfNotExists("SmtpFromName", "MTTQ Phường Tân Định", "Tên hiển thị (From)");
 

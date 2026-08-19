@@ -32,13 +32,12 @@ namespace WebMTTQ.Controllers
             const int pageSize = 10;
 
             var categories = await _context.ChuyenMucs
-                .Where(c => c.DaXoa == false && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc)
+                .Where(c => c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc)
                 .OrderBy(c => c.ThuTu)
                 .ToListAsync();
 
             IQueryable<BaiViet> query = _context.BaiViets
-                .Include(b => b.IdchuyenMucNavigation)
-                .Where(b => b.DaXoa == false);
+                .Include(b => b.IdchuyenMucNavigation);
 
             if (!string.IsNullOrEmpty(category))
             {
@@ -75,7 +74,7 @@ namespace WebMTTQ.Controllers
         public async Task<IActionResult> Create()
         {
             var categories = await _context.ChuyenMucs
-                .Where(c => c.DaXoa == false && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc)
+                .Where(c => c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc)
                 .OrderBy(c => c.ThuTu)
                 .ToListAsync();
             ViewBag.Categories = categories;
@@ -137,7 +136,6 @@ namespace WebMTTQ.Controllers
             ModelState.Remove("HinhAnh");
             ModelState.Remove("VideoUrl");
             ModelState.Remove("NgayXuatBan");
-            ModelState.Remove("DaXoa");
             ModelState.Remove("LuotXem");
             ModelState.Remove("LaTinNoiBat");
             ModelState.Remove("IdnguoiDung");
@@ -147,7 +145,6 @@ namespace WebMTTQ.Controllers
                 // Tạo đường dẫn từ tiêu đề
                 baiViet.DuongDan = GenerateSlug(baiViet.TieuDe);
                 baiViet.NgayXuatBan = DateTime.Now;
-                baiViet.DaXoa = false;
                 baiViet.LuotXem = 0;
                 baiViet.LaTinNoiBat = false;
                 baiViet.TrangThai = string.IsNullOrEmpty(baiViet.TrangThai) ? "DaDang" : baiViet.TrangThai;
@@ -165,7 +162,7 @@ namespace WebMTTQ.Controllers
                     if (FileAnh.Length > 5 * 1024 * 1024)
                     {
                         ModelState.AddModelError("HinhAnh", "Kích thước ảnh không được vượt quá 5MB.");
-                        var cats = await _context.ChuyenMucs.Where(c => c.DaXoa == false && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc).ToListAsync();
+                        var cats = await _context.ChuyenMucs.Where(c => c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc).ToListAsync();
                         ViewBag.Categories = cats;
                         return View("~/Views/Admin/News/Create.cshtml", baiViet);
                     }
@@ -189,7 +186,7 @@ namespace WebMTTQ.Controllers
                     catch (Exception ex)
                     {
                         ModelState.AddModelError("HinhAnh", $"Lỗi khi tải ảnh lên: {ex.Message}");
-                        var cats = await _context.ChuyenMucs.Where(c => c.DaXoa == false && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc).ToListAsync();
+                        var cats = await _context.ChuyenMucs.Where(c => c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc).ToListAsync();
                         ViewBag.Categories = cats;
                         return View("~/Views/Admin/News/Create.cshtml", baiViet);
                     }
@@ -201,7 +198,7 @@ namespace WebMTTQ.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var categories = await _context.ChuyenMucs.Where(c => c.DaXoa == false && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc).ToListAsync();
+            var categories = await _context.ChuyenMucs.Where(c => c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc).ToListAsync();
             ViewBag.Categories = categories;
             return View("~/Views/Admin/News/Create.cshtml", baiViet);
         }
@@ -216,7 +213,7 @@ namespace WebMTTQ.Controllers
             if (baiViet == null) return NotFound();
 
             var categories = await _context.ChuyenMucs
-                .Where(c => c.DaXoa == false && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc)
+                .Where(c => c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc)
                 .OrderBy(c => c.ThuTu)
                 .ToListAsync();
             ViewBag.Categories = categories;
@@ -238,7 +235,6 @@ namespace WebMTTQ.Controllers
             ModelState.Remove("HinhAnh");
             ModelState.Remove("VideoUrl");
             ModelState.Remove("NgayXuatBan");
-            ModelState.Remove("DaXoa");
             ModelState.Remove("LuotXem");
             ModelState.Remove("LaTinNoiBat");
             ModelState.Remove("IdnguoiDung");
@@ -259,7 +255,7 @@ namespace WebMTTQ.Controllers
                     if (FileAnh.Length > 5 * 1024 * 1024)
                     {
                         ModelState.AddModelError("HinhAnh", "Kích thước ảnh không được vượt quá 5MB.");
-                        var cats = await _context.ChuyenMucs.Where(c => c.DaXoa == false && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc).ToListAsync();
+                        var cats = await _context.ChuyenMucs.Where(c => c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc).ToListAsync();
                         ViewBag.Categories = cats;
                         return View("~/Views/Admin/News/Edit.cshtml", existing);
                     }
@@ -283,7 +279,7 @@ namespace WebMTTQ.Controllers
                     catch (Exception ex)
                     {
                         ModelState.AddModelError("HinhAnh", $"Lỗi khi tải ảnh lên: {ex.Message}");
-                        var cats = await _context.ChuyenMucs.Where(c => c.DaXoa == false && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc).ToListAsync();
+                        var cats = await _context.ChuyenMucs.Where(c => c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc).ToListAsync();
                         ViewBag.Categories = cats;
                         return View("~/Views/Admin/News/Edit.cshtml", existing);
                     }
@@ -294,7 +290,7 @@ namespace WebMTTQ.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var categories = await _context.ChuyenMucs.Where(c => c.DaXoa == false && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc).ToListAsync();
+            var categories = await _context.ChuyenMucs.Where(c => c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc).ToListAsync();
             ViewBag.Categories = categories;
             return View("~/Views/Admin/News/Edit.cshtml", existing);
         }
@@ -306,7 +302,7 @@ namespace WebMTTQ.Controllers
             var baiViet = await _context.BaiViets.FindAsync(id);
             if (baiViet != null)
             {
-                baiViet.DaXoa = true;
+                _context.BaiViets.Remove(baiViet);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Xóa bài viết thành công!";
             }
@@ -335,14 +331,13 @@ namespace WebMTTQ.Controllers
         public async Task<IActionResult> Categories()
         {
             var categories = await _context.ChuyenMucs
-                .Where(c => c.DaXoa == false && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc)
+                .Where(c => c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc)
                 .OrderBy(c => c.ThuTu)
                 .ThenBy(c => c.TenChuyenMuc)
                 .ToListAsync();
 
             // Đếm số bài viết cho mỗi chuyên mục
             var articleCounts = await _context.BaiViets
-                .Where(b => b.DaXoa == false)
                 .GroupBy(b => b.IdchuyenMuc)
                 .Select(g => new { Id = g.Key ?? 0, Count = g.Count() })
                 .ToDictionaryAsync(x => x.Id, x => x.Count);
@@ -364,20 +359,18 @@ namespace WebMTTQ.Controllers
         public async Task<IActionResult> CategoryCreate(ChuyenMuc chuyenMuc)
         {
             ModelState.Remove("DuongDan");
-            ModelState.Remove("DaXoa");
             ModelState.Remove("HienThi");
 
             if (ModelState.IsValid)
             {
                 chuyenMuc.DuongDan = GenerateSlug(chuyenMuc.TenChuyenMuc);
-                chuyenMuc.DaXoa = false;
                 chuyenMuc.HienThi = true;
                 chuyenMuc.ThuTu = chuyenMuc.ThuTu ?? 0;
                 chuyenMuc.LoaiChuyenMuc = LoaiChuyenMucConstants.TinTuc;
 
                 // Kiểm tra trùng đường dẫn
                 var exists = await _context.ChuyenMucs
-                    .AnyAsync(c => c.DuongDan == chuyenMuc.DuongDan && c.DaXoa == false);
+                    .AnyAsync(c => c.DuongDan == chuyenMuc.DuongDan);
                 if (exists)
                 {
                     chuyenMuc.DuongDan = chuyenMuc.DuongDan + "-" + Guid.NewGuid().ToString("N").Substring(0, 6);
@@ -411,7 +404,6 @@ namespace WebMTTQ.Controllers
             if (existing == null) return NotFound();
 
             ModelState.Remove("DuongDan");
-            ModelState.Remove("DaXoa");
 
             if (ModelState.IsValid)
             {
@@ -436,14 +428,14 @@ namespace WebMTTQ.Controllers
             {
                 // Kiểm tra có bài viết không
                 var hasArticles = await _context.BaiViets
-                    .AnyAsync(b => b.IdchuyenMuc == id && b.DaXoa == false);
+                    .AnyAsync(b => b.IdchuyenMuc == id);
                 if (hasArticles)
                 {
                     TempData["ErrorMessage"] = "Không thể xóa chuyên mục vì vẫn còn bài viết trong chuyên mục này!";
                     return RedirectToAction(nameof(Categories));
                 }
 
-                chuyenMuc.DaXoa = true;
+                _context.ChuyenMucs.Remove(chuyenMuc);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Xóa chuyên mục thành công!";
             }

@@ -23,8 +23,6 @@ public partial class VaiTro
     /// </summary>
     public byte? QuyenHan { get; set; }
 
-    public bool? DaXoa { get; set; }
-
     [Column(TypeName = "datetime")]
     public DateTime? NgayTao { get; set; }
 

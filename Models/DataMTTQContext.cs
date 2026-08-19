@@ -55,14 +55,16 @@ public partial class DataMTTQContext : DbContext
     public DbSet<SoDuQuyCuuTro> SoDuQuyCuuTros { get; set; }
     public DbSet<DanhSachUngHoCuuTro> DanhSachUngHoCuuTros { get; set; }
     public DbSet<KetQuaHoatDongCuuTro> KetQuaHoatDongCuuTros { get; set; }
-
-//    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-//        => optionsBuilder.UseSqlServer("Server=.;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");
+    public DbSet<SoDuQuy> SoDuQues { get; set; }
+    public DbSet<KetQuaHoatDong> KetQuaHoatDongs { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-C5LJ9BM\\SQL2025_DEV;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");
+        => optionsBuilder.UseSqlServer("Server=.;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");
+
+//    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+//        => optionsBuilder.UseSqlServer("Server=DESKTOP-C5LJ9BM\\SQL2025_DEV;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -70,7 +72,6 @@ public partial class DataMTTQContext : DbContext
         {
             entity.HasKey(e => e.IdbaiViet).HasName("PK__BaiViet__FC50A207B66391FD");
 
-            entity.Property(e => e.DaXoa).HasDefaultValue(false);
             entity.Property(e => e.LaTinNoiBat).HasDefaultValue(false);
             entity.Property(e => e.LuotXem).HasDefaultValue(0);
             entity.Property(e => e.TrangThai).HasDefaultValue("BanNhap");
@@ -90,7 +91,6 @@ public partial class DataMTTQContext : DbContext
         {
             entity.HasKey(e => e.IdchuongTrinh).HasName("PK__ChuongTr__7B0509A41C0A9DEB");
 
-            entity.Property(e => e.DaXoa).HasDefaultValue(false);
             entity.Property(e => e.TrangThai).HasDefaultValue("DangTrienKhai");
         });
 
@@ -98,7 +98,6 @@ public partial class DataMTTQContext : DbContext
         {
             entity.HasKey(e => e.IdchuyenMuc).HasName("PK__ChuyenMu__1078CD135189713F");
 
-            entity.Property(e => e.DaXoa).HasDefaultValue(false);
             entity.Property(e => e.ThuTu).HasDefaultValue(0);
 
             entity.HasOne(d => d.IdchuyenMucChaNavigation).WithMany(p => p.InverseIdchuyenMucChaNavigation).HasConstraintName("FK_ChuyenMuc_ChuyenMucCha");
@@ -108,7 +107,6 @@ public partial class DataMTTQContext : DbContext
         {
             entity.HasKey(e => e.Idquy).HasName("PK__DanhMucQ__A743077E0D5CACAF");
 
-            entity.Property(e => e.DaXoa).HasDefaultValue(false);
             entity.Property(e => e.TonQuy).HasDefaultValue(0m);
             entity.Property(e => e.TongChi).HasDefaultValue(0m);
             entity.Property(e => e.TongThu).HasDefaultValue(0m);
@@ -122,7 +120,6 @@ public partial class DataMTTQContext : DbContext
             entity.Property(e => e.ViDo).HasColumnType("decimal(12, 8)");
             entity.Property(e => e.KinhDo).HasColumnType("decimal(12, 8)");
 
-            entity.Property(e => e.DaXoa).HasDefaultValue(false);
             entity.Property(e => e.TrangThai).HasDefaultValue("HienThi");
 
             entity.HasOne(d => d.IddonViNavigation).WithMany(p => p.DiaDiemBanDos).HasConstraintName("FK_DiaDiem_DonVi");
@@ -131,15 +128,12 @@ public partial class DataMTTQContext : DbContext
         modelBuilder.Entity<DoanTheToChuc>(entity =>
         {
             entity.HasKey(e => e.IddonVi).HasName("PK__DoanTheT__082302BFBA08A593");
-
-            entity.Property(e => e.DaXoa).HasDefaultValue(false);
         });
 
         modelBuilder.Entity<DonXinHoTro>(entity =>
         {
             entity.HasKey(e => e.Iddon).HasName("PK__DonXinHo__93E3A4198A461737");
 
-            entity.Property(e => e.DaXoa).HasDefaultValue(false);
             entity.Property(e => e.MucDoUuTien).HasDefaultValue("BinhThuong");
             entity.Property(e => e.NgayGui).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.TrangThai).HasDefaultValue("ChoXuLy");
@@ -153,7 +147,6 @@ public partial class DataMTTQContext : DbContext
         {
             entity.HasKey(e => e.IdgopY).HasName("PK__HopThuGo__D232A95EF309C612");
 
-            entity.Property(e => e.DaXoa).HasDefaultValue(false);
             entity.Property(e => e.NgayGui).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.TrangThai).HasDefaultValue("ChoXuLy");
 
@@ -173,7 +166,6 @@ public partial class DataMTTQContext : DbContext
 
             entity.ToTable("KhoanDongGop", tb => tb.HasTrigger("trg_KhoanDongGop_AuditQuy"));
 
-            entity.Property(e => e.DaXoa).HasDefaultValue(false);
             entity.Property(e => e.NgayUngHo).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.SoTien).HasDefaultValue(0m);
             entity.Property(e => e.TrangThai).HasDefaultValue("ThanhCong");
@@ -195,7 +187,6 @@ public partial class DataMTTQContext : DbContext
 
             entity.ToTable("LuotTraoTang", tb => tb.HasTrigger("trg_LuotTraoTang_AuditQuy"));
 
-            entity.Property(e => e.DaXoa).HasDefaultValue(false);
             entity.Property(e => e.NgayPhanBo).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.SoTienHoTro).HasDefaultValue(0m);
 
@@ -217,8 +208,6 @@ public partial class DataMTTQContext : DbContext
         modelBuilder.Entity<NguoiCanGiupDo>(entity =>
         {
             entity.HasKey(e => e.IdnguoiCanGiup).HasName("PK__NguoiCan__92DA5CD99DA55672");
-
-            entity.Property(e => e.DaXoa).HasDefaultValue(false);
         });
 
         modelBuilder.Entity<NguoiDung>(entity =>
@@ -227,7 +216,6 @@ public partial class DataMTTQContext : DbContext
 
             entity.ToTable("NguoiDung", tb => tb.HasTrigger("trg_NguoiDung_UpdateNgay"));
 
-            entity.Property(e => e.DaXoa).HasDefaultValue(false);
             entity.Property(e => e.NgayCapNhat).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.NgayTao).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.TrangThai).HasDefaultValue("HoatDong");
@@ -251,8 +239,6 @@ public partial class DataMTTQContext : DbContext
         modelBuilder.Entity<NhaHaoTam>(entity =>
         {
             entity.HasKey(e => e.IdnhaHaoTam).HasName("PK__NhaHaoTa__9835F40B35BF40E3");
-
-            entity.Property(e => e.DaXoa).HasDefaultValue(false);
         });
 
         modelBuilder.Entity<NhatKyHeThong>(entity =>
@@ -276,7 +262,6 @@ public partial class DataMTTQContext : DbContext
         {
             entity.HasKey(e => e.IdthanhPhan).HasName("PK__ThanhPha__90B69433059DBB34");
 
-            entity.Property(e => e.DaXoa).HasDefaultValue(false);
             entity.Property(e => e.ThuTu).HasDefaultValue(0);
         });
 
@@ -303,7 +288,6 @@ public partial class DataMTTQContext : DbContext
         {
             entity.HasKey(e => e.IdvaiTro).HasName("PK__VaiTro__45D3FF49D7A1FDCD");
 
-            entity.Property(e => e.DaXoa).HasDefaultValue(false);
             entity.Property(e => e.NgayTao).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.NgayCapNhat).HasDefaultValueSql("(getdate())");
         });
@@ -324,8 +308,6 @@ public partial class DataMTTQContext : DbContext
         modelBuilder.Entity<VanBanTaiLieu>(entity =>
         {
             entity.HasKey(e => e.IdvanBan).HasName("PK__VanBanTa__FDADF58BFAC3319C");
-
-            entity.Property(e => e.DaXoa).HasDefaultValue(false);
 
             entity.HasOne(d => d.IdchuyenMucNavigation).WithMany(p => p.VanBanTaiLieus).HasConstraintName("FK_VanBan_ChuyenMuc");
         });
@@ -363,6 +345,18 @@ public partial class DataMTTQContext : DbContext
             entity.Property(e => e.TienGuiNganHang).HasPrecision(18, 2);
             entity.Property(e => e.TienMat).HasPrecision(18, 2);
             entity.Property(e => e.TongTonQuy).HasPrecision(18, 2);
+        });
+
+        modelBuilder.Entity<SoDuQuy>(entity =>
+        {
+            entity.Property(e => e.TienGuiNganHang).HasPrecision(18, 2);
+            entity.Property(e => e.TienMat).HasPrecision(18, 2);
+            entity.Property(e => e.TongTonQuy).HasPrecision(18, 2);
+        });
+
+        modelBuilder.Entity<KetQuaHoatDong>(entity =>
+        {
+            entity.Property(e => e.KinhPhi).HasPrecision(18, 2);
         });
 
         OnModelCreatingPartial(modelBuilder);

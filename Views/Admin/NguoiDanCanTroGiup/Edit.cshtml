@@ -53,7 +53,7 @@
         <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--admin-line);">
             <h5 style="margin:0 0 16px;font-weight:600;color:var(--admin-ink);">Cập nhật trạng thái xử lý</h5>
 
-            <form action="@Url.Action("Edit")" method="post">
+            <form action="@Url.Action("Edit")" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn cập nhật trạng thái xử lý cho yêu cầu của @Model.HoTen?');">
                 @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="Id" />
 

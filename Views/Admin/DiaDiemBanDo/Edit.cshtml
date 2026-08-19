@@ -18,7 +18,7 @@
 
 <div class="admin-card">
     <div class="admin-card-body">
-        <form asp-action="Edit" enctype="multipart/form-data" method="post">
+        <form asp-action="Edit" enctype="multipart/form-data" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn lưu các thay đổi của điểm này?');">
             <input type="hidden" asp-for="IddiaDiem" />
 
             <div style="display:flex;gap:24px;flex-wrap:wrap;">

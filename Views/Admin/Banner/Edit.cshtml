@@ -13,7 +13,7 @@
         <h2 style="margin: 0; color: #333;">Cập nhật Banner #@Model.IdBanner</h2>
     </div>
 
-    <form asp-action="BannerEdit" asp-controller="AdminTrangChu" method="post" enctype="multipart/form-data">
+    <form asp-action="BannerEdit" asp-controller="AdminTrangChu" method="post" enctype="multipart/form-data" onsubmit="return confirm('Bạn có chắc chắn muốn lưu các thay đổi của Banner này?');">
         <input type="hidden" asp-for="IdBanner" />
         <input type="hidden" asp-for="HinhAnh" />
 

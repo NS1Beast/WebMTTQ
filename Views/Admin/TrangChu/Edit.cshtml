@@ -20,7 +20,7 @@
         </div>
     }
 
-    <form asp-action="Edit" method="post">
+    <form asp-action="Edit" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn lưu các thay đổi của mục này?');">
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="Id" />
 

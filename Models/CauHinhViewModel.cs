@@ -47,7 +47,6 @@
         public bool SmtpUseSsl { get; set; } = true;
         public string? SmtpUsername { get; set; }
         public string? SmtpPassword { get; set; }
-        public string? SmtpPassword_Display { get; set; }
         public string? SmtpFromEmail { get; set; }
         public string? SmtpFromName { get; set; }
 

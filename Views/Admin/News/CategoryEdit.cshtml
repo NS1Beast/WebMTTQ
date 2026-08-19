@@ -20,7 +20,7 @@
         </div>
     }
 
-    <form asp-action="CategoryEdit" method="post">
+    <form asp-action="CategoryEdit" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn lưu các thay đổi của chuyên mục này?');">
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="IdchuyenMuc" />
 

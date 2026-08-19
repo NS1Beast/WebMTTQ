@@ -35,8 +35,6 @@ public partial class NguoiCanGiupDo
     [StringLength(50)]
     public string? TrangThai { get; set; }
 
-    public bool? DaXoa { get; set; }
-
     [InverseProperty("IdnguoiCanGiupNavigation")]
     public virtual ICollection<DonXinHoTro> DonXinHoTros { get; set; } = new List<DonXinHoTro>();
 

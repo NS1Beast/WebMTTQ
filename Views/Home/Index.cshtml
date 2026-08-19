@@ -547,7 +547,7 @@
             <div class="mini">
                 <div class="m"><b>24/7</b><span>Tiếp nhận phản ánh</span></div>
                 <div class="m"><b>100%</b><span>Công khai minh bạch</span></div>
-                <div class="m"><b>22</b><span>Ấp, khu dân cư</span></div>
+                <div class="m"><b>14</b><span>Khu dân cư</span></div>
             </div>
         </div>
         <div class="m26-emblem-stage">
@@ -625,6 +625,47 @@
     </div>
 }
 
+<!-- ================= UTILITIES (BENTO GRID) ================= -->
+<section class="utilities-section">
+    <div class="wrap">
+        <div class="utilities-header">
+            <span class="utilities-eyebrow">Tiện ích cho người dân</span>
+            <h2>Kết nối trực tiếp với Mặt trận</h2>
+            <p>Các dịch vụ trực tuyến giúp người dân phản ánh, tra cứu và đóng góp chỉ với vài thao tác.</p>
+        </div>
+        <div class="bento-grid">
+            <!-- Card 1 - Feature (largest) -->
+            <a asp-controller="GopY" asp-action="Index" class="bento-card bento-card-main">
+                <div class="sunburst"></div>
+                <div class="bento-card-icon"><i class="fas fa-comments"></i></div>
+                <div>
+                    <h3>Phản ánh & kiến nghị</h3>
+                    <p>Gửi ý kiến trực tuyến và theo dõi tiến độ xử lý công khai, minh bạch.</p>
+                    <span class="bento-cta">Gửi ngay <i class="fas fa-arrow-right"></i></span>
+                </div>
+            </a>
+            <!-- Card 2 -->
+            <a asp-controller="VanBanTaiLieu" asp-action="Index" class="bento-card bento-card-secondary">
+                <div class="bento-card-icon"><i class="fas fa-file-alt"></i></div>
+                <div>
+                    <h3>Văn bản & tài liệu</h3>
+                    <p>Kho văn bản, biểu mẫu được công khai và cập nhật thường xuyên.</p>
+                    <span class="bento-cta">Tra cứu <i class="fas fa-arrow-right"></i></span>
+                </div>
+            </a>
+            <!-- Card 3 -->
+            <a asp-controller="CongThongTinAnSXH" asp-action="Index" class="bento-card bento-card-secondary">
+                <div class="bento-card-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                <div>
+                    <h3>Tiếp nhận ủng hộ</h3>
+                    <p>Chung tay vì an sinh xã hội.</p>
+                    <span class="bento-cta">Ủng hộ <i class="fas fa-arrow-right"></i></span>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
 <!-- ================= FEATURED NEWS ================= -->
 @if (Model.FeaturedNews != null && Model.FeaturedNews.Any())
 {
@@ -675,47 +716,6 @@
         </div>
     </section>
 }
-
-<!-- ================= UTILITIES (BENTO GRID) ================= -->
-<section class="utilities-section">
-    <div class="wrap">
-        <div class="utilities-header">
-            <span class="utilities-eyebrow">Tiện ích cho người dân</span>
-            <h2>Kết nối trực tiếp với Mặt trận</h2>
-            <p>Các dịch vụ trực tuyến giúp người dân phản ánh, tra cứu và đóng góp chỉ với vài thao tác.</p>
-        </div>
-        <div class="bento-grid">
-            <!-- Card 1 - Feature (largest) -->
-            <a asp-controller="GopY" asp-action="Index" class="bento-card bento-card-main">
-                <div class="sunburst"></div>
-                <div class="bento-card-icon"><i class="fas fa-comments"></i></div>
-                <div>
-                    <h3>Phản ánh & kiến nghị</h3>
-                    <p>Gửi ý kiến trực tuyến và theo dõi tiến độ xử lý công khai, minh bạch.</p>
-                    <span class="bento-cta">Gửi ngay <i class="fas fa-arrow-right"></i></span>
-                </div>
-            </a>
-            <!-- Card 2 -->
-            <a asp-controller="VanBanTaiLieu" asp-action="Index" class="bento-card bento-card-secondary">
-                <div class="bento-card-icon"><i class="fas fa-file-alt"></i></div>
-                <div>
-                    <h3>Văn bản & tài liệu</h3>
-                    <p>Kho văn bản, biểu mẫu được công khai và cập nhật thường xuyên.</p>
-                    <span class="bento-cta">Tra cứu <i class="fas fa-arrow-right"></i></span>
-                </div>
-            </a>
-            <!-- Card 3 -->
-            <a asp-controller="CongThongTinAnSXH" asp-action="Index" class="bento-card bento-card-secondary">
-                <div class="bento-card-icon"><i class="fas fa-hand-holding-heart"></i></div>
-                <div>
-                    <h3>Tiếp nhận ủng hộ</h3>
-                    <p>Chung tay vì an sinh xã hội.</p>
-                    <span class="bento-cta">Ủng hộ <i class="fas fa-arrow-right"></i></span>
-                </div>
-            </a>
-        </div>
-    </div>
-</section>
 
 <!-- ================= HOMEPAGE SECTIONS (từ DB) ================= -->
 @if (Model.Sections != null && Model.Sections.Any())

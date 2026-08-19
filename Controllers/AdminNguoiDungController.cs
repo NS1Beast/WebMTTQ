@@ -33,9 +33,8 @@ namespace WebMTTQ.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden);
             }
 
-            var query = _context.NguoiDungs
-                .Include(u => u.IdvaiTroNavigation)
-                .Where(u => u.DaXoa == null || u.DaXoa == false);
+            IQueryable<NguoiDung> query = _context.NguoiDungs
+                .Include(u => u.IdvaiTroNavigation);
 
             if (!string.IsNullOrEmpty(tuKhoa))
             {
@@ -49,7 +48,7 @@ namespace WebMTTQ.Controllers
             }
 
             var users = await query.OrderByDescending(u => u.NgayTao).ToListAsync();
-            var listVaiTro = await _context.VaiTros.Where(v => v.DaXoa == null || v.DaXoa == false).ToListAsync();
+            var listVaiTro = await _context.VaiTros.ToListAsync();
 
             // Lấy ID người dùng hiện tại để đánh dấu "chính mình"
             var currentUserId = int.Parse(HttpContext.Session.GetString("AdminUserId") ?? "0");
@@ -149,7 +148,6 @@ namespace WebMTTQ.Controllers
                     SoDienThoai = string.IsNullOrWhiteSpace(model.SoDienThoai) ? null : model.SoDienThoai.Trim(),
                     IdvaiTro = model.IdVaiTro,
                     TrangThai = "HoatDong",
-                    DaXoa = false,
                     NgayTao = DateTime.Now,
                     NgayCapNhat = DateTime.Now
                 };
@@ -179,7 +177,7 @@ namespace WebMTTQ.Controllers
 
             var user = await _context.NguoiDungs
                 .Include(u => u.IdvaiTroNavigation)
-                .FirstOrDefaultAsync(u => u.IdnguoiDung == id && (u.DaXoa == null || u.DaXoa == false));
+                .FirstOrDefaultAsync(u => u.IdnguoiDung == id);
 
             if (user == null) return NotFound();
 
@@ -232,7 +230,7 @@ namespace WebMTTQ.Controllers
 
             var user = await _context.NguoiDungs
                 .Include(u => u.IdvaiTroNavigation)
-                .FirstOrDefaultAsync(u => u.IdnguoiDung == id && (u.DaXoa == null || u.DaXoa == false));
+                .FirstOrDefaultAsync(u => u.IdnguoiDung == id);
 
             if (user == null) return NotFound();
 
@@ -349,9 +347,8 @@ namespace WebMTTQ.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Soft delete
-            user.DaXoa = true;
-            user.TrangThai = "BiXoa";
+            // Hard delete
+            _context.NguoiDungs.Remove(user);
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = $"Đã xóa tài khoản '{user.TenDangNhap}' thành công!";
@@ -373,7 +370,7 @@ namespace WebMTTQ.Controllers
 
             var user = await _context.NguoiDungs
                 .Include(u => u.IdvaiTroNavigation)
-                .FirstOrDefaultAsync(u => u.IdnguoiDung == id && (u.DaXoa == null || u.DaXoa == false));
+                .FirstOrDefaultAsync(u => u.IdnguoiDung == id);
 
             if (user == null) return NotFound();
 
@@ -409,7 +406,6 @@ namespace WebMTTQ.Controllers
             }
 
             var vaiTros = await _context.VaiTros
-                .Where(v => v.DaXoa == null || v.DaXoa == false)
                 .OrderBy(v => v.TenVaiTro)
                 .ToListAsync();
 
@@ -467,7 +463,6 @@ namespace WebMTTQ.Controllers
                     TenVaiTro = model.TenVaiTro.Trim(),
                     // QuyenHan sẽ được set chính xác trong SaveQuyenChoVaiTroAsync
                     QuyenHan = QuyenHelper.IsAdminVaiTro(model.TenVaiTro) ? QuyenBitmask.ToanQuyen : (byte)0,
-                    DaXoa = false,
                     NgayTao = DateTime.Now,
                     NgayCapNhat = DateTime.Now
                 };
@@ -595,15 +590,15 @@ namespace WebMTTQ.Controllers
             }
 
             // Kiểm tra có user nào đang dùng vai trò này không
-            var userCount = await _context.NguoiDungs.CountAsync(u => u.IdvaiTro == id && (u.DaXoa == null || u.DaXoa == false));
+            var userCount = await _context.NguoiDungs.CountAsync(u => u.IdvaiTro == id);
             if (userCount > 0)
             {
                 TempData["ErrorMessage"] = $"Không thể xóa vai trò này vì có {userCount} người dùng đang sử dụng.";
                 return RedirectToAction(nameof(VaiTro));
             }
 
-            // Soft delete
-            vaiTro.DaXoa = true;
+            // Hard delete
+            _context.VaiTros.Remove(vaiTro);
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = $"Đã xóa vai trò '{vaiTro.TenVaiTro}' thành công!";
@@ -617,7 +612,6 @@ namespace WebMTTQ.Controllers
         private async Task<List<VaiTro>> GetVaiTros()
         {
             return await _context.VaiTros
-                .Where(v => v.DaXoa == null || v.DaXoa == false)
                 .OrderBy(v => v.TenVaiTro)
                 .ToListAsync();
         }

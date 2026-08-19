@@ -1,12 +1,14 @@
 using System.Net;
 using System.Net.Mail;
-using WebMTTQ.Services;
+using System.Text;
+using WebMTTQ.Models;
 
 namespace WebMTTQ.Services
 {
     /// <summary>
     /// Implementation of IEmailService.
     /// Uses SMTP settings stored in CauHinhHeThong table.
+    /// Supports OTP emails and general-purpose notification emails.
     /// </summary>
     public class EmailService : IEmailService
     {
@@ -19,50 +21,52 @@ namespace WebMTTQ.Services
             _logger = logger;
         }
 
-        public async Task<bool> SendEmailAsync(string toEmail, string subject, string body)
+        // ================================================
+        // PUBLIC METHODS
+        // ================================================
+
+        public async Task<bool> SendEmailAsync(string toEmail, string subject, string body, bool isHtml = true)
+        {
+            var message = EmailMessage.Create(toEmail, subject, body, isHtml);
+            return await SendEmailAsync(message);
+        }
+
+        public async Task<bool> SendEmailAsync(EmailMessage message)
         {
             try
             {
-                var smtpHost = await _settings.GetValueAsync("SmtpHost");
-                var smtpPortStr = await _settings.GetValueAsync("SmtpPort");
-                var smtpUseSsl = await _settings.GetBooleanAsync("SmtpUseSsl");
-                var smtpUsername = await _settings.GetValueAsync("SmtpUsername");
-                var smtpPassword = await _settings.GetEncryptedValueAsync("SmtpPassword");
-                var smtpFromEmail = await _settings.GetValueAsync("SmtpFromEmail");
-                var smtpFromName = await _settings.GetValueAsync("SmtpFromName");
-
-                if (string.IsNullOrEmpty(smtpHost) || string.IsNullOrEmpty(smtpFromEmail))
+                // Validate message
+                if (message.To == null || message.To.Count == 0)
                 {
-                    _logger.LogWarning("SMTP chưa được cấu hình đầy đủ.");
+                    _logger.LogWarning("Không thể gửi email: thiếu người nhận.");
                     return false;
                 }
 
-                int smtpPort = int.TryParse(smtpPortStr, out var port) ? port : 587;
-
-                using var client = new SmtpClient(smtpHost, smtpPort)
+                // Load SMTP settings
+                var smtpConfig = await LoadSmtpConfigAsync();
+                if (!smtpConfig.IsValid)
                 {
-                    EnableSsl = smtpUseSsl,
+                    _logger.LogWarning("SMTP chưa được cấu hình đầy đủ: {Reason}", smtpConfig.InvalidReason);
+                    return false;
+                }
+
+                using var client = new SmtpClient(smtpConfig.Host, smtpConfig.Port)
+                {
+                    EnableSsl = smtpConfig.UseSsl,
                     UseDefaultCredentials = false,
-                    Credentials = new NetworkCredential(smtpUsername, smtpPassword),
+                    Credentials = new NetworkCredential(smtpConfig.Username, smtpConfig.Password),
                     Timeout = 30000
                 };
 
-                var mailMessage = new MailMessage
-                {
-                    From = new MailAddress(smtpFromEmail, string.IsNullOrEmpty(smtpFromName) ? "MTTQ Phường Tân Định" : smtpFromName),
-                    Subject = subject,
-                    Body = body,
-                    IsBodyHtml = true
-                };
-                mailMessage.To.Add(toEmail);
+                using var mailMessage = BuildMailMessage(message, smtpConfig);
 
                 await client.SendMailAsync(mailMessage);
-                _logger.LogInformation($"Email đã gửi thành công đến {toEmail}");
+                _logger.LogInformation("Email đã gửi thành công đến {Recipients}", string.Join(", ", message.To));
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Lỗi gửi email đến {toEmail}");
+                _logger.LogError(ex, "Lỗi gửi email đến {Recipients}", string.Join(", ", message.To ?? new List<string>()));
                 return false;
             }
         }
@@ -70,11 +74,108 @@ namespace WebMTTQ.Services
         public async Task<bool> SendOtpEmailAsync(string toEmail, string otpCode)
         {
             var subject = "Mã xác thực OTP - MTTQ Phường Tân Định";
-            var body = $@"
-<!DOCTYPE html>
+            var body = BuildOtpEmailBody(toEmail, otpCode);
+            return await SendEmailAsync(toEmail, subject, body, isHtml: true);
+        }
+
+        // ================================================
+        // PRIVATE HELPERS
+        // ================================================
+
+        private async Task<SmtpConfig> LoadSmtpConfigAsync()
+        {
+            var config = new SmtpConfig
+            {
+                Host = await _settings.GetValueAsync("SmtpHost"),
+                Port = int.TryParse(await _settings.GetValueAsync("SmtpPort"), out var port) ? port : 587,
+                UseSsl = await _settings.GetBooleanAsync("SmtpUseSsl"),
+                Username = await _settings.GetValueAsync("SmtpUsername"),
+                Password = await _settings.GetEncryptedValueAsync("SmtpPassword"),
+                FromEmail = await _settings.GetValueAsync("SmtpFromEmail"),
+                FromName = await _settings.GetValueAsync("SmtpFromName")
+            };
+
+            if (string.IsNullOrEmpty(config.FromName))
+            {
+                config.FromName = "MTTQ Phường Tân Định";
+            }
+
+            return config;
+        }
+
+        private MailMessage BuildMailMessage(EmailMessage message, SmtpConfig config)
+        {
+            var fromEmail = message.FromEmail ?? config.FromEmail;
+            var fromName = message.FromName ?? config.FromName;
+
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(fromEmail, fromName),
+                Subject = message.Subject,
+                Body = message.Body,
+                IsBodyHtml = message.IsHtml,
+                // QUAN TRỌNG: Đặt UTF-8 cho encoding để hỗ trợ tiếng Việt có dấu trong email HTML + subject
+                SubjectEncoding = Encoding.UTF8,
+                BodyEncoding = Encoding.UTF8,
+                HeadersEncoding = Encoding.UTF8,
+                // Chống spam: đánh dấu là email bình thường (không quảng cáo)
+                Priority = MailPriority.Normal
+            };
+
+            // Chống spam: set ReplyTo = chính From, giúp mail server nhận ra là email hợp lệ
+            try
+            {
+                mailMessage.ReplyToList.Add(new MailAddress(fromEmail));
+            }
+            catch { /* ignore invalid reply-to */ }
+
+            // Chống spam: thêm header X-Mailer + X-Priority chuẩn
+            mailMessage.Headers.Add("X-Mailer", "MTTQ Tan Dinh Mailer v1.0");
+            mailMessage.Headers.Add("X-Priority", "3"); // 3 = Normal (1 = High, 2 = Urgent, 3 = Normal)
+            mailMessage.Headers.Add("X-MSMail-Priority", "Normal");
+
+            // Add recipients
+            foreach (var to in message.To)
+            {
+                if (!string.IsNullOrWhiteSpace(to))
+                    mailMessage.To.Add(to);
+            }
+
+            // Add CC
+            foreach (var cc in message.Cc ?? new List<string>())
+            {
+                if (!string.IsNullOrWhiteSpace(cc))
+                    mailMessage.CC.Add(cc);
+            }
+
+            // Add BCC
+            foreach (var bcc in message.Bcc ?? new List<string>())
+            {
+                if (!string.IsNullOrWhiteSpace(bcc))
+                    mailMessage.Bcc.Add(bcc);
+            }
+
+            // Add attachments
+            foreach (var attachment in message.Attachments ?? new List<EmailAttachment>())
+            {
+                if (attachment.Content != null && attachment.Content.Length > 0)
+                {
+                    var stream = new MemoryStream(attachment.Content);
+                    var mailAttachment = new Attachment(stream, attachment.FileName, attachment.ContentType);
+                    mailMessage.Attachments.Add(mailAttachment);
+                }
+            }
+
+            return mailMessage;
+        }
+
+        private string BuildOtpEmailBody(string toEmail, string otpCode)
+        {
+            return $@"<!DOCTYPE html>
 <html>
 <head>
 <meta charset='utf-8' />
+<meta name='viewport' content='width=device-width, initial-scale=1.0' />
 <style>
     body {{ font-family: 'Segoe UI', Arial, sans-serif; background: #f7f7f7; margin: 0; padding: 20px; }}
     .container {{ max-width: 500px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }}
@@ -112,8 +213,44 @@ namespace WebMTTQ.Services
 </div>
 </body>
 </html>";
+        }
 
-            return await SendEmailAsync(toEmail, subject, body);
+        // ================================================
+        // SMTP CONFIG CLASS
+        // ================================================
+
+        private class SmtpConfig
+        {
+            public string Host { get; set; } = string.Empty;
+            public int Port { get; set; } = 587;
+            public bool UseSsl { get; set; } = true;
+            public string Username { get; set; } = string.Empty;
+            public string Password { get; set; } = string.Empty;
+            public string FromEmail { get; set; } = string.Empty;
+            public string FromName { get; set; } = string.Empty;
+
+            public bool IsValid
+            {
+                get
+                {
+                    return !string.IsNullOrEmpty(Host)
+                        && !string.IsNullOrEmpty(FromEmail)
+                        && !string.IsNullOrEmpty(Username)
+                        && !string.IsNullOrEmpty(Password);
+                }
+            }
+
+            public string InvalidReason
+            {
+                get
+                {
+                    if (string.IsNullOrEmpty(Host)) return "thiếu SmtpHost";
+                    if (string.IsNullOrEmpty(FromEmail)) return "thiếu SmtpFromEmail";
+                    if (string.IsNullOrEmpty(Username)) return "thiếu SmtpUsername";
+                    if (string.IsNullOrEmpty(Password)) return "thiếu SmtpPassword";
+                    return "không xác định";
+                }
+            }
         }
     }
 }

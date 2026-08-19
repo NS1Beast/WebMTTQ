@@ -259,6 +259,12 @@ namespace WebMTTQ.Models
         [EmailAddress(ErrorMessage = "Email không hợp lệ")]
         [Display(Name = "Email")]
         public string Email { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Indicates whether the entered email exists in the system.
+        /// null = not yet checked, true = exists, false = does not exist.
+        /// </summary>
+        public bool? IsEmailExists { get; set; }
     }
 
     // ================================================

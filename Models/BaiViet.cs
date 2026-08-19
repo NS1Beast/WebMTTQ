@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 namespace WebMTTQ.Models;
 
 [Table("BaiViet")]
-[Index("DaXoa", Name = "IDX_BaiViet_DaXoa")]
 [Index("DuongDan", Name = "IDX_BaiViet_DuongDan")]
 public partial class BaiViet
 {
@@ -55,8 +54,6 @@ public partial class BaiViet
 
     [Column(TypeName = "datetime")]
     public DateTime? NgayXuatBan { get; set; }
-
-    public bool? DaXoa { get; set; }
 
     [ForeignKey("IdchuyenMuc")]
     [InverseProperty("BaiViets")]

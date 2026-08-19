@@ -13,7 +13,7 @@
         <h2 style="margin:0; color:#333;">Thêm mốc thời gian</h2>
     </div>
 
-    <form asp-action="TimelineItemCreate" asp-controller="AdminTrangChu" method="post">
+    <form asp-action="TimelineItemCreate" asp-controller="AdminTrangChu" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn thêm mốc thời gian mới này?');">
         <input type="hidden" name="sectionId" value="@(ViewBag.SectionId ?? 0)" />
 
         <div style="margin-bottom:20px;">

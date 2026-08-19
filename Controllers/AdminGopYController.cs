@@ -24,7 +24,6 @@ namespace WebMTTQ.Controllers
             // Lấy danh sách góp ý chưa bị xóa, sắp xếp mới nhất lên đầu
             var danhSach = await _context.HopThuGopies
                 .Include(g => g.IdnguoiXuLyNavigation)
-                .Where(g => g.DaXoa == false || g.DaXoa == null)
                 .OrderByDescending(g => g.NgayGui)
                 .AsNoTracking()
                 .ToListAsync();
@@ -89,7 +88,7 @@ namespace WebMTTQ.Controllers
             return RedirectToAction(nameof(Details), new { id = id });
         }
 
-        // 4. HÀM XÓA (ẨN) GÓP Ý
+        // 4. HÀM XÓA CỨNG GÓP Ý
         [HttpPost]
         [ValidateAntiForgeryToken]
         [KiemTraQuyen(ModuleQuyen.GopY, "Xoa")]
@@ -98,7 +97,7 @@ namespace WebMTTQ.Controllers
             var gopy = await _context.HopThuGopies.FindAsync(id);
             if (gopy != null)
             {
-                gopy.DaXoa = true; // Đánh dấu xóa mềm
+                _context.HopThuGopies.Remove(gopy);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Đã xóa góp ý khỏi danh sách!";
             }

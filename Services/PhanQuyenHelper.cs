@@ -150,7 +150,7 @@ namespace WebMTTQ.Services
                 // cho version của role hiện tại
                 var current = await db.NguoiDungs
                     .AsNoTracking()
-                    .Where(u => u.IdnguoiDung == userId && (u.DaXoa == null || u.DaXoa == false))
+                    .Where(u => u.IdnguoiDung == userId)
                     .Select(u => new
                     {
                         u.IdvaiTro,

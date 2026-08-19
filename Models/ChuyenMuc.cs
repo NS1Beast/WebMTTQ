@@ -46,8 +46,6 @@ public partial class ChuyenMuc
 
     public int? ThuTu { get; set; }
 
-    public bool? DaXoa { get; set; }
-
     /// <summary>
     /// Trạng thái hiển thị trên dropdown menu (tối đa 10 chuyên mục hiển thị cùng lúc).
     /// true = Hiển thị, false = Ẩn.

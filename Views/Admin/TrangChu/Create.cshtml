@@ -20,7 +20,7 @@
         </div>
     }
 
-    <form asp-action="Create" method="post">
+    <form asp-action="Create" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn tạo mục mới này?');">
         @Html.AntiForgeryToken()
 
         <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">

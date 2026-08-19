@@ -1,4 +1,4 @@
-﻿@model WebMTTQ.Models.SoDuQuyCuuTro
+@model WebMTTQ.Models.SoDuQuy
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Thêm số dư Quỹ Cứu trợ";
@@ -16,7 +16,7 @@
 
 <div class="admin-card">
     <div class="admin-card-body">
-        <form action="/Admin/QuyCuuTro/ThemSoDu" method="post">
+        <form action="/Admin/QuyCuuTro/ThemSoDu" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn thêm bản ghi số dư mới này?');">
 
             <div class="admin-form-row">
                 <div class="admin-form-group">

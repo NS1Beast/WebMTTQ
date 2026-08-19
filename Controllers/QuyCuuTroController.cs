@@ -64,7 +64,8 @@ namespace WebMTTQ.Controllers
                 //                                .Take(pageSize).ToListAsync();
 
                 // 4. Số dư quỹ
-                ViewBag.SoDuQuy = await _context.SoDuQuyCuuTros
+                ViewBag.SoDuQuy = await _context.SoDuQues
+                                                .Where(x => x.LoaiQuy == "CuuTro")
                                                 .AsNoTracking()
                                                 .OrderByDescending(x => x.NgayCapNhat)
                                                 .FirstOrDefaultAsync();
@@ -73,8 +74,8 @@ namespace WebMTTQ.Controllers
                 int currentYear = DateTime.Now.Year;
                 if (!_cache.TryGetValue("HoatDongCuuTroCache", out HoatDongCuuTroCacheDto? hoatDongData) || hoatDongData == null)
                 {
-                    var dsHoatDong = await _context.KetQuaHoatDongCuuTros
-                                            .Where(x => x.TrangThai == true && x.Nam == currentYear)
+                    var dsHoatDong = await _context.KetQuaHoatDongs
+                                            .Where(x => x.LoaiHoatDong == "CuuTro" && x.TrangThai == true && x.Nam == currentYear)
                                             .AsNoTracking().ToListAsync();
 
                     hoatDongData = new HoatDongCuuTroCacheDto

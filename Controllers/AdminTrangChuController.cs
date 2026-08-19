@@ -436,6 +436,52 @@ namespace WebMTTQ.Controllers
             return RedirectToAction(nameof(Timeline));
         }
 
+        // POST: /AdminTrangChu/TimelineItemMoveUp/5
+        [HttpPost]
+        public async Task<IActionResult> TimelineItemMoveUp(int id)
+        {
+            var item = await _context.TimelineItems.FindAsync(id);
+            if (item == null) return NotFound();
+
+            var siblings = await _context.TimelineItems
+                .Where(i => i.IdTimelineSection == item.IdTimelineSection)
+                .OrderBy(i => i.SortOrder)
+                .ToListAsync();
+
+            var currentIndex = siblings.FindIndex(i => i.Id == id);
+            if (currentIndex <= 0) return RedirectToAction(nameof(Timeline));
+
+            var previousItem = siblings[currentIndex - 1];
+            (previousItem.SortOrder, item.SortOrder) = (item.SortOrder, previousItem.SortOrder);
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Đã di chuyển mốc thời gian lên!";
+            return RedirectToAction(nameof(Timeline));
+        }
+
+        // POST: /AdminTrangChu/TimelineItemMoveDown/5
+        [HttpPost]
+        public async Task<IActionResult> TimelineItemMoveDown(int id)
+        {
+            var item = await _context.TimelineItems.FindAsync(id);
+            if (item == null) return NotFound();
+
+            var siblings = await _context.TimelineItems
+                .Where(i => i.IdTimelineSection == item.IdTimelineSection)
+                .OrderBy(i => i.SortOrder)
+                .ToListAsync();
+
+            var currentIndex = siblings.FindIndex(i => i.Id == id);
+            if (currentIndex < 0 || currentIndex >= siblings.Count - 1) return RedirectToAction(nameof(Timeline));
+
+            var nextItem = siblings[currentIndex + 1];
+            (nextItem.SortOrder, item.SortOrder) = (item.SortOrder, nextItem.SortOrder);
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Đã di chuyển mốc thời gian xuống!";
+            return RedirectToAction(nameof(Timeline));
+        }
+
         // POST: /AdminTrangChu/TimelineUpdateSort
         [HttpPost]
         public async Task<IActionResult> TimelineUpdateSort([FromBody] List<SortItem> items)

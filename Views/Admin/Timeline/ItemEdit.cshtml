@@ -13,7 +13,7 @@
         <h2 style="margin:0; color:#333;">Sửa mốc thời gian</h2>
     </div>
 
-    <form asp-action="TimelineItemEdit" asp-controller="AdminTrangChu" method="post">
+    <form asp-action="TimelineItemEdit" asp-controller="AdminTrangChu" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn lưu các thay đổi của mốc thời gian này?');">
         <input type="hidden" name="id" value="@Model.Id" />
 
         <div style="margin-bottom:20px;">

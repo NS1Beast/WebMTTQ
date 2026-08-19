@@ -40,8 +40,6 @@ public partial class DonXinHoTro
     [Column(TypeName = "datetime")]
     public DateTime? NgayGui { get; set; }
 
-    public bool? DaXoa { get; set; }
-
     [ForeignKey("IdnguoiCanGiup")]
     [InverseProperty("DonXinHoTros")]
     public virtual NguoiCanGiupDo? IdnguoiCanGiupNavigation { get; set; }

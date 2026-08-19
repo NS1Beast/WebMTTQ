@@ -15,7 +15,7 @@
     </a>
 </div>
 
-<form asp-action="VaiTroEdit" asp-route-id="@Model.IdvaiTro" method="post">
+<form asp-action="VaiTroEdit" asp-route-id="@Model.IdvaiTro" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn lưu các thay đổi của vai trò này?');">
     @Html.AntiForgeryToken()
     <input type="hidden" asp-for="IdvaiTro" />
 

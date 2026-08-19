@@ -43,7 +43,5 @@ namespace WebMTTQ.Models
         [StringLength(50)]
         [Display(Name = "Trạng thái")]
         public string? TrangThai { get; set; }
-
-        public bool? DaXoa { get; set; }
     }
 }

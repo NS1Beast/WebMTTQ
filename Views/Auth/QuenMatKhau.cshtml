@@ -248,6 +248,28 @@
             <div class="title">Quên mật khẩu</div>
             <div class="subtitle">Nhập email để nhận mã OTP đặt lại mật khẩu</div>
 
+            @if (Model?.IsEmailExists == true)
+            {
+                <div class="message success">
+                    <i class="fas fa-check-circle"></i>
+                    Email này tồn tại trong hệ thống. Mã OTP sẽ được gửi đến email của bạn.
+                </div>
+            }
+            else if (Model?.IsEmailExists == false)
+            {
+                <div class="message error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Email này không tồn tại trong hệ thống. Vui lòng kiểm tra lại.
+                </div>
+            }
+            else
+            {
+                <div class="message info">
+                    <i class="fas fa-info-circle"></i>
+                    Hệ thống sẽ kiểm tra email của bạn trước khi gửi mã OTP.
+                </div>
+            }
+
             @if (TempData["InfoMessage"] != null)
             {
                 <div class="message info">

@@ -15,7 +15,7 @@
 
 <div class="admin-card">
     <div class="admin-card-body">
-        <form action="/AdminVanBanTaiLieu/Edit" method="post" enctype="multipart/form-data">
+        <form action="/AdminVanBanTaiLieu/Edit" method="post" enctype="multipart/form-data" onsubmit="return confirm('Bạn có chắc chắn muốn lưu các thay đổi của văn bản này?');">
             <input type="hidden" name="IdvanBan" value="@Model.IdvanBan" />
 
             <div class="admin-form-row">

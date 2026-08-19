@@ -121,18 +121,21 @@ namespace WebMTTQ.Controllers
         public async Task<IActionResult> SoDu()
         {
             ViewData["Title"] = "Số dư Quỹ Biển Đảo";
-            var data = await _context.SoDuQuyBienDaos.OrderByDescending(x => x.NgayCapNhat).ToListAsync();
+            var data = await _context.SoDuQues
+                .Where(x => x.LoaiQuy == "BienDao")
+                .OrderByDescending(x => x.NgayCapNhat).ToListAsync();
             return View("~/Views/Admin/QuyViBienDao/SoDu.cshtml", data);
         }
 
         [HttpGet] public IActionResult ThemSoDu() => View("~/Views/Admin/QuyViBienDao/ThemSoDu.cshtml");
 
         [HttpPost]
-        public async Task<IActionResult> ThemSoDu(SoDuQuyBienDao model)
+        public async Task<IActionResult> ThemSoDu(SoDuQuy model)
         {
             model.NgayCapNhat = DateTime.Now;
+            model.LoaiQuy = "BienDao";
             model.TongTonQuy = (model.TienMat ?? 0) + (model.TienGuiNganHang ?? 0);
-            _context.SoDuQuyBienDaos.Add(model);
+            _context.SoDuQues.Add(model);
             await _context.SaveChangesAsync();
             TempData["SuccessMessage"] = "Cập nhật số dư mới thành công!";
             return RedirectToAction("SoDu");
@@ -141,16 +144,20 @@ namespace WebMTTQ.Controllers
         [HttpGet]
         public async Task<IActionResult> SuaSoDu(int id)
         {
-            var item = await _context.SoDuQuyBienDaos.FindAsync(id);
+            var item = await _context.SoDuQues.FindAsync(id);
             if (item == null) return NotFound();
             return View("~/Views/Admin/QuyViBienDao/SuaSoDu.cshtml", item);
         }
 
         [HttpPost]
-        public async Task<IActionResult> SuaSoDu(SoDuQuyBienDao model)
+        public async Task<IActionResult> SuaSoDu(SoDuQuy model)
         {
-            model.TongTonQuy = (model.TienMat ?? 0) + (model.TienGuiNganHang ?? 0);
-            _context.SoDuQuyBienDaos.Update(model);
+            var existingItem = await _context.SoDuQues.FindAsync(model.Id);
+            if (existingItem == null) return NotFound();
+            existingItem.NgayCapNhat = DateTime.Now;
+            existingItem.TienMat = model.TienMat;
+            existingItem.TienGuiNganHang = model.TienGuiNganHang;
+            existingItem.TongTonQuy = (model.TienMat ?? 0) + (model.TienGuiNganHang ?? 0);
             await _context.SaveChangesAsync();
             TempData["SuccessMessage"] = "Cập nhật số dư thành công!";
             return RedirectToAction("SoDu");
@@ -159,8 +166,8 @@ namespace WebMTTQ.Controllers
         [HttpPost]
         public async Task<IActionResult> XoaSoDu(int id)
         {
-            var item = await _context.SoDuQuyBienDaos.FindAsync(id);
-            if (item != null) { _context.SoDuQuyBienDaos.Remove(item); await _context.SaveChangesAsync(); TempData["SuccessMessage"] = "Đã xóa số dư!"; }
+            var item = await _context.SoDuQues.FindAsync(id);
+            if (item != null && item.LoaiQuy == "BienDao") { _context.SoDuQues.Remove(item); await _context.SaveChangesAsync(); TempData["SuccessMessage"] = "Đã xóa số dư!"; }
             return RedirectToAction("SoDu");
         }
 
@@ -354,17 +361,20 @@ namespace WebMTTQ.Controllers
         public async Task<IActionResult> KetQua()
         {
             ViewData["Title"] = "Hoạt động hướng về Biển Đảo";
-            var data = await _context.KetQuaHoatDongBienDaos.OrderByDescending(x => x.Nam).ThenByDescending(x => x.Thang).ToListAsync();
+            var data = await _context.KetQuaHoatDongs
+                .Where(x => x.LoaiHoatDong == "BienDao")
+                .OrderByDescending(x => x.Nam).ThenByDescending(x => x.Thang).ToListAsync();
             return View("~/Views/Admin/QuyViBienDao/KetQua.cshtml", data);
         }
 
         [HttpGet] public IActionResult ThemKetQua() => View("~/Views/Admin/QuyViBienDao/ThemKetQua.cshtml");
 
         [HttpPost]
-        public async Task<IActionResult> ThemKetQua(KetQuaHoatDongBienDao model)
+        public async Task<IActionResult> ThemKetQua(KetQuaHoatDong model)
         {
             model.TrangThai = true;
-            _context.KetQuaHoatDongBienDaos.Add(model);
+            model.LoaiHoatDong = "BienDao";
+            _context.KetQuaHoatDongs.Add(model);
             await _context.SaveChangesAsync();
             TempData["SuccessMessage"] = "Thêm hoạt động thành công!";
             return RedirectToAction("KetQua");
@@ -373,15 +383,24 @@ namespace WebMTTQ.Controllers
         [HttpGet]
         public async Task<IActionResult> SuaKetQua(int id)
         {
-            var item = await _context.KetQuaHoatDongBienDaos.FindAsync(id);
+            var item = await _context.KetQuaHoatDongs.FindAsync(id);
             if (item == null) return NotFound();
             return View("~/Views/Admin/QuyViBienDao/SuaKetQua.cshtml", item);
         }
 
         [HttpPost]
-        public async Task<IActionResult> SuaKetQua(KetQuaHoatDongBienDao model)
+        public async Task<IActionResult> SuaKetQua(KetQuaHoatDong model)
         {
-            _context.KetQuaHoatDongBienDaos.Update(model);
+            var existingItem = await _context.KetQuaHoatDongs.FindAsync(model.Id);
+            if (existingItem == null) return NotFound();
+            existingItem.Thang = model.Thang;
+            existingItem.Nam = model.Nam;
+            existingItem.DonViUngHo = model.DonViUngHo;
+            existingItem.PhanLoaiDonVi = model.PhanLoaiDonVi;
+            existingItem.NoiDung = model.NoiDung;
+            existingItem.SoLuongHo = model.SoLuongHo;
+            existingItem.KinhPhi = model.KinhPhi;
+            existingItem.TrangThai = model.TrangThai;
             await _context.SaveChangesAsync();
             TempData["SuccessMessage"] = "Cập nhật hoạt động thành công!";
             return RedirectToAction("KetQua");
@@ -390,8 +409,8 @@ namespace WebMTTQ.Controllers
         [HttpPost]
         public async Task<IActionResult> XoaKetQua(int id)
         {
-            var item = await _context.KetQuaHoatDongBienDaos.FindAsync(id);
-            if (item != null) { _context.KetQuaHoatDongBienDaos.Remove(item); await _context.SaveChangesAsync(); TempData["SuccessMessage"] = "Đã xóa hoạt động!"; }
+            var item = await _context.KetQuaHoatDongs.FindAsync(id);
+            if (item != null && item.LoaiHoatDong == "BienDao") { _context.KetQuaHoatDongs.Remove(item); await _context.SaveChangesAsync(); TempData["SuccessMessage"] = "Đã xóa hoạt động!"; }
             return RedirectToAction("KetQua");
         }
     }

@@ -16,7 +16,7 @@
 
 <div class="admin-card">
     <div class="admin-card-body">
-        <form action="/Admin/QuyCuuTro/SuaDanhSach" method="post">
+        <form action="/Admin/QuyCuuTro/SuaDanhSach" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn lưu các thay đổi của lượt ủng hộ này?');">
             <input type="hidden" name="Id" value="@Model.Id" />
             <input type="hidden" name="HienThi" value="true" />
 

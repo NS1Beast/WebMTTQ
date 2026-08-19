@@ -46,8 +46,7 @@ namespace WebMTTQ.Controllers
 
             var user = await _context.NguoiDungs
                 .Include(u => u.IdvaiTroNavigation)
-                .FirstOrDefaultAsync(u => u.TenDangNhap == model.TenDangNhap
-                                       && (u.DaXoa == null || u.DaXoa == false));
+                .FirstOrDefaultAsync(u => u.TenDangNhap == model.TenDangNhap);
 
             if (user != null && PasswordHelper.VerifyPassword(model.MatKhau, user.MatKhau))
             {
@@ -134,24 +133,17 @@ namespace WebMTTQ.Controllers
             // Kiểm tra email có tồn tại trong hệ thống không
             var user = await _context.NguoiDungs
                 .Include(u => u.IdvaiTroNavigation)
-                .FirstOrDefaultAsync(u => u.Email == model.Email
-                                       && (u.DaXoa == null || u.DaXoa == false));
+                .FirstOrDefaultAsync(u => u.Email == model.Email);
 
             if (user == null)
             {
-                // Không tiết lộ email có tồn tại hay không vì lý do bảo mật
-                TempData["InfoMessage"] = "Nếu email này tồn tại trong hệ thống, mã OTP sẽ được gửi đến email của bạn.";
-                // Vẫn redirect tới trang xác nhận OTP để tránh lộ thông tin
-                return RedirectToAction(nameof(XacNhanOtp), new { email = model.Email });
+                // Email không tồn tại - hiển thị thông báo trên trang quên mật khẩu
+                model.IsEmailExists = false;
+                return View(model);
             }
 
-            // TUYỆT ĐỐI KHÔNG cho phép đặt lại mật khẩu tài khoản Admin qua email
-            // (chỉ Admin mới có thể đổi mật khẩu cho chính mình qua trang cá nhân)
-            if (QuyenHelper.IsAdminVaiTro(user.IdvaiTroNavigation?.TenVaiTro))
-            {
-                TempData["InfoMessage"] = "Nếu email này tồn tại trong hệ thống, mã OTP sẽ được gửi đến email của bạn.";
-                return RedirectToAction(nameof(XacNhanOtp), new { email = model.Email });
-            }
+            // Email tồn tại - hiển thị thông báo thành công
+            model.IsEmailExists = true;
 
             // Kiểm tra thời gian gửi lại OTP (tối thiểu 2 phút giữa các lần gửi)
             var lastOtp = await _context.MaXacThus
@@ -191,14 +183,16 @@ namespace WebMTTQ.Controllers
 
             if (emailSent)
             {
-                TempData["SuccessMessage"] = "Mã OTP đã được gửi đến email của bạn. Mã có hiệu lực trong 2 phút.";
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Đã có lỗi khi gửi email. Vui lòng thử lại sau hoặc liên hệ quản trị viên.";
+                // Chuyển hướng tới trang xác nhận OTP nơi ô nhập mã OTP hiển thị
+                return RedirectToAction(nameof(XacNhanOtp), new { email = model.Email });
             }
 
-            return RedirectToAction(nameof(XacNhanOtp), new { email = model.Email });
+            // Nếu gửi email thất bại, xóa OTP vừa tạo để tránh rác
+            _context.MaXacThus.Remove(maXacThuc);
+            await _context.SaveChangesAsync();
+
+            TempData["ErrorMessage"] = "Đã có lỗi khi gửi email. Vui lòng kiểm tra cấu hình SMTP trong trang quản trị hoặc thử lại sau.";
+            return RedirectToAction(nameof(QuenMatKhau));
         }
 
         // ================================================
@@ -292,20 +286,12 @@ namespace WebMTTQ.Controllers
             // Tìm và cập nhật mật khẩu
             var user = await _context.NguoiDungs
                 .Include(u => u.IdvaiTroNavigation)
-                .FirstOrDefaultAsync(u => u.Email == model.Email
-                                       && (u.DaXoa == null || u.DaXoa == false));
+                .FirstOrDefaultAsync(u => u.Email == model.Email);
 
             if (user == null)
             {
                 TempData["ErrorMessage"] = "Không tìm thấy tài khoản với email này.";
                 return RedirectToAction(nameof(QuenMatKhau));
-            }
-
-            // TUYỆT ĐỐI KHÔNG cho phép đặt lại mật khẩu tài khoản Admin qua email
-            if (QuyenHelper.IsAdminVaiTro(user.IdvaiTroNavigation?.TenVaiTro))
-            {
-                TempData["ErrorMessage"] = "Tài khoản quản trị viên không thể đặt lại mật khẩu qua email. Vui lòng liên hệ quản trị viên hệ thống.";
-                return RedirectToAction(nameof(Login));
             }
 
             user.MatKhau = PasswordHelper.HashPassword(model.MatKhauMoi);

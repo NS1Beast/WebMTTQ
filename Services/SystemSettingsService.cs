@@ -16,10 +16,7 @@ namespace WebMTTQ.Services
         private readonly IDataProtector _protector;
 
         // List of keys that should be encrypted
-        private static readonly List<string> _encryptedKeys = new()
-        {
-            "SmtpPassword"
-        };
+        private static readonly List<string> _encryptedKeys = new();
 
         public SystemSettingsService(DataMTTQContext context, IDataProtectionProvider protectionProvider)
         {
@@ -73,8 +70,8 @@ namespace WebMTTQ.Services
             }
             catch
             {
-                // If decryption fails, return empty (data may be corrupted or plain text)
-                return string.Empty;
+                // If decryption fails, the value may already be plain text (backward compatibility)
+                return encryptedValue;
             }
         }
 
@@ -93,7 +90,8 @@ namespace WebMTTQ.Services
             }
             catch
             {
-                return string.Empty;
+                // If decryption fails, the value may already be plain text (backward compatibility)
+                return config.GiaTriCauHinh;
             }
         }
 
