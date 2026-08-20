@@ -19,6 +19,19 @@
     </div>
 </div>
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div style="background:#f8d7da; color:#721c24; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #f5c6cb;">
+        <i class="fas fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div style="background:#d4edda; color:#155724; padding:15px; border-radius:8px; margin-bottom:20px; border:1px solid #c3e6cb;">
+        <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+    </div>
+}
+
 <div style="background:#fff; border:1px solid #eae5e1; border-radius:12px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
     <div style="overflow-x:auto;">
         <table class="admin-table">
@@ -27,6 +40,7 @@
                     <th>ID</th>
                     <th>Tên vai trò</th>
                     <th>Số module quyền</th>
+                    <th>Số người dùng</th>
                     <th>Ngày tạo</th>
                     <th style="width:120px;">Thao tác</th>
                 </tr>
@@ -35,7 +49,7 @@
                 @if (Model.Count == 0)
                 {
                     <tr>
-                        <td colspan="5" style="text-align:center; padding:40px; color:#999;">
+                        <td colspan="6" style="text-align:center; padding:40px; color:#999;">
                             <i class="fas fa-inbox" style="font-size:2rem; display:block; margin-bottom:12px;"></i>
                             Không có vai trò nào
                         </td>
@@ -46,6 +60,8 @@
                     var isAdmin = WebMTTQ.Models.QuyenHelper.IsAdminVaiTro(vaiTro.TenVaiTro);
                     var moduleCounts = ViewBag.ModuleCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
                     var soQuyen = moduleCounts.ContainsKey(vaiTro.IdvaiTro) ? moduleCounts[vaiTro.IdvaiTro] : 0;
+                    var userCounts = ViewBag.UserCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
+                    var soNguoiDung = userCounts.ContainsKey(vaiTro.IdvaiTro) ? userCounts[vaiTro.IdvaiTro] : 0;
                     <tr>
                         <td>@vaiTro.IdvaiTro</td>
                         <td>
@@ -59,6 +75,15 @@
                             <span style="display:inline-block; background:rgba(16,185,129,0.1); color:#059669; padding:3px 10px; border-radius:12px; font-size:0.75rem; font-weight:600;">
                                 @soQuyen module
                             </span>
+                        </td>
+                        <td>
+                            <span style="display:inline-block; background:@(soNguoiDung > 0 ? "rgba(239,68,68,0.1)" : "rgba(16,185,129,0.1)"); color:@(soNguoiDung > 0 ? "#dc2626" : "#059669"); padding:3px 10px; border-radius:12px; font-size:0.75rem; font-weight:600;">
+                                @soNguoiDung người dùng
+                            </span>
+                            @if (soNguoiDung > 0)
+                            {
+                                <div style="font-size:0.7rem; color:#dc2626; margin-top:4px;">Cần chuyển người dùng trước khi xóa</div>
+                            }
                         </td>
                         <td>@(vaiTro.NgayTao?.ToString("dd/MM/yyyy") ?? "-")</td>
                         <td>

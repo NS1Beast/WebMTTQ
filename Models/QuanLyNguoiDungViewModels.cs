@@ -73,6 +73,7 @@ namespace WebMTTQ.Models
         public DateTime? NgayTao { get; set; }
         public int SoModuleDuocQuyen { get; set; }
         public bool LaAdmin { get; set; }
+        public bool LaChinhAdmin { get; set; }
         public bool LaChinhMinh { get; set; }
     }
 

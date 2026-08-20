@@ -69,6 +69,7 @@ namespace WebMTTQ.Controllers
                     TrangThai = u.TrangThai,
                     NgayTao = u.NgayTao,
                     LaAdmin = QuyenHelper.IsAdminVaiTro(u.IdvaiTroNavigation?.TenVaiTro),
+                    LaChinhAdmin = u.TenDangNhap == "MTTQAdmin",
                     LaChinhMinh = u.IdnguoiDung == currentUserId
                 }).ToList()
             };
@@ -190,6 +191,13 @@ namespace WebMTTQ.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            // TUYỆT ĐỐI KHÔNG cho phép chỉnh sửa tài khoản Admin chính (MTTQAdmin) bởi người khác
+            if (user.TenDangNhap == "MTTQAdmin")
+            {
+                TempData["ErrorMessage"] = "Không thể chỉnh sửa tài khoản Admin chính (MTTQAdmin) qua trang quản lý người dùng!";
+                return RedirectToAction(nameof(Index));
+            }
+
             // Admin không được sửa chính tài khoản của mình qua trang quản lý
             // (chỉ được sửa thông tin cá nhân qua trang cá nhân)
             var currentUserId = int.Parse(HttpContext.Session.GetString("AdminUserId") ?? "0");
@@ -240,6 +248,13 @@ namespace WebMTTQ.Controllers
             if (targetIsAdmin && !currentUserIsAdmin)
             {
                 TempData["ErrorMessage"] = "Bạn không có quyền chỉnh sửa tài khoản quản trị viên!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // TUYỆT ĐỐI KHÔNG cho phép chỉnh sửa tài khoản Admin chính (MTTQAdmin) bởi người khác
+            if (user.TenDangNhap == "MTTQAdmin")
+            {
+                TempData["ErrorMessage"] = "Không thể chỉnh sửa tài khoản Admin chính (MTTQAdmin) qua trang quản lý người dùng!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -332,19 +347,38 @@ namespace WebMTTQ.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // TUYỆT ĐỐI KHÔNG cho phép xóa tài khoản có vai trò Admin
-            if (QuyenHelper.IsAdminVaiTro(user.IdvaiTroNavigation?.TenVaiTro))
-            {
-                TempData["ErrorMessage"] = "Không thể xóa tài khoản quản trị viên! Tài khoản Admin là bất khả xâm phạm.";
-                return RedirectToAction(nameof(Index));
-            }
-
             // Không cho phép xóa chính mình
             var currentUserId = int.Parse(HttpContext.Session.GetString("AdminUserId") ?? "0");
             if (user.IdnguoiDung == currentUserId)
             {
                 TempData["ErrorMessage"] = "Bạn không thể xóa tài khoản của chính mình!";
                 return RedirectToAction(nameof(Index));
+            }
+
+            // TUYỆT ĐỐI KHÔNG cho phép xóa tài khoản Admin chính (MTTQAdmin)
+            if (user.TenDangNhap == "MTTQAdmin")
+            {
+                TempData["ErrorMessage"] = "Không thể xóa tài khoản Admin chính (MTTQAdmin)! Tài khoản này là bất khả xâm phạm.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Kiểm tra quyền xóa tài khoản Admin
+            var targetIsAdmin = QuyenHelper.IsAdminVaiTro(user.IdvaiTroNavigation?.TenVaiTro);
+            if (targetIsAdmin)
+            {
+                var currentUser = await _context.NguoiDungs
+                    .Include(u => u.IdvaiTroNavigation)
+                    .FirstOrDefaultAsync(u => u.IdnguoiDung == currentUserId);
+
+                var currentUserIsAdmin = currentUser != null && QuyenHelper.IsAdminVaiTro(currentUser.IdvaiTroNavigation?.TenVaiTro);
+                var currentUserIsChinhAdmin = currentUser != null && currentUser.TenDangNhap == "MTTQAdmin";
+
+                // Chỉ Admin chính (MTTQAdmin) mới được xóa tài khoản Admin phụ
+                if (!currentUserIsChinhAdmin)
+                {
+                    TempData["ErrorMessage"] = "Chỉ Admin chính (MTTQAdmin) mới có quyền xóa tài khoản quản trị viên khác!";
+                    return RedirectToAction(nameof(Index));
+                }
             }
 
             // Hard delete
@@ -417,6 +451,15 @@ namespace WebMTTQ.Controllers
                 moduleCounts[vt.IdvaiTro] = quyens.Count;
             }
             ViewBag.ModuleCounts = moduleCounts;
+
+            // Đếm số người dùng cho từng vai trò
+            var userCounts = new Dictionary<int, int>();
+            foreach (var vt in vaiTros)
+            {
+                var count = await _context.NguoiDungs.CountAsync(u => u.IdvaiTro == vt.IdvaiTro);
+                userCounts[vt.IdvaiTro] = count;
+            }
+            ViewBag.UserCounts = userCounts;
 
             return View("~/Views/Admin/NguoiDung/VaiTro.cshtml", vaiTros);
         }
@@ -590,10 +633,15 @@ namespace WebMTTQ.Controllers
             }
 
             // Kiểm tra có user nào đang dùng vai trò này không
-            var userCount = await _context.NguoiDungs.CountAsync(u => u.IdvaiTro == id);
-            if (userCount > 0)
+            var users = await _context.NguoiDungs
+                .Where(u => u.IdvaiTro == id)
+                .Select(u => u.TenDangNhap)
+                .ToListAsync();
+
+            if (users.Count > 0)
             {
-                TempData["ErrorMessage"] = $"Không thể xóa vai trò này vì có {userCount} người dùng đang sử dụng.";
+                var usernames = string.Join(", ", users.Select(u => $"\"{u}\""));
+                TempData["ErrorMessage"] = $"Không thể xóa vai trò \"{vaiTro.TenVaiTro}\" vì có {users.Count} người dùng đang sử dụng: {usernames}. Vui lòng chuyển vai trò của các người dùng này sang vai trò khác trước khi xóa.";
                 return RedirectToAction(nameof(VaiTro));
             }
 

@@ -431,7 +431,7 @@ namespace WebMTTQ.Controllers
                     .AnyAsync(b => b.IdchuyenMuc == id);
                 if (hasArticles)
                 {
-                    TempData["ErrorMessage"] = "Không thể xóa chuyên mục vì vẫn còn bài viết trong chuyên mục này!";
+                    TempData["ErrorMessage"] = $"Không thể xóa chuyên mục \"{chuyenMuc.TenChuyenMuc}\" vì vẫn còn bài viết trong chuyên mục này! Vui lòng chuyển hoặc xóa bài viết trước.";
                     return RedirectToAction(nameof(Categories));
                 }
 
@@ -440,6 +440,51 @@ namespace WebMTTQ.Controllers
                 TempData["SuccessMessage"] = "Xóa chuyên mục thành công!";
             }
             return RedirectToAction(nameof(Categories));
+        }
+
+        // POST: /AdminNews/MoveCategory
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MoveCategory(int id, int newCategoryId)
+        {
+            var baiViet = await _context.BaiViets.FindAsync(id);
+            if (baiViet == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy bài viết cần chuyển!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Kiểm tra chuyên mục mới tồn tại
+            var newCategory = await _context.ChuyenMucs
+                .FirstOrDefaultAsync(c => c.IdchuyenMuc == newCategoryId
+                    && c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc);
+            if (newCategory == null)
+            {
+                TempData["ErrorMessage"] = "Chuyên mục đích không tồn tại!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Kiểm tra chuyên mục mới khác chuyên mục hiện tại
+            if (baiViet.IdchuyenMuc == newCategoryId)
+            {
+                TempData["ErrorMessage"] = "Bài viết đang ở trong chuyên mục này rồi!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Kiểm tra có ít nhất 2 chuyên mục
+            var totalCategories = await _context.ChuyenMucs
+                .CountAsync(c => c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc);
+            if (totalCategories < 2)
+            {
+                TempData["ErrorMessage"] = "Cần ít nhất 2 chuyên mục để chuyển bài viết qua lại!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            baiViet.IdchuyenMuc = newCategoryId;
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Đã chuyển bài viết \"{baiViet.TieuDe}\" sang chuyên mục \"{newCategory.TenChuyenMuc}\" thành công!";
+            return RedirectToAction(nameof(Index));
         }
 
         // POST: /AdminNews/CategoryToggleStatus/5

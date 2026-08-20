@@ -78,7 +78,11 @@
                         <td>@user.IdnguoiDung</td>
                         <td>
                             <strong>@user.TenDangNhap</strong>
-                            @if (user.LaAdmin)
+                            @if (user.LaChinhAdmin)
+                            {
+                                <span style="display:inline-block; margin-left:6px; background:rgba(139,26,43,0.15); color:#8b1a2b; padding:2px 8px; border-radius:12px; font-size:0.7rem; font-weight:600;">ADMIN CHÍNH</span>
+                            }
+                            else if (user.LaAdmin)
                             {
                                 <span style="display:inline-block; margin-left:6px; background:rgba(139,26,43,0.1); color:#8b1a2b; padding:2px 8px; border-radius:12px; font-size:0.7rem; font-weight:600;">ADMIN</span>
                             }
@@ -112,14 +116,23 @@
                                     <a href="/AdminNguoiDung/Edit/@user.IdnguoiDung" class="admin-btn-icon" title="Chinh sua (bao gom doi mat khau)" style="padding:6px 10px; border-radius:8px; font-size:0.8rem; background:rgba(245,158,11,0.1); color:#d97706;">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    @if (!user.LaAdmin)
+                                    @if (!user.LaChinhAdmin)
                                     {
-                                        <form asp-action="Delete" asp-route-id="@user.IdnguoiDung" method="post" style="margin:0;" onsubmit="return confirm('Ban chac chan muon xoa nguoi dung nay?');">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="admin-btn-icon" title="Xoa" style="padding:6px 10px; border-radius:8px; font-size:0.8rem; background:rgba(239,68,68,0.1); color:#dc2626; border:none; cursor:pointer;">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
-                                        </form>
+                                        if (!user.LaAdmin)
+                                        {
+                                            <form asp-action="Delete" asp-route-id="@user.IdnguoiDung" method="post" style="margin:0;" onsubmit="return confirm('Ban chac chan muon xoa nguoi dung nay?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="admin-btn-icon" title="Xoa" style="padding:6px 10px; border-radius:8px; font-size:0.8rem; background:rgba(239,68,68,0.1); color:#dc2626; border:none; cursor:pointer;">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <span style="display:inline-block; padding:6px 10px; border-radius:8px; font-size:0.7rem; background:rgba(139,26,43,0.08); color:#8b1a2b; font-weight:600; cursor:pointer;" title="Chỉ Admin chinh (MTTQAdmin) moi xoa duoc">
+                                                <i class="fas fa-lock"></i> Admin phu
+                                            </span>
+                                        }
                                     }
                                 }
                                 else if (user.LaChinhMinh)

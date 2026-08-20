@@ -111,6 +111,15 @@ namespace WebMTTQ.Controllers
             var section = await _context.TrangChuMucs.FindAsync(id);
             if (section != null)
             {
+                // Kiểm tra có tin tức trong mục này không
+                var hasTinTuc = await _context.TrangChuTinTucs
+                    .AnyAsync(t => t.IdTrangChuMuc == id);
+                if (hasTinTuc)
+                {
+                    TempData["ErrorMessage"] = $"Không thể xóa mục \"{section.TieuDe}\" vì vẫn còn tin tức trong mục này! Vui lòng chuyển hoặc xóa tin tức trước.";
+                    return RedirectToAction(nameof(Index));
+                }
+
                 _context.TrangChuMucs.Remove(section);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Xóa mục Trang chủ thành công!";
@@ -523,7 +532,56 @@ namespace WebMTTQ.Controllers
                 .ToListAsync();
 
             ViewBag.Section = section;
+            ViewBag.Sections = await _context.TrangChuMucs
+                .Where(s => s.Loai == "tin-tuc")
+                .OrderBy(s => s.ThuTu)
+                .ToListAsync();
             return View("~/Views/Admin/TrangChu/TinTuc/Index.cshtml", tinTucs);
+        }
+
+        // POST: /AdminTrangChu/TinTuc/Move/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> TinTucMove(int id, int newSectionId)
+        {
+            var tinTuc = await _context.TrangChuTinTucs.FindAsync(id);
+            if (tinTuc == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy tin tức cần chuyển!";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Kiểm tra mục đích tồn tại
+            var newSection = await _context.TrangChuMucs
+                .FirstOrDefaultAsync(s => s.Id == newSectionId && s.Loai == "tin-tuc");
+            if (newSection == null)
+            {
+                TempData["ErrorMessage"] = "Mục đích không tồn tại!";
+                return RedirectToAction(nameof(TinTucList), new { id = tinTuc.IdTrangChuMuc });
+            }
+
+            // Kiểm tra mục mới khác mục hiện tại
+            if (tinTuc.IdTrangChuMuc == newSectionId)
+            {
+                TempData["ErrorMessage"] = "Tin tức đang ở trong mục này rồi!";
+                return RedirectToAction(nameof(TinTucList), new { id = tinTuc.IdTrangChuMuc });
+            }
+
+            // Kiểm tra có ít nhất 2 mục
+            var totalSections = await _context.TrangChuMucs
+                .CountAsync(s => s.Loai == "tin-tuc");
+            if (totalSections < 2)
+            {
+                TempData["ErrorMessage"] = "Cần ít nhất 2 mục tin tức để chuyển qua lại!";
+                return RedirectToAction(nameof(TinTucList), new { id = tinTuc.IdTrangChuMuc });
+            }
+
+            int oldSectionId = tinTuc.IdTrangChuMuc;
+            tinTuc.IdTrangChuMuc = newSectionId;
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Đã chuyển tin tức \"{tinTuc.TieuDe}\" sang mục \"{newSection.TieuDe}\" thành công!";
+            return RedirectToAction(nameof(TinTucList), new { id = oldSectionId });
         }
 
         // GET: /AdminTrangChu/TinTuc/Create/5
