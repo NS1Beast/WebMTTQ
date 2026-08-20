@@ -80,6 +80,34 @@ namespace WebMTTQ.Controllers
             }
             catch { ViewBag.ListYeuCauMoi = null; }
 
+            // 7. Lấy 5 góp ý MỚI NHẤT
+            try
+            {
+                ViewBag.ListGopYMoi = await _context.HopThuGopies
+                    .OrderByDescending(x => x.NgayGui)
+                    .Take(5)
+                    .ToListAsync();
+            }
+            catch { ViewBag.ListGopYMoi = null; }
+
+            // 8. Lấy 5 bài viết MỚI NHẤT
+            try
+            {
+                ViewBag.ListTinTucMoi = await _context.BaiViets
+                    .OrderByDescending(x => x.NgayXuatBan)
+                    .Take(5)
+                    .ToListAsync();
+            }
+            catch { ViewBag.ListTinTucMoi = null; }
+
+            // 9. Thống kê tổng số người dùng
+            try { ViewBag.TongNguoiDung = await _context.NguoiDungs.CountAsync(); }
+            catch { ViewBag.TongNguoiDung = 0; }
+
+            // 10. Thống kê tổng số lượt xem bài viết
+            try { ViewBag.TongLuotXem = await _context.BaiViets.SumAsync(x => (int?)x.LuotXem) ?? 0; }
+            catch { ViewBag.TongLuotXem = 0; }
+
             return View("~/Views/Admin/Dashboard/Index.cshtml");
         }
     }

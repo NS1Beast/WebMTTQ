@@ -5,164 +5,722 @@
     // Hàm format tiền tệ
     var culture = new System.Globalization.CultureInfo("vi-VN");
     string FormatVND(decimal amount) => amount.ToString("C0", culture);
+
+    // Lấy tên người dùng hiện tại
+    var tenNguoiDung = Context.Session.GetString("AdminHoTen") ?? "Admin";
 }
 
 <style>
-    /* CSS CHO DASHBOARD HIỆN ĐẠI */
-    .admin-welcome {
+    /* ========================================================
+       DASHBOARD HIỆN ĐẠI - MTTQ ADMIN
+       ======================================================== */
+
+    /* --- WELCOME BANNER --- */
+    .dash-welcome {
         background: linear-gradient(135deg, #8a1527 0%, #4a0a11 100%);
-        color: white; padding: 25px 30px; border-radius: 12px; margin-bottom: 25px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1); position: relative; overflow: hidden;
+        color: white;
+        padding: 28px 32px;
+        border-radius: 16px;
+        margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(139, 26, 43, 0.25);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
     }
-    .admin-welcome::after {
-        content: '\f19c'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
-        position: absolute; right: 30px; top: -10px; font-size: 8rem; opacity: 0.1; transform: rotate(-15deg);
+    .dash-welcome::before {
+        content: '';
+        position: absolute;
+        top: -60px;
+        right: -40px;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        background: rgba(232, 184, 75, 0.08);
     }
-    .admin-welcome h2 { margin: 0 0 8px 0; font-size: 1.6rem; font-family: 'Playfair Display', serif; }
-    .admin-welcome p { margin: 0; font-size: 0.95rem; opacity: 0.9; }
+    .dash-welcome::after {
+        content: '\f19c';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        position: absolute;
+        right: 40px;
+        top: 10px;
+        font-size: 7rem;
+        opacity: 0.08;
+        transform: rotate(-15deg);
+    }
+    .dash-welcome-left { position: relative; z-index: 1; }
+    .dash-welcome-left h2 {
+        margin: 0 0 6px 0;
+        font-size: 1.5rem;
+        font-family: 'Playfair Display', Georgia, serif;
+        font-weight: 700;
+    }
+    .dash-welcome-left p {
+        margin: 0;
+        font-size: 0.9rem;
+        opacity: 0.85;
+    }
+    .dash-welcome-left .dash-date {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 12px;
+        background: rgba(255,255,255,0.1);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        color: #f0d48a;
+    }
+    .dash-welcome-right {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        gap: 12px;
+        flex-shrink: 0;
+    }
+    .dash-welcome-right .welcome-stat {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 12px;
+        padding: 14px 20px;
+        text-align: center;
+        min-width: 110px;
+        backdrop-filter: blur(4px);
+    }
+    .dash-welcome-right .welcome-stat .ws-value {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #e8b84b;
+        line-height: 1.2;
+    }
+    .dash-welcome-right .welcome-stat .ws-label {
+        font-size: 0.7rem;
+        color: rgba(255,255,255,0.6);
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
 
-    /* LƯỚI KPI CARDS */
-    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    /* --- KPI CARDS --- */
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 18px;
+        margin-bottom: 28px;
+    }
     .kpi-card {
-        background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.04);
-        display: flex; align-items: center; transition: transform 0.3s ease;
+        background: #fff;
+        padding: 22px 20px;
+        border-radius: 14px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.03);
+        position: relative;
+        overflow: hidden;
     }
-    .kpi-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+    .kpi-card::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--kpi-color, #8b1a2b), transparent);
+        opacity: 0.6;
+    }
+    .kpi-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+    }
     .kpi-icon {
-        width: 55px; height: 55px; border-radius: 10px; display: flex; justify-content: center; align-items: center;
-        font-size: 1.6rem; margin-right: 15px; flex-shrink: 0;
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
     }
-    .icon-money { background: rgba(212, 149, 68, 0.15); color: #d49544; }
-    .icon-alert { background: rgba(220, 53, 69, 0.15); color: #dc3545; }
-    .icon-news { background: rgba(0, 123, 255, 0.15); color: #007bff; }
-    .icon-doc { background: rgba(111, 66, 193, 0.15); color: #6f42c1; }
+    .kpi-icon.icon-money { background: linear-gradient(135deg, rgba(212,149,68,0.15), rgba(212,149,68,0.05)); color: #d49544; }
+    .kpi-icon.icon-alert { background: linear-gradient(135deg, rgba(220,53,69,0.15), rgba(220,53,69,0.05)); color: #dc3545; }
+    .kpi-icon.icon-news { background: linear-gradient(135deg, rgba(0,123,255,0.15), rgba(0,123,255,0.05)); color: #007bff; }
+    .kpi-icon.icon-doc { background: linear-gradient(135deg, rgba(111,66,193,0.15), rgba(111,66,193,0.05)); color: #6f42c1; }
+    .kpi-icon.icon-users { background: linear-gradient(135deg, rgba(23,162,184,0.15), rgba(23,162,184,0.05)); color: #17a2b8; }
+    .kpi-icon.icon-eye { background: linear-gradient(135deg, rgba(40,167,69,0.15), rgba(40,167,69,0.05)); color: #28a745; }
 
-    .kpi-info h4 { margin: 0; font-size: 0.85rem; color: #888; text-transform: uppercase; font-weight: bold; }
-    .kpi-info p { margin: 4px 0 0 0; font-size: 1.5rem; font-weight: 700; color: #222; line-height: 1; }
+    .kpi-info { flex: 1; min-width: 0; }
+    .kpi-info h4 {
+        margin: 0;
+        font-size: 0.75rem;
+        color: #888;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .kpi-info p {
+        margin: 5px 0 0 0;
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #222;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .kpi-info .kpi-trend {
+        font-size: 0.7rem;
+        color: #28a745;
+        margin-top: 3px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
 
-    /* LƯỚI BIỂU ĐỒ */
-    .dashboard-row { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 30px; }
-    .dash-box { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.04); }
-    .dash-box-title { margin: 0 0 20px 0; font-size: 1.1rem; color: #333; font-weight: bold; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
+    /* --- CHART SECTION --- */
+    .dashboard-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        margin-bottom: 28px;
+    }
+    .dash-box {
+        background: #fff;
+        padding: 22px;
+        border-radius: 14px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+        border: 1px solid rgba(0,0,0,0.03);
+    }
+    .dash-box-title {
+        margin: 0 0 18px 0;
+        font-size: 1.05rem;
+        color: #333;
+        font-weight: 700;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #f5f5f5;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .dash-box-title .box-sub {
+        font-size: 0.75rem;
+        color: #999;
+        font-weight: 400;
+    }
 
-    /* BẢNG DỮ LIỆU NHANH */
-    .table-quick { width: 100%; border-collapse: collapse; }
-    .table-quick th { text-align: left; padding: 12px; color: #888; font-size: 0.85rem; border-bottom: 2px solid #eee; }
-    .table-quick td { padding: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; color: #444; }
-    .badge { padding: 5px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
-    .bg-warning { background: #ffeeba; color: #856404; }
+    /* --- RECENT ACTIVITY TABS --- */
+    .activity-tabs {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 16px;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 0;
+    }
+    .activity-tab {
+        padding: 10px 18px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #777;
+        cursor: pointer;
+        border: none;
+        background: none;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
+        transition: all 0.25s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: inherit;
+    }
+    .activity-tab:hover { color: #8b1a2b; }
+    .activity-tab.active {
+        color: #8b1a2b;
+        border-bottom-color: #8b1a2b;
+    }
+    .activity-tab .tab-count {
+        background: #f0f0f0;
+        color: #666;
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: 700;
+    }
+    .activity-tab.active .tab-count {
+        background: rgba(139,26,43,0.1);
+        color: #8b1a2b;
+    }
+
+    .activity-panel { display: none; }
+    .activity-panel.active { display: block; }
+
+    /* --- TABLE --- */
+    .table-quick {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .table-quick th {
+        text-align: left;
+        padding: 12px 14px;
+        color: #888;
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        border-bottom: 2px solid #f0f0f0;
+        background: #fafafa;
+    }
+    .table-quick th:first-child { border-radius: 8px 0 0 0; }
+    .table-quick th:last-child { border-radius: 0 8px 0 0; }
+    .table-quick td {
+        padding: 12px 14px;
+        border-bottom: 1px solid #f5f5f5;
+        font-size: 0.85rem;
+        color: #444;
+        vertical-align: middle;
+    }
+    .table-quick tr:hover td { background: #faf9f7; }
+    .table-quick tr:last-child td { border-bottom: none; }
+
+    .badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .bg-warning { background: #fff3cd; color: #856404; }
     .bg-success { background: #d4edda; color: #155724; }
+    .bg-info { background: #d1ecf1; color: #0c5460; }
 
-    @@media (max-width: 992px) { .dashboard-row { grid-template-columns: 1fr; } }
+    .text-name { font-weight: 600; color: #8a1527; }
+    .text-muted-sm { color: #999; font-size: 0.78rem; }
+    .text-ellipsis {
+        max-width: 280px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 30px 20px;
+        color: #aaa;
+    }
+    .empty-state i {
+        font-size: 2.5rem;
+        display: block;
+        margin-bottom: 10px;
+        opacity: 0.4;
+    }
+    .empty-state p { margin: 0; font-size: 0.85rem; }
+
+    /* --- QUICK LINKS --- */
+    .quick-links {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+        margin-bottom: 28px;
+    }
+    .quick-link {
+        background: #fff;
+        border: 1px solid rgba(0,0,0,0.04);
+        border-radius: 12px;
+        padding: 16px;
+        text-decoration: none;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: all 0.25s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .quick-link:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        border-color: rgba(139,26,43,0.15);
+        color: #8a1527;
+    }
+    .quick-link i {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+    .quick-link .ql-text { font-size: 0.82rem; font-weight: 600; line-height: 1.3; }
+    .quick-link .ql-text small { display: block; font-size: 0.7rem; color: #999; font-weight: 400; margin-top: 2px; }
+
+    .ql-red i { background: rgba(139,26,43,0.1); color: #8a1527; }
+    .ql-gold i { background: rgba(232,184,75,0.15); color: #c99a2e; }
+    .ql-blue i { background: rgba(0,123,255,0.1); color: #007bff; }
+    .ql-green i { background: rgba(40,167,69,0.1); color: #28a745; }
+    .ql-purple i { background: rgba(111,66,193,0.1); color: #6f42c1; }
+    .ql-teal i { background: rgba(23,162,184,0.1); color: #17a2b8; }
+
+    /* --- RESPONSIVE --- */
+    @@media (max-width: 992px) {
+        .dashboard-row { grid-template-columns: 1fr; }
+        .dash-welcome { flex-direction: column; align-items: flex-start; }
+        .dash-welcome-right { width: 100%; }
+        .dash-welcome-right .welcome-stat { flex: 1; }
+    }
+    @@media (max-width: 576px) {
+        .dash-welcome { padding: 20px; }
+        .dash-welcome-right { flex-wrap: wrap; }
+        .dash-welcome-right .welcome-stat { min-width: calc(50% - 6px); }
+        .kpi-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+        .kpi-card { padding: 16px 14px; }
+        .kpi-icon { width: 44px; height: 44px; font-size: 1.2rem; }
+        .kpi-info p { font-size: 1.1rem; }
+        .activity-tab { padding: 8px 12px; font-size: 0.78rem; }
+    }
 </style>
 
-<div class="admin-welcome">
-    <h2>Chào mừng đến với Trung tâm Quản trị</h2>
-    <p>Hệ thống Cổng thông tin Ủy ban Mặt trận Tổ quốc Việt Nam Phường Tân Định.</p>
+<!-- ===== WELCOME BANNER ===== -->
+<div class="dash-welcome">
+    <div class="dash-welcome-left">
+        <h2>Xin chào, @tenNguoiDung! 👋</h2>
+        <p>Chào mừng đến với Trung tâm Quản trị Cổng thông tin MTTQ Phường Tân Định.</p>
+        <div class="dash-date">
+            <i class="fas fa-calendar-alt"></i>
+            @DateTime.Now.ToString("dddd, dd/MM/yyyy", new System.Globalization.CultureInfo("vi-VN"))
+        </div>
+    </div>
+    <div class="dash-welcome-right">
+        <div class="welcome-stat">
+            <div class="ws-value">@(ViewBag.TongTuongTacMoi ?? 0)</div>
+            <div class="ws-label">Cần xử lý</div>
+        </div>
+        <div class="welcome-stat">
+            <div class="ws-value">@(ViewBag.TongTinTuc ?? 0)</div>
+            <div class="ws-label">Bài viết</div>
+        </div>
+        <div class="welcome-stat">
+            <div class="ws-value">@(ViewBag.TongNguoiDung ?? 0)</div>
+            <div class="ws-label">Người dùng</div>
+        </div>
+    </div>
 </div>
 
-<!-- 1. THẺ THỐNG KÊ (KPIs) -->
+<!-- ===== KPI CARDS ===== -->
 <div class="kpi-grid">
-    <div class="kpi-card">
+    <div class="kpi-card" style="--kpi-color:#d49544;">
         <div class="kpi-icon icon-money"><i class="fas fa-hand-holding-usd"></i></div>
         <div class="kpi-info">
             <h4>Tổng Số Dư Các Quỹ</h4>
-            <p style="color:#d49544; font-size: 1.25rem;">@FormatVND(ViewBag.TongTienCacQuy ?? 0)</p>
+            <p style="color:#d49544; font-size: 1.15rem;">@FormatVND(ViewBag.TongTienCacQuy ?? 0)</p>
+            <div class="kpi-trend"><i class="fas fa-arrow-up"></i> 3 quỹ an sinh</div>
         </div>
     </div>
 
-    <div class="kpi-card">
+    <div class="kpi-card" style="--kpi-color:#dc3545;">
         <div class="kpi-icon icon-alert"><i class="fas fa-bell"></i></div>
         <div class="kpi-info">
-            <h4>Chờ xử lý (Yêu cầu & Góp ý)</h4>
+            <h4>Chờ Xử Lý</h4>
             <p>@(ViewBag.TongTuongTacMoi ?? 0)</p>
+            <div class="kpi-trend" style="color:#dc3545;"><i class="fas fa-exclamation-circle"></i> Yêu cầu & Góp ý</div>
         </div>
     </div>
 
-    <div class="kpi-card">
+    <div class="kpi-card" style="--kpi-color:#007bff;">
         <div class="kpi-icon icon-news"><i class="fas fa-newspaper"></i></div>
         <div class="kpi-info">
             <h4>Tin Tức Đã Đăng</h4>
             <p>@(ViewBag.TongTinTuc ?? 0)</p>
+            <div class="kpi-trend"><i class="fas fa-eye"></i> @(ViewBag.TongLuotXem ?? 0) lượt xem</div>
         </div>
     </div>
 
-    <div class="kpi-card">
+    <div class="kpi-card" style="--kpi-color:#6f42c1;">
         <div class="kpi-icon icon-doc"><i class="fas fa-file-signature"></i></div>
         <div class="kpi-info">
             <h4>Văn Bản Ban Hành</h4>
             <p>@(ViewBag.TongVanBan ?? 0)</p>
+            <div class="kpi-trend"><i class="fas fa-folder-open"></i> Tài liệu lưu trữ</div>
+        </div>
+    </div>
+
+    <div class="kpi-card" style="--kpi-color:#17a2b8;">
+        <div class="kpi-icon icon-users"><i class="fas fa-users"></i></div>
+        <div class="kpi-info">
+            <h4>Người Dùng Hệ Thống</h4>
+            <p>@(ViewBag.TongNguoiDung ?? 0)</p>
+            <div class="kpi-trend"><i class="fas fa-user-shield"></i> Tài khoản quản trị</div>
+        </div>
+    </div>
+
+    <div class="kpi-card" style="--kpi-color:#28a745;">
+        <div class="kpi-icon icon-eye"><i class="fas fa-check-circle"></i></div>
+        <div class="kpi-info">
+            <h4>Đã Xử Lý</h4>
+            <p>@(ViewBag.TongTuongTacDaXuLy ?? 0)</p>
+            <div class="kpi-trend"><i class="fas fa-check"></i> Hoàn thành</div>
         </div>
     </div>
 </div>
 
-<!-- 2. KHU VỰC BIỂU ĐỒ -->
+<!-- ===== QUICK LINKS ===== -->
+<div class="quick-links">
+    <a href="/AdminNews/Index" class="quick-link ql-red">
+        <i class="fas fa-newspaper"></i>
+        <div class="ql-text">Quản lý Tin tức<small>Bài viết & Chuyên mục</small></div>
+    </a>
+    <a href="/AdminNguoiDanCanTroGiup/Index" class="quick-link ql-gold">
+        <i class="fas fa-life-ring"></i>
+        <div class="ql-text">Yêu cầu trợ giúp<small>@(ViewBag.YeuCauMoi ?? 0) đang chờ</small></div>
+    </a>
+    <a href="/AdminGopY/Index" class="quick-link ql-blue">
+        <i class="fas fa-envelope-open-text"></i>
+        <div class="ql-text">Hộp thư góp ý<small>@(ViewBag.GopYMoi ?? 0) đang chờ</small></div>
+    </a>
+    <a href="/AdminSoDuQuy/Index" class="quick-link ql-green">
+        <i class="fas fa-wallet"></i>
+        <div class="ql-text">Số dư Quỹ<small>Cập nhật quỹ an sinh</small></div>
+    </a>
+    <a href="/AdminVanBanTaiLieu/Index" class="quick-link ql-purple">
+        <i class="fas fa-file-signature"></i>
+        <div class="ql-text">Văn bản & Tài liệu<small>Quản lý văn bản</small></div>
+    </a>
+    <a href="/AdminNguoiDung/Index" class="quick-link ql-teal">
+        <i class="fas fa-users-cog"></i>
+        <div class="ql-text">Quản lý người dùng<small>Phân quyền & Vai trò</small></div>
+    </a>
+</div>
+
+<!-- ===== CHART SECTION ===== -->
 <div class="dashboard-row">
     <!-- Biểu đồ cột: Tỉ trọng các Quỹ -->
     <div class="dash-box">
-        <h3 class="dash-box-title">Thống kê Số dư các Quỹ An sinh</h3>
+        <h3 class="dash-box-title">
+            Thống kê Số dư các Quỹ An sinh
+            <span class="box-sub"><i class="fas fa-chart-bar"></i> Cập nhật mới nhất</span>
+        </h3>
         <canvas id="quyChart" height="110"></canvas>
     </div>
 
     <!-- Biểu đồ tròn: Tình trạng xử lý yêu cầu -->
     <div class="dash-box">
-        <h3 class="dash-box-title">Tiến độ Phản ánh / Yêu cầu</h3>
-        <div style="height: 220px; display: flex; justify-content: center;">
+        <h3 class="dash-box-title">
+            Tiến độ Phản ánh / Yêu cầu
+            <span class="box-sub"><i class="fas fa-chart-pie"></i> Tổng @((ViewBag.TongTuongTacMoi ?? 0) + (ViewBag.TongTuongTacDaXuLy ?? 0))</span>
+        </h3>
+        <div style="height: 220px; display: flex; justify-content: center; align-items: center;">
             <canvas id="tuongTacChart"></canvas>
         </div>
     </div>
 </div>
 
-<!-- 3. DANH SÁCH MỚI NHẤT -->
+<!-- ===== RECENT ACTIVITY ===== -->
 <div class="dash-box">
-    <h3 class="dash-box-title" style="display: flex; justify-content: space-between; align-items: center;">
-        Yêu cầu trợ giúp mới nhất
-        <a href="/AdminNguoiDanCanTroGiup/Index" style="font-size: 0.85rem; color: #007bff; text-decoration: none;">Xem tất cả <i class="fas fa-arrow-right"></i></a>
+    <h3 class="dash-box-title">
+        Hoạt động gần đây
+        <span class="box-sub"><i class="fas fa-clock"></i> 5 mục mới nhất</span>
     </h3>
-    <div style="overflow-x:auto;">
-        <table class="table-quick">
-            <thead>
-                <tr>
-                    <th>Họ Tên</th>
-                    <th>Số điện thoại</th>
-                    <th>Nội dung tóm tắt</th>
-                    <th>Ngày gửi</th>
-                    <th>Trạng thái</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (ViewBag.ListYeuCauMoi != null && Enumerable.Count(ViewBag.ListYeuCauMoi) > 0)
-                {
-                    foreach (var item in ViewBag.ListYeuCauMoi)
+
+    <div class="activity-tabs">
+        <button class="activity-tab active" data-tab="yeucau">
+            <i class="fas fa-life-ring"></i>
+            Yêu cầu trợ giúp
+            <span class="tab-count">@(ViewBag.YeuCauMoi ?? 0)</span>
+        </button>
+        <button class="activity-tab" data-tab="gopy">
+            <i class="fas fa-envelope-open-text"></i>
+            Góp ý
+            <span class="tab-count">@(ViewBag.GopYMoi ?? 0)</span>
+        </button>
+        <button class="activity-tab" data-tab="tintuc">
+            <i class="fas fa-newspaper"></i>
+            Tin tức
+            <span class="tab-count">@(ViewBag.TongTinTuc ?? 0)</span>
+        </button>
+    </div>
+
+    <!-- Tab: Yêu cầu trợ giúp -->
+    <div class="activity-panel active" id="panel-yeucau">
+        <div style="overflow-x:auto;">
+            <table class="table-quick">
+                <thead>
+                    <tr>
+                        <th>Họ Tên</th>
+                        <th>Số điện thoại</th>
+                        <th>Nội dung tóm tắt</th>
+                        <th>Ngày gửi</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.ListYeuCauMoi != null && Enumerable.Count(ViewBag.ListYeuCauMoi) > 0)
+                    {
+                        foreach (var item in ViewBag.ListYeuCauMoi)
+                        {
+                            <tr>
+                                <td class="text-name">@item.HoTen</td>
+                                <td>@item.SoDienThoai</td>
+                                <td>
+                                    <span class="text-ellipsis" title="@item.NoiDung">@item.NoiDung</span>
+                                </td>
+                                <td class="text-muted-sm">@(item.NgayGui?.ToString("dd/MM/yyyy"))</td>
+                                <td>
+                                    @if (item.TrangThai == "Chưa xử lý" || string.IsNullOrEmpty(item.TrangThai))
+                                    {
+                                        <span class="badge bg-warning"><i class="fas fa-clock"></i> Chờ xử lý</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success"><i class="fas fa-check"></i> Đã xử lý</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
                     {
                         <tr>
-                            <td style="font-weight: bold; color: #8a1527;">@item.HoTen</td>
-                            <td>@item.SoDienThoai</td>
-                            <td style="max-width: 350px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                @item.NoiDung
-                            </td>
-                            <td>@(item.NgayGui?.ToString("dd/MM/yyyy"))</td>
-                            <td>
-                                @if (item.TrangThai == "Chưa xử lý" || string.IsNullOrEmpty(item.TrangThai))
-                                {
-                                    <span class="badge bg-warning">Chờ xử lý</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-success"><i class="fas fa-check"></i> Đã xử lý</span>
-                                }
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <i class="fas fa-inbox"></i>
+                                    <p>Hiện tại chưa có yêu cầu phản ánh nào.</p>
+                                </div>
                             </td>
                         </tr>
                     }
-                }
-                else
-                {
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tab: Góp ý -->
+    <div class="activity-panel" id="panel-gopy">
+        <div style="overflow-x:auto;">
+            <table class="table-quick">
+                <thead>
                     <tr>
-                        <td colspan="5" style="text-align: center; color: #999; padding: 20px;">Hiện tại chưa có yêu cầu phản ánh nào.</td>
+                        <th>Tiêu đề</th>
+                        <th>Người gửi</th>
+                        <th>Lĩnh vực</th>
+                        <th>Ngày gửi</th>
+                        <th>Trạng thái</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @if (ViewBag.ListGopYMoi != null && Enumerable.Count(ViewBag.ListGopYMoi) > 0)
+                    {
+                        foreach (var item in ViewBag.ListGopYMoi)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="text-ellipsis" title="@item.TieuDe" style="font-weight:600;color:#333;">@item.TieuDe</span>
+                                </td>
+                                <td class="text-name">@item.HoTen</td>
+                                <td>@item.LinhVuc</td>
+                                <td class="text-muted-sm">@(item.NgayGui?.ToString("dd/MM/yyyy"))</td>
+                                <td>
+                                    @if (item.TrangThai == "Chưa xử lý" || string.IsNullOrEmpty(item.TrangThai))
+                                    {
+                                        <span class="badge bg-warning"><i class="fas fa-clock"></i> Chờ xử lý</span>
+                                    }
+                                    else if (item.TrangThai == "Đang xử lý")
+                                    {
+                                        <span class="badge bg-info"><i class="fas fa-spinner"></i> Đang xử lý</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success"><i class="fas fa-check"></i> Đã xử lý</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <i class="fas fa-envelope-open"></i>
+                                    <p>Hiện tại chưa có góp ý nào.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tab: Tin tức -->
+    <div class="activity-panel" id="panel-tintuc">
+        <div style="overflow-x:auto;">
+            <table class="table-quick">
+                <thead>
+                    <tr>
+                        <th>Tiêu đề bài viết</th>
+                        <th>Lượt xem</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày xuất bản</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ViewBag.ListTinTucMoi != null && Enumerable.Count(ViewBag.ListTinTucMoi) > 0)
+                    {
+                        foreach (var item in ViewBag.ListTinTucMoi)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="text-ellipsis" title="@item.TieuDe" style="font-weight:600;color:#333;">@item.TieuDe</span>
+                                </td>
+                                <td>
+                                    <span style="display:inline-flex;align-items:center;gap:5px;">
+                                        <i class="fas fa-eye" style="color:#999;font-size:0.75rem;"></i>
+                                        @(item.LuotXem ?? 0)
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (item.TrangThai == "Đã xuất bản" || item.TrangThai == "Xuất bản")
+                                    {
+                                        <span class="badge bg-success"><i class="fas fa-check"></i> Đã xuất bản</span>
+                                    }
+                                    else if (item.TrangThai == "Nháp")
+                                    {
+                                        <span class="badge bg-warning"><i class="fas fa-pen"></i> Nháp</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-info"><i class="fas fa-eye"></i> @item.TrangThai</span>
+                                    }
+                                </td>
+                                <td class="text-muted-sm">@(item.NgayXuatBan?.ToString("dd/MM/yyyy"))</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4">
+                                <div class="empty-state">
+                                    <i class="fas fa-newspaper"></i>
+                                    <p>Chưa có bài viết nào.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -172,6 +730,22 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // --- TAB SWITCHING ---
+            var tabs = document.querySelectorAll('.activity-tab');
+            tabs.forEach(function(tab) {
+                tab.addEventListener('click', function() {
+                    // Remove active from all tabs
+                    tabs.forEach(function(t) { t.classList.remove('active'); });
+                    this.classList.add('active');
+
+                    // Show corresponding panel
+                    var panels = document.querySelectorAll('.activity-panel');
+                    panels.forEach(function(p) { p.classList.remove('active'); });
+                    var panelId = 'panel-' + this.getAttribute('data-tab');
+                    document.getElementById(panelId).classList.add('active');
+                });
+            });
+
             if (typeof Chart === 'undefined') return; // Chống lỗi nếu không load được thư viện
 
             // --- 1. BIỂU ĐỒ CỘT (QUỸ) ---
@@ -189,27 +763,41 @@
                                 @(ViewBag.TienCuuTro ?? 0)
                             ],
                             backgroundColor: [
-                                'rgba(212, 149, 68, 0.85)', // Vàng Gold
-                                'rgba(0, 123, 255, 0.85)',  // Xanh dương
-                                'rgba(220, 53, 69, 0.85)'   // Đỏ
+                                'rgba(212, 149, 68, 0.85)',
+                                'rgba(0, 123, 255, 0.85)',
+                                'rgba(220, 53, 69, 0.85)'
                             ],
                             borderColor: ['#d49544', '#007bff', '#dc3545'],
                             borderWidth: 1,
-                            borderRadius: 6
+                            borderRadius: 8,
+                            maxBarThickness: 60
                         }]
                     },
                     options: {
                         responsive: true,
-                        plugins: { legend: { display: false } },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.parsed.y.toLocaleString('vi-VN') + ' VNĐ';
+                                    }
+                                }
+                            }
+                        },
                         scales: {
                             y: {
                                 beginAtZero: true,
+                                grid: { color: 'rgba(0,0,0,0.05)' },
                                 ticks: {
                                     callback: function(value) {
                                         if (value >= 1000000) return (value / 1000000).toLocaleString('vi-VN') + ' Triệu';
                                         return value.toLocaleString('vi-VN');
                                     }
                                 }
+                            },
+                            x: {
+                                grid: { display: false }
                             }
                         }
                     }
@@ -229,14 +817,35 @@
                                 @(ViewBag.TongTuongTacDaXuLy ?? 0)
                             ],
                             backgroundColor: ['#ffc107', '#28a745'],
-                            hoverOffset: 4
+                            borderColor: ['#fff', '#fff'],
+                            borderWidth: 3,
+                            hoverOffset: 6
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: { legend: { position: 'bottom' } },
-                        cutout: '65%' // Làm mỏng viền
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 16,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle',
+                                    font: { size: 12 }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        var total = context.dataset.data.reduce(function(a, b) { return a + b; }, 0);
+                                        var pct = total > 0 ? Math.round(context.parsed / total * 100) : 0;
+                                        return context.label + ': ' + context.parsed + ' (' + pct + '%)';
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '65%'
                     }
                 });
             }

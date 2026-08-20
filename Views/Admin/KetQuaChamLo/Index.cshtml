@@ -2,16 +2,42 @@
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Kết quả chăm lo";
+    var tongKinhPhi = Model?.Sum(x => x.KinhPhi) ?? 0;
+    var tongHoatDong = Model?.Count() ?? 0;
+    var tongDoiTuong = Model?.Sum(x => x.SoLuongHo) ?? 0;
 }
 
-<div class="admin-page-header">
-    <div>
-        <h2>Lịch sử Chăm lo An sinh Xã hội</h2>
-        <div class="subtitle">Quản lý các hoạt động chăm lo an sinh xã hội</div>
+<div class="fund-hero-bar">
+    <div class="fund-hero-content">
+        <h2>Kết quả chăm lo An sinh Xã hội</h2>
+        <p>Quản lý các hoạt động chăm lo an sinh xã hội</p>
     </div>
-    <a href="/admin/ketquachamlo/Create" class="admin-btn admin-btn-primary">
-        <i class="fas fa-plus"></i> Thêm hoạt động mới
-    </a>
+    <div class="fund-hero-stats">
+        <div class="fund-hero-stat">
+            <div class="stat-label">Số hoạt động</div>
+            <div class="stat-number">@tongHoatDong <small>hoạt động</small></div>
+        </div>
+        <div class="fund-hero-stat">
+            <div class="stat-label">Tổng kinh phí</div>
+            <div class="stat-number">@tongKinhPhi.ToString("N0")<small>đ</small></div>
+        </div>
+        <div class="fund-hero-stat">
+            <div class="stat-label">Đối tượng hỗ trợ</div>
+            <div class="stat-number">@tongDoiTuong <small>lượt</small></div>
+        </div>
+    </div>
+    <div class="fund-hero-actions">
+        <a href="/admin/ketquachamlo/Create" class="admin-btn admin-btn-primary">
+            <i class="fas fa-plus"></i> Thêm hoạt động mới
+        </a>
+    </div>
+</div>
+
+<div class="fund-tabs">
+    <a href="/admin/thongtinungho" class="fund-tab"><i class="fas fa-university"></i> Tài khoản tiếp nhận</a>
+    <a href="/admin/danhsachungho" class="fund-tab"><i class="fas fa-hand-holding-usd"></i> Danh sách ủng hộ</a>
+    <a href="/admin/soduquy" class="fund-tab"><i class="fas fa-wallet"></i> Số dư quỹ</a>
+    <a href="/admin/ketquachamlo" class="fund-tab is-active"><i class="fas fa-hand-holding-heart"></i> Kết quả chăm lo</a>
 </div>
 
 <div class="admin-card">
@@ -45,14 +71,16 @@
                                 <td class="cell-center">@item.SoLuongHo</td>
                                 <td class="cell-right"><span class="admin-money red">@item.KinhPhi.ToString("N0")đ</span></td>
                                 <td class="cell-actions">
-                                    <a href="/admin/ketquachamlo/Edit/@item.Id" class="admin-btn admin-btn-warning admin-btn-sm">
-                                        <i class="fas fa-edit"></i> Sửa
-                                    </a>
-                                    <form action="/admin/ketquachamlo/Delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa hoạt động này?');">
-                                        <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
-                                            <i class="fas fa-trash"></i> Xóa
-                                        </button>
-                                    </form>
+                                    <div class="admin-row-actions">
+                                        <a href="/admin/ketquachamlo/Edit/@item.Id" class="admin-btn admin-btn-warning admin-btn-sm">
+                                            <i class="fas fa-edit"></i> Sửa
+                                        </a>
+                                        <form action="/admin/ketquachamlo/Delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa hoạt động này?');">
+                                            <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
+                                                <i class="fas fa-trash"></i> Xóa
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -70,6 +98,10 @@
                     }
                 </tbody>
             </table>
+        </div>
+        <div class="admin-result-info" style="padding: 14px 16px;">
+            <span>Tổng số hoạt động: <strong>@tongHoatDong</strong></span>
+            <span>Tổng kinh phí: <strong>@tongKinhPhi.ToString("N0")đ</strong></span>
         </div>
     </div>
 </div>

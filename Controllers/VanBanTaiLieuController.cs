@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebMTTQ.Models;
+using WebMTTQ.Services;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,15 +12,23 @@ namespace WebMTTQ.Controllers
     public class VanBanTaiLieuController : Controller
     {
         private readonly DataMTTQContext _context;
+        private readonly ISystemSettingsService _settings;
 
-        public VanBanTaiLieuController(DataMTTQContext context)
+        public VanBanTaiLieuController(DataMTTQContext context, ISystemSettingsService settings)
         {
             _context = context;
+            _settings = settings;
         }
 
         // Action hiển thị danh sách ngoài trang chủ
         public async Task<IActionResult> Index(string keyword, int? chuyenMucId, int page = 1)
         {
+            // Kiểm tra bảo trì trang văn bản tài liệu
+            if (await MaintenanceHelper.IsVanBanTaiLieuUnderMaintenanceAsync(_settings))
+            {
+                return View("~/Views/Home/UnderConstruction.cshtml");
+            }
+
             int pageSize = 15;
 
             IQueryable<VanBanTaiLieu> query = _context.VanBanTaiLieus
@@ -79,6 +88,12 @@ namespace WebMTTQ.Controllers
         // Action xử lý tải tệp đính kèm
         public async Task<IActionResult> Download(int id)
         {
+            // Kiểm tra bảo trì trang văn bản tài liệu
+            if (await MaintenanceHelper.IsVanBanTaiLieuUnderMaintenanceAsync(_settings))
+            {
+                return View("~/Views/Home/UnderConstruction.cshtml");
+            }
+
             var document = await _context.VanBanTaiLieus.FirstOrDefaultAsync(v => v.IdvanBan == id);
 
             if (document == null || document.TepDinhKem == null)

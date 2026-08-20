@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebMTTQ.Models;
+using WebMTTQ.Services;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Threading.Tasks;
@@ -12,19 +13,27 @@ namespace WebMTTQ.Controllers
     public class GopYController : Controller
     {
         private readonly DataMTTQContext _context;
+        private readonly ISystemSettingsService _settings;
         private static readonly string[] _allowedExtensions = { ".pdf", ".jpg", ".jpeg", ".png" };
         private static readonly string[] _allowedMimeTypes = { "application/pdf", "image/jpeg", "image/png" };
         private const int MaxFileSizeBytes = 10 * 1024 * 1024; // 10MB
 
-        public GopYController(DataMTTQContext context)
+        public GopYController(DataMTTQContext context, ISystemSettingsService settings)
         {
             _context = context;
+            _settings = settings;
         }
 
         // 1. Hàm hiển thị trang form
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            // Kiểm tra bảo trì trang góp ý
+            if (await MaintenanceHelper.IsGopYUnderMaintenanceAsync(_settings))
+            {
+                return View("~/Views/Home/UnderConstruction.cshtml");
+            }
+
             return View("~/Views/GopY/Index.cshtml");
         }
 
@@ -34,6 +43,12 @@ namespace WebMTTQ.Controllers
         [RequestSizeLimit(12 * 1024 * 1024)] // Giới hạn request 12MB (form + file 10MB)
         public async Task<IActionResult> GuiGopY(HopThuGopY model, IFormFile? tepDinhKem)
         {
+            // Kiểm tra bảo trì trang góp ý
+            if (await MaintenanceHelper.IsGopYUnderMaintenanceAsync(_settings))
+            {
+                return View("~/Views/Home/UnderConstruction.cshtml");
+            }
+
             // === Chống spam: kiểm tra thời gian giữa các lần gửi (tối thiểu 30 giây) ===
             var lastSubmitKey = $"GopY_LastSubmit_{HttpContext.Connection.RemoteIpAddress}";
             var lastSubmit = HttpContext.Session.GetString(lastSubmitKey);

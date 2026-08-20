@@ -2,27 +2,68 @@
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Danh sách ủng hộ Cứu trợ";
+    var tongTien = Model?.Sum(x => x.SoTien) ?? 0;
+    var tongNgay = Model?.Count() ?? 0;
 }
 
-<div class="admin-page-header">
-    <div>
-        <h2>Danh sách ủng hộ</h2>
-        <div class="subtitle">Quản lý các lượt ủng hộ từ tổ chức, cá nhân</div>
+<!-- HERO BAR -->
+<div class="fund-hero-bar">
+    <div class="fund-hero-content">
+        <h2>Danh sách ủng hộ Cứu trợ</h2>
+        <p>Quản lý các lượt ủng hộ từ tổ chức, cá nhân gửi đến Quỹ Cứu trợ</p>
     </div>
+    <div class="fund-hero-stats">
+        <div class="fund-hero-stat">
+            <div class="stat-label">Tổng số lượt ủng hộ</div>
+            <div class="stat-number">@tongNgay.ToString("N0") <small>lượt</small></div>
+        </div>
+        <div class="fund-hero-stat">
+            <div class="stat-label">Tổng giá trị</div>
+            <div class="stat-number">@tongTien.ToString("N0")<small>đ</small></div>
+        </div>
+    </div>
+    <div class="fund-hero-actions">
+        <a href="/Admin/QuyCuuTro/ThemDanhSach" class="admin-btn admin-btn-primary">
+            <i class="fas fa-plus"></i> Thêm lượt ủng hộ
+        </a>
+    </div>
+</div>
 
-    <div style="display: flex; gap: 10px; align-items: center;">
-        <!-- Nút xử lý Import Excel ngầm (Không làm xấu giao diện) -->
-        <form action="@Url.Action("ImportExcel")" method="post" enctype="multipart/form-data" id="formImportExcel_@ViewData["Title"].GetHashCode()" style="display:inline;">
+<!-- FUND TABS -->
+<div class="fund-tabs">
+    <a href="/Admin/QuyCuuTro/ThongTin" class="fund-tab @(ViewContext.RouteData.Values["action"]?.ToString() == "ThongTin" ? "is-active" : "")">
+        <i class="fas fa-university"></i> Tài khoản tiếp nhận
+    </a>
+    <a href="/Admin/QuyCuuTro/DanhSach" class="fund-tab is-active">
+        <i class="fas fa-hand-holding-usd"></i> Danh sách ủng hộ
+        <span class="fund-tab-count">@tongNgay</span>
+    </a>
+    <a href="/Admin/QuyCuuTro/SoDu" class="fund-tab @(ViewContext.RouteData.Values["action"]?.ToString() == "SoDu" ? "is-active" : "")">
+        <i class="fas fa-wallet"></i> Số dư quỹ
+    </a>
+    <a href="/Admin/QuyCuuTro/KetQua" class="fund-tab @(ViewContext.RouteData.Values["action"]?.ToString() == "KetQua" ? "is-active" : "")">
+        <i class="fas fa-shield-alt"></i> Hoạt động
+    </a>
+</div>
+
+<!-- TOOLBAR -->
+<div class="admin-toolbar">
+    <div class="admin-toolbar-left">
+        <div class="admin-search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchBox" class="admin-form-control" placeholder="Tìm theo đơn vị/cá nhân..." onkeyup="filterTable()" />
+        </div>
+    </div>
+    <div class="admin-toolbar-right">
+        <form action="@Url.Action("ImportExcel")" method="post" enctype="multipart/form-data" id="formImportExcel" style="display:inline;">
             @Html.AntiForgeryToken()
-            <input type="file" name="file" accept=".xlsx" style="display:none;" id="fileExcel_@ViewData["Title"].GetHashCode()" onchange="document.getElementById('formImportExcel_@ViewData["Title"].GetHashCode()').submit();" />
-            <button type="button" class="admin-btn" style="background-color: #28a745; color: white; border: none;" onclick="document.getElementById('fileExcel_@ViewData["Title"].GetHashCode()').click();">
-                <i class="fas fa-file-excel"></i> Nhập từ Excel
+            <input type="file" name="file" accept=".xlsx" style="display:none;" id="fileExcel" onchange="document.getElementById('formImportExcel').submit();" />
+            <button type="button" class="admin-btn admin-btn-success" onclick="document.getElementById('fileExcel').click();">
+                <i class="fas fa-file-excel"></i> Nhập Excel
             </button>
         </form>
-
-        <!-- Nút thêm thủ công bằng tay (Đổi URL href tùy theo từng quỹ) -->
-        <a href="Url_To_Action_Create" class="admin-btn admin-btn-primary">
-            <i class="fas fa-plus"></i> Thêm lượt ủng hộ
+        <a href="/Admin/QuyCuuTro/ThemDanhSach" class="admin-btn admin-btn-primary">
+            <i class="fas fa-plus"></i> Thêm mới
         </a>
     </div>
 </div>
@@ -30,9 +71,10 @@
 <div class="admin-card">
     <div class="admin-card-body p-0">
         <div class="admin-table-wrap">
-            <table class="admin-table">
+            <table class="admin-table" id="dataTable">
                 <thead>
                     <tr>
+                        <th>#</th>
                         <th>Đơn vị / Cá nhân</th>
                         <th class="cell-center">Thời gian</th>
                         <th class="cell-right">Số tiền</th>
@@ -42,9 +84,11 @@
                 <tbody>
                     @if (Model != null && Model.Any())
                     {
+                        var index = 1;
                         foreach (var item in Model)
                         {
                             <tr>
+                                <td class="cell-center" style="color:var(--admin-muted);">@index</td>
                                 <td>
                                     <strong>@item.TenNguoiUngHo</strong>
                                 </td>
@@ -53,23 +97,26 @@
                                 </td>
                                 <td class="cell-right"><span class="admin-money green">@(item.SoTien?.ToString("N0"))đ</span></td>
                                 <td class="cell-actions">
-                                    <a href="/Admin/QuyCuuTro/SuaDanhSach/@item.Id" class="admin-btn admin-btn-warning admin-btn-sm">
-                                        <i class="fas fa-edit"></i> Sửa
-                                    </a>
-                                    <form action="/Admin/QuyCuuTro/XoaDanhSach" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa lượt ủng hộ này?');">
-                                        <input type="hidden" name="id" value="@item.Id" />
-                                        <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
-                                            <i class="fas fa-trash"></i> Xóa
-                                        </button>
-                                    </form>
+                                    <div class="admin-row-actions">
+                                        <a href="/Admin/QuyCuuTro/SuaDanhSach/@item.Id" class="admin-btn admin-btn-warning admin-btn-sm">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <form action="/Admin/QuyCuuTro/XoaDanhSach" method="post" style="display:inline;" onsubmit="return confirm('Bạn chắc chắn muốn xóa?');">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
+                                                <i class="fas fa-trash"></i> Xóa
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
+                            index++;
                         }
                     }
                     else
                     {
                         <tr>
-                            <td colspan="4">
+                            <td colspan="5">
                                 <div class="admin-empty">
                                     <i class="fas fa-hand-holding-usd"></i>
                                     <p>Chưa có dữ liệu ủng hộ Cứu trợ nào.</p>
@@ -80,5 +127,34 @@
                 </tbody>
             </table>
         </div>
+        <div class="admin-result-info" style="padding: 14px 16px;">
+            <span>Hiển thị <strong id="rowCount">@tongNgay</strong> trong tổng số <strong>@tongNgay</strong> lượt ủng hộ</span>
+            <span>Tổng: <strong>@tongTien.ToString("N0")đ</strong></span>
+        </div>
     </div>
 </div>
+
+<script>
+    function filterTable() {
+        var input = document.getElementById('searchBox');
+        var filter = input.value.toLowerCase();
+        var table = document.getElementById('dataTable');
+        var rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        var visible = 0;
+        for (var i = 0; i < rows.length; i++) {
+            var name = rows[i].getElementsByTagName('td')[1];
+            if (name) {
+                var text = name.textContent.toLowerCase();
+                if (text.indexOf(filter) > -1) {
+                    rows[i].style.display = '';
+                    visible++;
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+        var countEl = document.getElementById('rowCount');
+        if (countEl) countEl.textContent = visible;
+    }
+</script>
+

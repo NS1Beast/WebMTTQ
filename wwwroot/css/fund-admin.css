@@ -1,0 +1,198 @@
+/* ============================================================
+   ENHANCED FUND MANAGEMENT UI (2026)
+   ============================================================ */
+
+/* ===== FUND HERO BAR ===== */
+.fund-hero-bar {
+  background: linear-gradient(135deg, var(--admin-red), #1a0304);
+  border-radius: var(--admin-radius);
+  padding: 26px 32px;
+  color: #fff;
+  margin-bottom: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+.fund-hero-bar::after {
+  content: '';
+  position: absolute;
+  top: -60%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: rgba(232,184,75,0.08);
+}
+.fund-hero-bar::before {
+  content: '';
+  position: absolute;
+  bottom: -80%;
+  left: 20%;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+.fund-hero-content { position: relative; z-index: 1; }
+.fund-hero-content h2 {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+.fund-hero-content p { margin: 0; font-size: 0.85rem; opacity: 0.8; }
+.fund-hero-stats { display: flex; gap: 14px; flex-wrap: wrap; position: relative; z-index: 1; }
+.fund-hero-stat {
+  min-width: 150px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 14px 18px;
+  backdrop-filter: blur(4px);
+}
+.fund-hero-stat .stat-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.7;
+  margin-bottom: 4px;
+}
+.fund-hero-stat .stat-number {
+  font-size: 1.4rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+  color: var(--admin-gold);
+  line-height: 1.2;
+}
+.fund-hero-stat .stat-number small { font-size: 0.72rem; opacity: 0.6; margin-left: 2px; font-family: var(--font-body); }
+.fund-hero-stat .stat-sub { font-size: 0.72rem; opacity: 0.6; margin-top: 3px; }
+.fund-hero-actions { display: flex; gap: 10px; flex-wrap: wrap; position: relative; z-index: 2; }
+
+/* ---------- FUND TABS ---------- */
+.fund-tabs { display: flex; gap: 8px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 4px; }
+.fund-tab {
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 26px; border-radius: 10px;
+  font-size: 0.82rem; font-weight: 600; text-decoration: none; color: var(--admin-muted);
+  background: var(--admin-white); border: 1px solid var(--admin-line);
+  transition: all 0.22s ease; white-space: nowrap;
+}
+.fund-tab:hover {
+  border-color: var(--admin-red); color: var(--admin-red); transform: translateY(-1px);
+  box-shadow: var(--admin-shadow);
+}
+.fund-tab.is-active {
+  background: linear-gradient(135deg, var(--admin-red), var(--admin-red-mid));
+  color: #fff; border-color: var(--admin-red); box-shadow: 0 4px 14px rgba(139,26,43,0.25);
+}
+.fund-tab i { font-size: 0.95rem; }
+.fund-tab-count { background: rgba(0,0,0,0.08); border-radius: 20px; padding: 1px 8px; font-size: 0.7rem; }
+.fund-tab.is-active .fund-tab-count { background: rgba(255,255,255,0.25); }
+
+/* ---------- FUND MODULE CARDS ---------- */
+.fund-module-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+.fund-module-card {
+  background: var(--admin-white); border-radius: var(--admin-radius); padding: 18px;
+  border: 1px solid var(--admin-line); box-shadow: var(--admin-shadow);
+  text-decoration: none; color: var(--admin-ink); display: block;
+  transition: all 0.22s ease; position: relative; overflow: hidden;
+}
+.fund-module-card:hover { transform: translateY(-3px); box-shadow: var(--admin-shadow-lg); border-color: rgba(139,26,43,0.25); }
+.fund-module-icon {
+  width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; margin-bottom: 12px;
+}
+.fund-module-icon.red { background: rgba(139,26,43,0.1); color: var(--admin-red); }
+.fund-module-icon.gold { background: rgba(232,184,75,0.15); color: var(--admin-gold-dark); }
+.fund-module-icon.blue { background: rgba(59,130,246,0.1); color: #3b82f6; }
+.fund-module-icon.green { background: rgba(16,185,129,0.1); color: #10b981; }
+.fund-module-card h4 { margin: 0 0 4px; font-size: 0.88rem; font-weight: 700; }
+.fund-module-card p { margin: 0; font-size: 0.75rem; color: var(--admin-muted); line-height: 1.4; }
+.fund-module-badge {
+  position: absolute; top: 10px; right: 10px; font-size: 0.68rem; font-weight: 700;
+  background: rgba(139,26,43,0.08); color: var(--admin-red); border-radius: 20px; padding: 2px 10px;
+}
+
+/* ---------- TOOLBAR ---------- */
+.admin-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.admin-toolbar-left { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.admin-toolbar-right { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.admin-search-box { position: relative; }
+.admin-search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--admin-muted); font-size: 0.85rem; }
+.admin-search-box .admin-form-control { padding-left: 36px; min-width: 240px; }
+.admin-search-box .admin-form-control:focus { border-color: var(--admin-red); box-shadow: 0 0 0 3px rgba(139,26,43,0.08); }
+
+/* ---------- TOGGLE SWITCH ---------- */
+.admin-toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.admin-toggle-switch input { opacity: 0; width: 0; height: 0; }
+.admin-toggle-slider {
+  position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+  background: #ccc; border-radius: 34px; transition: 0.3s;
+}
+.admin-toggle-slider::before {
+  content: ""; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px;
+  background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.admin-toggle-switch input:checked + .admin-toggle-slider { background: #10b981; }
+.admin-toggle-switch input:checked + .admin-toggle-slider::before { transform: translateX(20px); }
+
+/* ---------- QR THUMB ---------- */
+.admin-qr-thumb {
+  width: 56px; height: 56px; border-radius: 8px; object-fit: contain; border: 1px solid var(--admin-line);
+  background: #fff; padding: 3px; display: block;
+}
+.admin-qr-thumb:hover { transform: scale(1.7); z-index: 10; position: relative; box-shadow: 0 6px 16px rgba(0,0,0,0.15); transition: all 0.2s ease; }
+
+/* ---------- ROW ACTIONS ---------- */
+.admin-row-actions { display: inline-flex; gap: 4px; }
+.admin-row-actions .admin-btn-sm { padding: 4px 10px; font-size: 0.72rem; }
+
+/* ---------- FORM SECTION ---------- */
+.admin-form-section { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--admin-line); }
+.admin-form-section-title { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.admin-form-section-title i { color: var(--admin-red); font-size: 1rem; }
+.admin-form-section-title h4 { margin: 0; font-size: 0.9rem; font-weight: 700; color: var(--admin-ink); }
+.admin-form-section-title small { display: block; font-size: 0.72rem; font-weight: 400; color: var(--admin-muted); margin-top: 2px; }
+
+/* ---------- QR STATUS ---------- */
+.qr-status { display: inline-flex; align-items: center; gap: 4px; font-size: 0.68rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+.qr-status.has-qr { background: rgba(16,185,129,0.1); color: #10b981; }
+.qr-status.no-qr { background: rgba(107,114,128,0.08); color: #6b7280; }
+
+/* ---------- RESULT INFO ---------- */
+.admin-result-info {
+  font-size: 0.8rem; color: var(--admin-muted); padding: 10px 0 0;
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+}
+.admin-result-info strong { color: var(--admin-red); }
+
+/* ---------- FUND SUMMARY ---------- */
+.fund-summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.fund-summary-card {
+  background: var(--admin-white); border-radius: var(--admin-radius); padding: 20px;
+  border: 1px solid var(--admin-line); box-shadow: var(--admin-shadow);
+  display: flex; align-items: center; gap: 14px;
+}
+.fund-summary-card:hover { transform: translateY(-2px); box-shadow: var(--admin-shadow-lg); transition: all 0.2s; }
+.fund-summary-icon {
+  width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; flex-shrink: 0;
+}
+.fund-summary-icon.red { background: rgba(139,26,43,0.1); color: var(--admin-red); }
+.fund-summary-icon.blue { background: rgba(59,130,246,0.1); color: #3b82f6; }
+.fund-summary-icon.green { background: rgba(16,185,129,0.1); color: #10b981; }
+.fund-summary-icon.gold { background: rgba(232,184,75,0.15); color: var(--admin-gold-dark); }
+.fund-summary-info h4 {
+  margin: 0 0 3px; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--admin-muted); font-weight: 600;
+}
+.fund-summary-info .sum-number {
+  margin: 0; font-size: 1.25rem; font-weight: 800; font-family: var(--font-display); color: var(--admin-ink);
+}
+.fund-summary-info .sum-number.red { color: var(--admin-red); }
+.fund-summary-info .sum-number.green { color: #10b981; }
+.fund-summary-info .sum-number.blue { color: #3b82f6; }
+.fund-summary-info .sum-number.gold { color: var(--admin-gold-dark); }

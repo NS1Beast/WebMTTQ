@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebMTTQ.Models;
+using WebMTTQ.Services;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
@@ -10,15 +11,23 @@ namespace WebMTTQ.Controllers
     public class NewsController : Controller
     {
         private readonly DataMTTQContext _context;
+        private readonly ISystemSettingsService _settings;
 
-        public NewsController(DataMTTQContext context)
+        public NewsController(DataMTTQContext context, ISystemSettingsService settings)
         {
             _context = context;
+            _settings = settings;
         }
 
         // Trang danh sách tin tức theo chuyên mục
         public async Task<IActionResult> Index(string category = "", int page = 1)
         {
+            // Kiểm tra bảo trì trang tin tức
+            if (await MaintenanceHelper.IsNewsUnderMaintenanceAsync(_settings))
+            {
+                return View("~/Views/Home/UnderConstruction.cshtml");
+            }
+
             const int pageSize = 10;
 
             // Lấy danh sách chuyên mục TIN TỨC chưa xóa và đang hiển thị - tối đa 10 cho dropdown
@@ -110,6 +119,12 @@ namespace WebMTTQ.Controllers
         // Chi tiết bài viết
         public async Task<IActionResult> Details(int id)
         {
+            // Kiểm tra bảo trì trang tin tức
+            if (await MaintenanceHelper.IsNewsUnderMaintenanceAsync(_settings))
+            {
+                return View("~/Views/Home/UnderConstruction.cshtml");
+            }
+
             var article = await _context.BaiViets
                 .Include(b => b.IdchuyenMucNavigation)
                 .Include(b => b.IdnguoiDungNavigation)

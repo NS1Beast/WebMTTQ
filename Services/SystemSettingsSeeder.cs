@@ -45,6 +45,16 @@ namespace WebMTTQ.Services
             AddIfNotExists("LinkFacebook", "", "Đường dẫn Fanpage Facebook");
             AddIfNotExists("LinkZalo", "", "Đường dẫn Zalo OA");
             AddIfNotExists("BaoTriHeThong", "0", "Chế độ bảo trì hệ thống (1=Bật, 0=Tắt)");
+            AddIfNotExists("BaoTriToanBo", "0", "Bảo trì toàn bộ website (1=Bật, 0=Tắt)");
+            AddIfNotExists("BaoTriTrangChu", "0", "Bảo trì trang chủ (1=Bật, 0=Tắt)");
+            AddIfNotExists("BaoTriTinTuc", "0", "Bảo trì trang tin tức (1=Bật, 0=Tắt)");
+            AddIfNotExists("BaoTriVanBanTaiLieu", "0", "Bảo trì trang văn bản tài liệu (1=Bật, 0=Tắt)");
+            AddIfNotExists("BaoTriGioiThieu", "0", "Bảo trì trang giới thiệu (1=Bật, 0=Tắt)");
+            AddIfNotExists("BaoTriGopY", "0", "Bảo trì trang góp ý (1=Bật, 0=Tắt)");
+            AddIfNotExists("BaoTriAnSinhXaHoi", "0", "Bảo trì trang an sinh xã hội (1=Bật, 0=Tắt)");
+            AddIfNotExists("BaoTriQuyCuuTro", "0", "Bảo trì trang quỹ cứu trợ (1=Bật, 0=Tắt)");
+            AddIfNotExists("BaoTriQuyBienDao", "0", "Bảo trì trang quỹ biển đảo (1=Bật, 0=Tắt)");
+            AddIfNotExists("MainAdminId", "", "ID người dùng tài khoản Admin chính hệ thống");
 
             // ================================================
             // FOLDER CONFIGURATION

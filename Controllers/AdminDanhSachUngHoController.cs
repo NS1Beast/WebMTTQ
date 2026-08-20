@@ -105,7 +105,7 @@ namespace WebMTTQ.Controllers
                     int successCount = 0;
                     for (int row = startRow; row <= rowCount; row++)
                     {
-                        string ten = worksheet.Cells[row, colTen].Text?.Trim();
+                        string? ten = worksheet.Cells[row, colTen].Text?.Trim();
                         // Bỏ qua nếu cột tên trống (Ví dụ như dòng 8: "Từ ngày 01/04..." nhưng cột Tên lại rỗng)
                         if (string.IsNullOrEmpty(ten)) continue;
 
@@ -124,7 +124,7 @@ namespace WebMTTQ.Controllers
                             }
                             else
                             {
-                                string dateText = worksheet.Cells[row, colThoiGian].Text?.Trim();
+                                string? dateText = worksheet.Cells[row, colThoiGian].Text?.Trim();
                                 if (!string.IsNullOrEmpty(dateText))
                                 {
                                     // Thử ép kiểu ngày tháng dạng phổ biến của Việt Nam
@@ -153,7 +153,7 @@ namespace WebMTTQ.Controllers
                             else if (cellTien is long l) soTien = l;
                             else
                             {
-                                string tienText = worksheet.Cells[row, colSoTien].Text?.Replace(",", "").Replace(".", "").Replace("đ", "").Replace("d", "").Replace(" ", "");
+                                string? tienText = worksheet.Cells[row, colSoTien].Text?.Replace(",", "").Replace(".", "").Replace("đ", "").Replace("d", "").Replace(" ", "");
                                 decimal.TryParse(tienText, out soTien);
                             }
                         }

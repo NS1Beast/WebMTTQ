@@ -2,20 +2,29 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using WebMTTQ.Models;
+using WebMTTQ.Services;
 
 namespace WebMTTQ.Controllers
 {
     public class HomeController : Controller
     {
         private readonly DataMTTQContext _context;
+        private readonly ISystemSettingsService _settings;
 
-        public HomeController(DataMTTQContext context)
+        public HomeController(DataMTTQContext context, ISystemSettingsService settings)
         {
             _context = context;
+            _settings = settings;
         }
 
         public async Task<IActionResult> Index()
         {
+            // Kiểm tra bảo trì trang chủ
+            if (await MaintenanceHelper.IsHomeUnderMaintenanceAsync(_settings))
+            {
+                return View("~/Views/Home/UnderConstruction.cshtml");
+            }
+
             // Lấy danh sách Banner đang hoạt động
             var danhSachBanner = await _context.Banners
                 .Where(b => b.TrangThai == true)

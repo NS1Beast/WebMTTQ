@@ -36,6 +36,15 @@ namespace WebMTTQ.Controllers
 
                 // --- Maintenance Mode ---
                 BaoTriHeThong = await _settings.GetBooleanAsync("BaoTriHeThong"),
+                BaoTriToanBo = await _settings.GetBooleanAsync("BaoTriToanBo"),
+                BaoTriTrangChu = await _settings.GetBooleanAsync("BaoTriTrangChu"),
+                BaoTriTinTuc = await _settings.GetBooleanAsync("BaoTriTinTuc"),
+                BaoTriVanBanTaiLieu = await _settings.GetBooleanAsync("BaoTriVanBanTaiLieu"),
+                BaoTriGioiThieu = await _settings.GetBooleanAsync("BaoTriGioiThieu"),
+                BaoTriGopY = await _settings.GetBooleanAsync("BaoTriGopY"),
+                BaoTriAnSinhXaHoi = await _settings.GetBooleanAsync("BaoTriAnSinhXaHoi"),
+                BaoTriQuyCuuTro = await _settings.GetBooleanAsync("BaoTriQuyCuuTro"),
+                BaoTriQuyBienDao = await _settings.GetBooleanAsync("BaoTriQuyBienDao"),
 
                 // --- Folder Configuration ---
                 Folder_Documents = await _settings.GetValueAsync("Folder_Documents"),
@@ -95,6 +104,15 @@ namespace WebMTTQ.Controllers
 
                 // --- Maintenance Mode ---
                 await _settings.SetValueAsync("BaoTriHeThong", model.BaoTriHeThong ? "1" : "0", "Chế độ bảo trì hệ thống (1=Bật, 0=Tắt)");
+                await _settings.SetValueAsync("BaoTriToanBo", model.BaoTriToanBo ? "1" : "0", "Bảo trì toàn bộ website (1=Bật, 0=Tắt)");
+                await _settings.SetValueAsync("BaoTriTrangChu", model.BaoTriTrangChu ? "1" : "0", "Bảo trì trang chủ (1=Bật, 0=Tắt)");
+                await _settings.SetValueAsync("BaoTriTinTuc", model.BaoTriTinTuc ? "1" : "0", "Bảo trì trang tin tức (1=Bật, 0=Tắt)");
+                await _settings.SetValueAsync("BaoTriVanBanTaiLieu", model.BaoTriVanBanTaiLieu ? "1" : "0", "Bảo trì trang văn bản tài liệu (1=Bật, 0=Tắt)");
+                await _settings.SetValueAsync("BaoTriGioiThieu", model.BaoTriGioiThieu ? "1" : "0", "Bảo trì trang giới thiệu (1=Bật, 0=Tắt)");
+                await _settings.SetValueAsync("BaoTriGopY", model.BaoTriGopY ? "1" : "0", "Bảo trì trang góp ý (1=Bật, 0=Tắt)");
+                await _settings.SetValueAsync("BaoTriAnSinhXaHoi", model.BaoTriAnSinhXaHoi ? "1" : "0", "Bảo trì trang an sinh xã hội (1=Bật, 0=Tắt)");
+                await _settings.SetValueAsync("BaoTriQuyCuuTro", model.BaoTriQuyCuuTro ? "1" : "0", "Bảo trì trang quỹ cứu trợ (1=Bật, 0=Tắt)");
+                await _settings.SetValueAsync("BaoTriQuyBienDao", model.BaoTriQuyBienDao ? "1" : "0", "Bảo trì trang quỹ biển đảo (1=Bật, 0=Tắt)");
 
                 // --- Folder Configuration ---
                 await _settings.SetValueAsync("Folder_Documents", model.Folder_Documents, "Thư mục lưu tài liệu");

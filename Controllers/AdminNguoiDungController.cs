@@ -11,11 +11,13 @@ namespace WebMTTQ.Controllers
     {
         private readonly DataMTTQContext _context;
         private readonly IQuyenTruyCapService _quyenService;
+        private readonly ISystemSettingsService _settingsService;
 
-        public AdminNguoiDungController(DataMTTQContext context, IQuyenTruyCapService quyenService)
+        public AdminNguoiDungController(DataMTTQContext context, IQuyenTruyCapService quyenService, ISystemSettingsService settingsService)
         {
             _context = context;
             _quyenService = quyenService;
+            _settingsService = settingsService;
         }
 
         // ================================================
@@ -52,6 +54,7 @@ namespace WebMTTQ.Controllers
 
             // Lấy ID người dùng hiện tại để đánh dấu "chính mình"
             var currentUserId = int.Parse(HttpContext.Session.GetString("AdminUserId") ?? "0");
+            var mainAdminId = _settingsService.GetValue("MainAdminId");
 
             var model = new QuanLyNguoiDungIndexViewModel
             {
@@ -69,7 +72,7 @@ namespace WebMTTQ.Controllers
                     TrangThai = u.TrangThai,
                     NgayTao = u.NgayTao,
                     LaAdmin = QuyenHelper.IsAdminVaiTro(u.IdvaiTroNavigation?.TenVaiTro),
-                    LaChinhAdmin = u.TenDangNhap == "MTTQAdmin",
+                    LaChinhAdmin = u.IdnguoiDung.ToString() == mainAdminId,
                     LaChinhMinh = u.IdnguoiDung == currentUserId
                 }).ToList()
             };
@@ -191,10 +194,11 @@ namespace WebMTTQ.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // TUYỆT ĐỐI KHÔNG cho phép chỉnh sửa tài khoản Admin chính (MTTQAdmin) bởi người khác
-            if (user.TenDangNhap == "MTTQAdmin")
+            // TUYỆT ĐỐI KHÔNG cho phép chỉnh sửa tài khoản Admin chính bởi người khác
+            var mainAdminId = _settingsService.GetValue("MainAdminId");
+            if (user.IdnguoiDung.ToString() == mainAdminId)
             {
-                TempData["ErrorMessage"] = "Không thể chỉnh sửa tài khoản Admin chính (MTTQAdmin) qua trang quản lý người dùng!";
+                TempData["ErrorMessage"] = "Không thể chỉnh sửa tài khoản Admin chính qua trang quản lý người dùng!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -251,10 +255,11 @@ namespace WebMTTQ.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // TUYỆT ĐỐI KHÔNG cho phép chỉnh sửa tài khoản Admin chính (MTTQAdmin) bởi người khác
-            if (user.TenDangNhap == "MTTQAdmin")
+            // TUYỆT ĐỐI KHÔNG cho phép chỉnh sửa tài khoản Admin chính bởi người khác
+            var mainAdminId = _settingsService.GetValue("MainAdminId");
+            if (user.IdnguoiDung.ToString() == mainAdminId)
             {
-                TempData["ErrorMessage"] = "Không thể chỉnh sửa tài khoản Admin chính (MTTQAdmin) qua trang quản lý người dùng!";
+                TempData["ErrorMessage"] = "Không thể chỉnh sửa tài khoản Admin chính qua trang quản lý người dùng!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -355,10 +360,11 @@ namespace WebMTTQ.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // TUYỆT ĐỐI KHÔNG cho phép xóa tài khoản Admin chính (MTTQAdmin)
-            if (user.TenDangNhap == "MTTQAdmin")
+            // TUYỆT ĐỐI KHÔNG cho phép xóa tài khoản Admin chính
+            var mainAdminId = _settingsService.GetValue("MainAdminId");
+            if (user.IdnguoiDung.ToString() == mainAdminId)
             {
-                TempData["ErrorMessage"] = "Không thể xóa tài khoản Admin chính (MTTQAdmin)! Tài khoản này là bất khả xâm phạm.";
+                TempData["ErrorMessage"] = "Không thể xóa tài khoản Admin chính! Tài khoản này là bất khả xâm phạm.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -371,12 +377,12 @@ namespace WebMTTQ.Controllers
                     .FirstOrDefaultAsync(u => u.IdnguoiDung == currentUserId);
 
                 var currentUserIsAdmin = currentUser != null && QuyenHelper.IsAdminVaiTro(currentUser.IdvaiTroNavigation?.TenVaiTro);
-                var currentUserIsChinhAdmin = currentUser != null && currentUser.TenDangNhap == "MTTQAdmin";
+                var currentUserIsChinhAdmin = currentUser != null && currentUser.IdnguoiDung.ToString() == _settingsService.GetValue("MainAdminId");
 
-                // Chỉ Admin chính (MTTQAdmin) mới được xóa tài khoản Admin phụ
+                // Chỉ Admin chính mới được xóa tài khoản Admin phụ
                 if (!currentUserIsChinhAdmin)
                 {
-                    TempData["ErrorMessage"] = "Chỉ Admin chính (MTTQAdmin) mới có quyền xóa tài khoản quản trị viên khác!";
+                    TempData["ErrorMessage"] = "Chỉ Admin chính mới có quyền xóa tài khoản quản trị viên khác!";
                     return RedirectToAction(nameof(Index));
                 }
             }
@@ -422,6 +428,7 @@ namespace WebMTTQ.Controllers
             ViewBag.Quyens = quyens;
             ViewBag.IsAdmin = QuyenHelper.IsAdminVaiTro(user.IdvaiTroNavigation?.TenVaiTro);
             ViewBag.LaChinhMinh = user.IdnguoiDung == int.Parse(HttpContext.Session.GetString("AdminUserId") ?? "0");
+            ViewBag.LaChinhAdmin = user.IdnguoiDung.ToString() == _settingsService.GetValue("MainAdminId");
 
             return View("~/Views/Admin/NguoiDung/Details.cshtml", user);
         }

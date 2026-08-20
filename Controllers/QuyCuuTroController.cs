@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using WebMTTQ.Models;
+using WebMTTQ.Services;
 
 namespace WebMTTQ.Controllers
 {
@@ -13,15 +14,23 @@ namespace WebMTTQ.Controllers
     {
         private readonly DataMTTQContext _context;
         private readonly IMemoryCache _cache;
+        private readonly ISystemSettingsService _settings;
 
-        public QuyCuuTroController(DataMTTQContext context, IMemoryCache cache)
+        public QuyCuuTroController(DataMTTQContext context, IMemoryCache cache, ISystemSettingsService settings)
         {
             _context = context;
             _cache = cache;
+            _settings = settings;
         }
 
         public async Task<IActionResult> Index(int page = 1)
         {
+            // Kiểm tra bảo trì trang quỹ cứu trợ
+            if (await MaintenanceHelper.IsQuyCuuTroUnderMaintenanceAsync(_settings))
+            {
+                return View("~/Views/Home/UnderConstruction.cshtml");
+            }
+
             try
             {
                 _context.Database.SetCommandTimeout(60);
@@ -50,18 +59,6 @@ namespace WebMTTQ.Controllers
                 ViewBag.TongSoLuot = thongKe!.TotalItems;
                 ViewBag.TongTien = thongKe!.TongTien;
                 ViewBag.NgayCapNhat = thongKe!.NgayCapNhat;
-
-                //// 3. Phân trang danh sách
-                //int pageSize = 10;
-                //ViewBag.CurrentPage = page;
-                //ViewBag.TotalPages = (int)Math.Ceiling(thongKe.TotalItems / (double)pageSize);
-
-                //ViewBag.DanhSachNguoiUngHo = await _context.DanhSachUngHoCuuTros
-                //                                .Where(x => x.HienThi == true)
-                //                                .AsNoTracking()
-                //                                .OrderByDescending(x => x.NgayUngHo)
-                //                                .Skip((page - 1) * pageSize)
-                //                                .Take(pageSize).ToListAsync();
 
                 // 4. Số dư quỹ
                 ViewBag.SoDuQuy = await _context.SoDuQues
@@ -118,7 +115,7 @@ namespace WebMTTQ.Controllers
                 ViewBag.ListNhomDonVi = hoatDongData.ListNhomDonVi;
                 ViewBag.HienThiBanDo = false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Bẫy lỗi bảo vệ
                 ViewBag.DanhSachUngHo = new List<ThongTinNhanUngHoCuuTro>();

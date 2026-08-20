@@ -2,16 +2,37 @@
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Tài khoản tiếp nhận Biển Đảo";
+    var tongTaiKhoan = Model?.Count() ?? 0;
+    var coQr = Model?.Count(x => !string.IsNullOrEmpty(x.QrCodeUrl)) ?? 0;
 }
 
-<div class="admin-page-header">
-    <div>
+<div class="fund-hero-bar">
+    <div class="fund-hero-content">
         <h2>Tài khoản tiếp nhận Biển Đảo</h2>
-        <div class="subtitle">Quản lý các tài khoản ngân hàng tiếp nhận ủng hộ Quỹ Biển Đảo</div>
+        <p>Quản lý các tài khoản ngân hàng tiếp nhận ủng hộ Quỹ Biển Đảo</p>
     </div>
-    <a href="/AdminQuyBienDao/ThemThongTin" class="admin-btn admin-btn-primary">
-        <i class="fas fa-plus"></i> Thêm tài khoản
-    </a>
+    <div class="fund-hero-stats">
+        <div class="fund-hero-stat">
+            <div class="stat-label">Tổng tài khoản</div>
+            <div class="stat-number">@tongTaiKhoan <small>tài khoản</small></div>
+        </div>
+        <div class="fund-hero-stat">
+            <div class="stat-label">Có QR Code</div>
+            <div class="stat-number">@coQr <small>tài khoản</small></div>
+        </div>
+    </div>
+    <div class="fund-hero-actions">
+        <a href="/Admin/QuyBienDao/ThemThongTin" class="admin-btn admin-btn-primary">
+            <i class="fas fa-plus"></i> Thêm tài khoản
+        </a>
+    </div>
+</div>
+
+<div class="fund-tabs">
+    <a href="/Admin/QuyBienDao/ThongTin" class="fund-tab is-active"><i class="fas fa-university"></i> Tài khoản tiếp nhận</a>
+    <a href="/Admin/QuyBienDao/DanhSach" class="fund-tab"><i class="fas fa-hand-holding-usd"></i> Danh sách ủng hộ</a>
+    <a href="/Admin/QuyBienDao/SoDu" class="fund-tab"><i class="fas fa-wallet"></i> Số dư quỹ</a>
+    <a href="/Admin/QuyBienDao/KetQua" class="fund-tab"><i class="fas fa-ship"></i> Hoạt động</a>
 </div>
 
 <div class="admin-card">
@@ -23,6 +44,7 @@
                         <th>Ngân hàng</th>
                         <th>Thông tin Tài khoản</th>
                         <th>Đơn vị thụ hưởng</th>
+                        <th class="cell-center">QR Code</th>
                         <th class="cell-actions">Thao tác</th>
                     </tr>
                 </thead>
@@ -41,16 +63,28 @@
                                     <div style="font-size:0.85rem;color:var(--admin-ink);">@item.TenTaiKhoan</div>
                                 </td>
                                 <td>@item.DonViThuHuong</td>
+                                <td class="cell-center">
+                                    @if (!string.IsNullOrEmpty(item.QrCodeUrl))
+                                    {
+                                        <img src="@item.QrCodeUrl" alt="QR" class="admin-qr-thumb" />
+                                    }
+                                    else
+                                    {
+                                        <span class="qr-status no-qr"><i class="fas fa-times-circle"></i> Chưa có</span>
+                                    }
+                                </td>
                                 <td class="cell-actions">
-                                    <a href="/AdminQuyBienDao/SuaThongTin/@item.Id" class="admin-btn admin-btn-warning admin-btn-sm">
-                                        <i class="fas fa-edit"></i> Sửa
-                                    </a>
-                                    <form action="/AdminQuyBienDao/XoaThongTin" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?');">
-                                        <input type="hidden" name="id" value="@item.Id" />
-                                        <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
-                                            <i class="fas fa-trash"></i> Xóa
-                                        </button>
-                                    </form>
+                                    <div class="admin-row-actions">
+                                        <a href="/Admin/QuyBienDao/SuaThongTin/@item.Id" class="admin-btn admin-btn-warning admin-btn-sm">
+                                            <i class="fas fa-edit"></i> Sửa
+                                        </a>
+                                        <form action="/Admin/QuyBienDao/XoaThongTin" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?');">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
+                                                <i class="fas fa-trash"></i> Xóa
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -58,7 +92,7 @@
                     else
                     {
                         <tr>
-                            <td colspan="4">
+                            <td colspan="5">
                                 <div class="admin-empty">
                                     <i class="fas fa-university"></i>
                                     <p>Chưa cấu hình tài khoản tiếp nhận nào.</p>
@@ -71,3 +105,4 @@
         </div>
     </div>
 </div>
+

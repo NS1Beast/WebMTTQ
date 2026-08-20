@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic; // Bổ sung thư viện này để dùng List
 using WebMTTQ.Models;
+using WebMTTQ.Services;
 
 namespace WebMTTQ.Controllers
 {
@@ -13,16 +14,24 @@ namespace WebMTTQ.Controllers
     {
         private readonly DataMTTQContext _context;
         private readonly IMemoryCache _cache; // Thêm bộ nhớ đệm
+        private readonly ISystemSettingsService _settings;
 
         // Tiêm IMemoryCache vào constructor
-        public CongThongTinAnSXHController(DataMTTQContext context, IMemoryCache cache)
+        public CongThongTinAnSXHController(DataMTTQContext context, IMemoryCache cache, ISystemSettingsService settings)
         {
             _context = context;
             _cache = cache;
+            _settings = settings;
         }
 
         public async Task<IActionResult> Index(int page = 1)
         {
+            // Kiểm tra bảo trì trang an sinh xã hội
+            if (await MaintenanceHelper.IsAnSinhXaHoiUnderMaintenanceAsync(_settings))
+            {
+                return View("~/Views/Home/UnderConstruction.cshtml");
+            }
+
             try
             {
                 // BƯỚC KHẮC PHỤC 1: Báo cho CSDL ráng đợi 60 giây, không được văng lỗi vội
@@ -238,6 +247,12 @@ namespace WebMTTQ.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> GuiYeuCauTroGiup(NguoiDanCanTroGiup model)
         {
+            // Kiểm tra bảo trì trang an sinh xã hội
+            if (await MaintenanceHelper.IsAnSinhXaHoiUnderMaintenanceAsync(_settings))
+            {
+                return View("~/Views/Home/UnderConstruction.cshtml");
+            }
+
             // === Chống spam: kiểm tra thời gian giữa các lần gửi (tối thiểu 30 giây) ===
             var lastSubmitKey = $"TroGiup_LastSubmit_{HttpContext.Connection.RemoteIpAddress}";
             var lastSubmit = HttpContext.Session.GetString(lastSubmitKey);

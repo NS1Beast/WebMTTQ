@@ -10,6 +10,10 @@ using Microsoft.AspNetCore.Hosting;
 using System.IO;
 namespace WebMTTQ.Controllers
 {
+    // CHIÊU THỨC TRỊ LỖI 404 TẬN GỐC:
+    // Chấp nhận cả 2 loại đường dẫn (có dấu gạch chéo và không có dấu gạch chéo)!
+    [Route("AdminQuyBienDao/[action]/{id?}")]
+    [Route("Admin/QuyBienDao/[action]/{id?}")]
     [KiemTraQuyen(ModuleQuyen.ThongTinUngHo)]
     public class AdminQuyBienDaoController : BaseAdminController
     {
@@ -250,7 +254,7 @@ namespace WebMTTQ.Controllers
                     int successCount = 0;
                     for (int row = startRow; row <= rowCount; row++)
                     {
-                        string ten = worksheet.Cells[row, colTen].Text?.Trim();
+                        string? ten = worksheet.Cells[row, colTen].Text?.Trim();
                         if (string.IsNullOrEmpty(ten)) continue;
 
                         // 2. ĐỌC NGÀY THÁNG
@@ -262,7 +266,7 @@ namespace WebMTTQ.Controllers
                             else if (cellDate is double d) { ngayUngHo = DateTime.FromOADate(d); }
                             else
                             {
-                                string dateText = worksheet.Cells[row, colThoiGian].Text?.Trim();
+                                string? dateText = worksheet.Cells[row, colThoiGian].Text?.Trim();
                                 if (!string.IsNullOrEmpty(dateText))
                                 {
                                     string[] formats = { "dd/MM/yyyy", "d/M/yyyy", "dd/M/yyyy", "d/MM/yyyy", "MM/dd/yyyy", "yyyy-MM-dd" };
@@ -286,7 +290,7 @@ namespace WebMTTQ.Controllers
                             else if (cellTien is long l) soTien = l;
                             else
                             {
-                                string tienText = worksheet.Cells[row, colSoTien].Text?.Replace(",", "").Replace(".", "").Replace("đ", "").Replace("d", "").Replace(" ", "");
+                                string? tienText = worksheet.Cells[row, colSoTien].Text?.Replace(",", "").Replace(".", "").Replace("đ", "").Replace("d", "").Replace(" ", "");
                                 decimal.TryParse(tienText, out soTien);
                             }
                         }

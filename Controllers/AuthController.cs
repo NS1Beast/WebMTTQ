@@ -13,12 +13,14 @@ namespace WebMTTQ.Controllers
         private readonly DataMTTQContext _context;
         private readonly IQuyenTruyCapService _quyenService;
         private readonly IEmailService _emailService;
+        private readonly ISystemSettingsService _settingsService;
 
-        public AuthController(DataMTTQContext context, IQuyenTruyCapService quyenService, IEmailService emailService)
+        public AuthController(DataMTTQContext context, IQuyenTruyCapService quyenService, IEmailService emailService, ISystemSettingsService settingsService)
         {
             _context = context;
             _quyenService = quyenService;
             _emailService = emailService;
+            _settingsService = settingsService;
         }
 
         // ================================================
@@ -33,6 +35,14 @@ namespace WebMTTQ.Controllers
             {
                 return RedirectToAction("Index", "Admin");
             }
+
+            // Kiểm tra xem có tài khoản Admin chính hay không
+            // Nếu không có, chuyển hướng tới trang đăng ký tài khoản admin chính
+            if (!HasMainAdmin())
+            {
+                return RedirectToAction(nameof(DangKyAdmin));
+            }
+
             return View();
         }
 
@@ -107,6 +117,111 @@ namespace WebMTTQ.Controllers
         {
             HttpContext.Session.Clear();
             return RedirectToAction("Login");
+        }
+
+        // ================================================
+        // ĐĂNG KÝ TÀI KHOẢN ADMIN CHÍNH (LẦN ĐẦU CHẠY)
+        // ================================================
+
+        [HttpGet]
+        public IActionResult DangKyAdmin()
+        {
+            // Nếu đã có tài khoản Admin chính, chuyển hướng về trang login
+            if (HasMainAdmin())
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            return View(new DangKyAdminViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DangKyAdmin(DangKyAdminViewModel model)
+        {
+            // Nếu đã có tài khoản Admin chính, chuyển hướng về trang login
+            if (HasMainAdmin())
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // Kiểm tra tên đăng nhập đã tồn tại chưa
+            if (await _context.NguoiDungs.AnyAsync(u => u.TenDangNhap == model.TenDangNhap))
+            {
+                ModelState.AddModelError("TenDangNhap", "Tên đăng nhập này đã tồn tại. Vui lòng chọn tên khác.");
+                return View(model);
+            }
+
+            // Kiểm tra email đã tồn tại chưa (nếu nhập)
+            if (!string.IsNullOrWhiteSpace(model.Email))
+            {
+                var emailExists = await _context.NguoiDungs.AnyAsync(u => u.Email == model.Email);
+                if (emailExists)
+                {
+                    ModelState.AddModelError("Email", "Email này đã được sử dụng bởi tài khoản khác.");
+                    return View(model);
+                }
+            }
+
+            // Tìm vai trò Admin hệ thống
+            var allRoles = await _context.VaiTros.AsNoTracking().ToListAsync();
+            var adminRole = allRoles.FirstOrDefault(v => QuyenHelper.IsAdminVaiTro(v.TenVaiTro));
+
+            // Nếu không có vai trò Admin, tạo mới
+            if (adminRole == null)
+            {
+                adminRole = new VaiTro
+                {
+                    TenVaiTro = "Quản trị viên",
+                    QuyenHan = QuyenBitmask.ToanQuyen, // 15 = toàn quyền
+                    NgayTao = DateTime.Now,
+                    NgayCapNhat = DateTime.Now
+                };
+                _context.VaiTros.Add(adminRole);
+                await _context.SaveChangesAsync();
+            }
+
+            // Tạo tài khoản admin chính
+            var emailValue = string.IsNullOrWhiteSpace(model.Email) ? null : model.Email.Trim();
+            var adminUser = new NguoiDung
+            {
+                TenDangNhap = model.TenDangNhap.Trim(),
+                MatKhau = PasswordHelper.HashPassword(model.MatKhau),
+                HoTen = model.HoTen.Trim(),
+                Email = emailValue,
+                SoDienThoai = string.IsNullOrWhiteSpace(model.SoDienThoai) ? null : model.SoDienThoai.Trim(),
+                IdvaiTro = adminRole.IdvaiTro,
+                TrangThai = "HoatDong",
+                NgayTao = DateTime.Now,
+                NgayCapNhat = DateTime.Now
+            };
+
+            _context.NguoiDungs.Add(adminUser);
+            await _context.SaveChangesAsync();
+
+            // Lưu ID tài khoản Admin chính vào cấu hình hệ thống
+            await _settingsService.SetValueAsync("MainAdminId", adminUser.IdnguoiDung.ToString(), "ID người dùng tài khoản Admin chính hệ thống");
+
+            // Đăng nhập tự động
+            HttpContext.Session.SetString("AdminLoggedIn", "true");
+            HttpContext.Session.SetString("AdminUserId", adminUser.IdnguoiDung.ToString());
+            HttpContext.Session.SetString("AdminHoTen", adminUser.HoTen);
+            HttpContext.Session.SetString("AdminTenDangNhap", adminUser.TenDangNhap);
+            HttpContext.Session.SetString("AdminVaiTro", adminRole.TenVaiTro);
+
+            var quyens = await _quyenService.GetQuyenCuaNguoiDungAsync(adminUser.IdnguoiDung);
+            long roleVersion = adminRole.NgayCapNhat?.Ticks ?? adminRole.NgayTao?.Ticks ?? 0;
+            PhanQuyenHelper.SaveQuyenToSession(
+                HttpContext.Session, quyens, true, adminRole.TenVaiTro, 
+                adminRole.IdvaiTro, roleVersion);
+
+            TempData["SuccessMessage"] = "Tài khoản Admin chính đã được tạo thành công!";
+            return RedirectToAction("Index", "Admin");
         }
 
         // ================================================
@@ -268,7 +383,7 @@ namespace WebMTTQ.Controllers
             model.Email = model.Email.Trim().ToLower();
             model.MaOtp = model.MaOtp.Trim();
 
-            // Kiểm tra OTP đã được xác nhận (đã đánh dấu DaSuDung = true)
+            // Kiểm ra OTP đã được xác nhận (đã đánh dấu DaSuDung = true)
             var otpRecord = await _context.MaXacThus
                 .Where(o => o.Email == model.Email
                          && o.MaOtp == model.MaOtp
@@ -305,5 +420,26 @@ namespace WebMTTQ.Controllers
         // ================================================
         // HELPERS
         // ================================================
+
+        /// <summary>
+        /// Kiểm tra xem hệ thống đã có tài khoản Admin chính hay không.
+        /// </summary>
+        private bool HasMainAdmin()
+        {
+            var mainAdminId = _settingsService.GetValue("MainAdminId");
+            if (string.IsNullOrWhiteSpace(mainAdminId))
+            {
+                return false;
+            }
+
+            // Vérifier que l'utilisateur existe encore
+            var adminId = int.TryParse(mainAdminId, out var id) ? id : 0;
+            if (adminId <= 0)
+            {
+                return false;
+            }
+
+            return _context.NguoiDungs.Any(u => u.IdnguoiDung == adminId);
+        }
     }
 }

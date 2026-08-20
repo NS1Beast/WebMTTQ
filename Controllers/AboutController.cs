@@ -1,12 +1,26 @@
 using Microsoft.AspNetCore.Mvc;
 using WebMTTQ.Models;
+using WebMTTQ.Services;
 
 namespace WebMTTQ.Controllers;
 
 public class AboutController : Controller
 {
-    public IActionResult Index()
+    private readonly ISystemSettingsService _settings;
+
+    public AboutController(ISystemSettingsService settings)
     {
+        _settings = settings;
+    }
+
+    public async Task<IActionResult> Index()
+    {
+        // Kiểm tra bảo trì trang giới thiệu
+        if (await MaintenanceHelper.IsGioiThieuUnderMaintenanceAsync(_settings))
+        {
+            return View("~/Views/Home/UnderConstruction.cshtml");
+        }
+
         var model = new AboutPageViewModel
         {
             PageTitle = "Giới thiệu",

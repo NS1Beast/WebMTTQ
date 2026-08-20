@@ -108,19 +108,83 @@
                 </div>
             </div>
             <div class="settings-body">
-                <div class="toggle-group">
+                @* <div class="toggle-group">
                     <div class="toggle-group-info">
                         <strong>Bật chế độ bảo trì</strong>
                         <span>Tạm khóa website đối với người dân. Chỉ Admin mới xem được trang quản trị.</span>
                     </div>
                     <label class="switch">
-                        <input type="checkbox" asp-for="BaoTriHeThong">
+                        <input type="checkbox" asp-for="BaoTriHeThong" id="bao-tri-he-thong">
+                        <span class="slider"></span>
+                    </label>
+                </div> *@
+
+                <div class="toggle-group" style="border-top: 1px solid #f0ece8; margin-top: 8px;">
+                    <div class="toggle-group-info">
+                        <strong style="color: #dc3545;">Bảo trì TOÀN BỘ website</strong>
+                        <span>Khi bật, tất cả các trang chức năng sẽ hiện thông báo bảo trì. Trang Admin vẫn hoạt động bình thường.</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" asp-for="BaoTriToanBo" id="bao-tri-toan-bo">
                         <span class="slider"></span>
                     </label>
                 </div>
+
+                <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #f0ece8;">
+                    <h4 style="margin: 0 0 12px; font-size: 0.9rem; color: var(--admin-ink);">
+                        <i class="fas fa-check-square" style="color: #dc3545;"></i> Chọn trang chức năng cần bảo trì
+                    </h4>
+                    <p style="font-size: 0.78rem; color: var(--admin-muted); margin: 0 0 12px;">
+                        Tích vào các trang cần bảo trì. Người dân truy cập vào trang được tích sẽ thấy thông báo "Hệ thống đang được bảo trì". Các trang không tích vẫn hoạt động bình thường.
+                    </p>
+
+                    <div class="maintenance-checkbox-grid">
+                        <label class="maintenance-checkbox-item">
+                            <input type="checkbox" asp-for="BaoTriTrangChu">
+                            <span class="maintenance-checkbox-box"><i class="fas fa-home"></i></span>
+                            <span class="maintenance-checkbox-label">Trang chủ</span>
+                        </label>
+                        <label class="maintenance-checkbox-item">
+                            <input type="checkbox" asp-for="BaoTriTinTuc">
+                            <span class="maintenance-checkbox-box"><i class="fas fa-newspaper"></i></span>
+                            <span class="maintenance-checkbox-label">Tin tức</span>
+                        </label>
+                        <label class="maintenance-checkbox-item">
+                            <input type="checkbox" asp-for="BaoTriVanBanTaiLieu">
+                            <span class="maintenance-checkbox-box"><i class="fas fa-file-alt"></i></span>
+                            <span class="maintenance-checkbox-label">Văn bản tài liệu</span>
+                        </label>
+                        <label class="maintenance-checkbox-item">
+                            <input type="checkbox" asp-for="BaoTriGioiThieu">
+                            <span class="maintenance-checkbox-box"><i class="fas fa-info-circle"></i></span>
+                            <span class="maintenance-checkbox-label">Giới thiệu</span>
+                        </label>
+                        <label class="maintenance-checkbox-item">
+                            <input type="checkbox" asp-for="BaoTriGopY">
+                            <span class="maintenance-checkbox-box"><i class="fas fa-comment-dots"></i></span>
+                            <span class="maintenance-checkbox-label">Góp ý</span>
+                        </label>
+                        <label class="maintenance-checkbox-item">
+                            <input type="checkbox" asp-for="BaoTriAnSinhXaHoi">
+                            <span class="maintenance-checkbox-box"><i class="fas fa-hands-helping"></i></span>
+                            <span class="maintenance-checkbox-label">An sinh xã hội</span>
+                        </label>
+                        <label class="maintenance-checkbox-item">
+                            <input type="checkbox" asp-for="BaoTriQuyCuuTro">
+                            <span class="maintenance-checkbox-box"><i class="fas fa-hand-holding-heart"></i></span>
+                            <span class="maintenance-checkbox-label">Quỹ cứu trợ</span>
+                        </label>
+                        <label class="maintenance-checkbox-item">
+                            <input type="checkbox" asp-for="BaoTriQuyBienDao">
+                            <span class="maintenance-checkbox-box"><i class="fas fa-ship"></i></span>
+                            <span class="maintenance-checkbox-label">Quỹ biển đảo</span>
+                        </label>
+                    </div>
+                </div>
+
                 <div class="admin-alert admin-alert-warning" style="margin-top: 12px;">
                     <i class="fas fa-info-circle"></i>
-                    <b>Lưu ý:</b> Khi bật tính năng này, người dân truy cập vào trang chủ sẽ tự động bị chuyển hướng sang trang "Hệ thống đang nâng cấp".
+                    <b>Lưu ý:</b> Khi bật "Bảo trì TOÀN BỘ", tất cả các trang chức năng sẽ hiện thông báo bảo trì. Trang quản trị Admin vẫn hoạt động bình thường để bạn có thể tắt bảo trì bất cứ lúc nào.
                 </div>
             </div>
         </div>
@@ -548,6 +612,54 @@
         transform: translateX(26px);
     }
 
+    /* ===== MAINTENANCE CHECKBOX GRID ===== */
+    .maintenance-checkbox-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+    .maintenance-checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 1px solid #eae5e1;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: #fafaf9;
+    }
+    .maintenance-checkbox-item:hover {
+        border-color: #dc3545;
+        background: #fff5f5;
+    }
+    .maintenance-checkbox-item input[type="checkbox"] {
+        display: none;
+    }
+    .maintenance-checkbox-box {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: #f0ece8;
+        color: #7a6e72;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+    .maintenance-checkbox-item input[type="checkbox"]:checked + .maintenance-checkbox-box {
+        background: #dc3545;
+        color: #fff;
+    }
+    .maintenance-checkbox-label {
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: var(--admin-ink, #1e1a1d);
+    }
+
     /* ===== PASSWORD FIELD ===== */
     .password-field-wrapper {
         display: flex;
@@ -590,6 +702,9 @@
         }
         .settings-badge {
             display: none;
+        }
+        .maintenance-checkbox-grid {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         }
     }
 </style>

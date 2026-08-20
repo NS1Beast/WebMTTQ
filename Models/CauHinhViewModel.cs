@@ -21,6 +21,15 @@
         // 3. BẢO TRÌ HỆ THỐNG (Maintenance Mode)
         // ================================================
         public bool BaoTriHeThong { get; set; }
+        public bool BaoTriToanBo { get; set; }
+        public bool BaoTriTrangChu { get; set; }
+        public bool BaoTriTinTuc { get; set; }
+        public bool BaoTriVanBanTaiLieu { get; set; }
+        public bool BaoTriGioiThieu { get; set; }
+        public bool BaoTriGopY { get; set; }
+        public bool BaoTriAnSinhXaHoi { get; set; }
+        public bool BaoTriQuyCuuTro { get; set; }
+        public bool BaoTriQuyBienDao { get; set; }
 
         // ================================================
         // 4. CẤU HÌNH THƯ MỤC (Folder Configuration)

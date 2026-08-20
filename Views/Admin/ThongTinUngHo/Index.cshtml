@@ -1,17 +1,38 @@
 ﻿@model IEnumerable<WebMTTQ.Models.ThongTinNhanUngHo>
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    ViewData["Title"] = "Quản lý thông tin ủng hộ";
+    ViewData["Title"] = "Tài khoản tiếp nhận Vì người nghèo";
+    var tongTaiKhoan = Model?.Count() ?? 0;
+    var coQr = Model?.Count(x => !string.IsNullOrEmpty(x.QrCodeUrl)) ?? 0;
 }
 
-<div class="admin-page-header">
-    <div>
-        <h2>Danh sách tài khoản tiếp nhận</h2>
-        <div class="subtitle">Quản lý các tài khoản ngân hàng tiếp nhận ủng hộ</div>
+<div class="fund-hero-bar">
+    <div class="fund-hero-content">
+        <h2>Tài khoản tiếp nhận Vì người nghèo</h2>
+        <p>Quản lý các tài khoản ngân hàng tiếp nhận ủng hộ Quỹ Vì người nghèo</p>
     </div>
-    <a asp-action="Create" class="admin-btn admin-btn-primary">
-        <i class="fas fa-plus"></i> Thêm tài khoản
-    </a>
+    <div class="fund-hero-stats">
+        <div class="fund-hero-stat">
+            <div class="stat-label">Tổng tài khoản</div>
+            <div class="stat-number">@tongTaiKhoan <small>tài khoản</small></div>
+        </div>
+        <div class="fund-hero-stat">
+            <div class="stat-label">Có QR Code</div>
+            <div class="stat-number">@coQr <small>tài khoản</small></div>
+        </div>
+    </div>
+    <div class="fund-hero-actions">
+        <a href="/admin/thongtinungho/Create" class="admin-btn admin-btn-primary">
+            <i class="fas fa-plus"></i> Thêm tài khoản
+        </a>
+    </div>
+</div>
+
+<div class="fund-tabs">
+    <a href="/admin/thongtinungho" class="fund-tab is-active"><i class="fas fa-university"></i> Tài khoản tiếp nhận</a>
+    <a href="/admin/danhsachungho" class="fund-tab"><i class="fas fa-hand-holding-usd"></i> Danh sách ủng hộ</a>
+    <a href="/admin/soduquy" class="fund-tab"><i class="fas fa-wallet"></i> Số dư quỹ</a>
+    <a href="/admin/ketquachamlo" class="fund-tab"><i class="fas fa-hand-holding-heart"></i> Kết quả chăm lo</a>
 </div>
 
 <div class="admin-card">
@@ -21,8 +42,9 @@
                 <thead>
                     <tr>
                         <th>Ngân hàng</th>
-                        <th>Tài khoản</th>
+                        <th>Thông tin Tài khoản</th>
                         <th>Đơn vị thụ hưởng</th>
+                        <th class="cell-center">QR Code</th>
                         <th class="cell-actions">Thao tác</th>
                     </tr>
                 </thead>
@@ -34,22 +56,34 @@
                             <tr>
                                 <td>
                                     <strong>@item.TenNgânHang</strong>
-                                    <div style="font-size:0.8rem;color:var(--admin-muted);">@item.ChiNhanh</div>
+                                    <div style="font-size:0.78rem;color:var(--admin-muted);">@item.ChiNhanh</div>
                                 </td>
                                 <td>
-                                    <span class="admin-badge red" style="font-size:0.85rem;">@item.SoTaiKhoan</span>
-                                    <div style="font-size:0.82rem;font-weight:600;margin-top:4px;">@item.TenTaiKhoan</div>
+                                    <span class="admin-badge gold" style="font-size: 0.9rem; margin-bottom: 4px;">@item.SoTaiKhoan</span>
+                                    <div style="font-size:0.85rem;color:var(--admin-ink);">@item.TenTaiKhoan</div>
                                 </td>
                                 <td>@item.DonViThuHuong</td>
+                                <td class="cell-center">
+                                    @if (!string.IsNullOrEmpty(item.QrCodeUrl))
+                                    {
+                                        <img src="@item.QrCodeUrl" alt="QR" class="admin-qr-thumb" />
+                                    }
+                                    else
+                                    {
+                                        <span class="qr-status no-qr"><i class="fas fa-times-circle"></i> Chưa có</span>
+                                    }
+                                </td>
                                 <td class="cell-actions">
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="admin-btn admin-btn-warning admin-btn-sm">
-                                        <i class="fas fa-edit"></i> Sửa
-                                    </a>
-                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này không?');">
-                                        <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
-                                            <i class="fas fa-trash"></i> Xóa
-                                        </button>
-                                    </form>
+                                    <div class="admin-row-actions">
+                                        <a href="/admin/thongtinungho/Edit/@item.Id" class="admin-btn admin-btn-warning admin-btn-sm">
+                                            <i class="fas fa-edit"></i> Sửa
+                                        </a>
+                                        <form action="/admin/thongtinungho/Delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?');">
+                                            <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
+                                                <i class="fas fa-trash"></i> Xóa
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -57,10 +91,10 @@
                     else
                     {
                         <tr>
-                            <td colspan="4">
+                            <td colspan="5">
                                 <div class="admin-empty">
                                     <i class="fas fa-university"></i>
-                                    <p>Chưa có dữ liệu thông tin ủng hộ nào.</p>
+                                    <p>Chưa cấu hình tài khoản tiếp nhận nào.</p>
                                 </div>
                             </td>
                         </tr>
