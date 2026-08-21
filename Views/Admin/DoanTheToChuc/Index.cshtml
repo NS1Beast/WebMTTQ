@@ -1,0 +1,43 @@
+﻿@model IEnumerable<WebMTTQ.Models.DoanTheToChuc>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Sơ đồ Tổ chức";
+}
+<div class="admin-page-header">
+    <div>
+        <h2>Sơ đồ tổ chức</h2>
+        <div class="subtitle">Quản lý nhân sự hiển thị trên trang Giới thiệu</div>
+    </div>
+    <a href="/admin/doanthe/Create" class="admin-btn admin-btn-primary"><i class="fas fa-plus"></i> Thêm thành viên</a>
+</div>
+
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>Ảnh</th>
+            <th>Cấp độ</th>
+            <th>Họ Tên</th>
+            <th>Chức vụ / Cơ quan</th>
+            <th>Thứ tự</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td><img src="@item.HinhAnh" style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid @item.MauSac;" /></td>
+                <td><span class="badge @(item.CapDo == 1 ? "bg-danger" : "bg-primary")">Cấp @item.CapDo</span></td>
+                <td style="font-weight:bold;">@item.HoTen</td>
+                <td>@item.ChucVu<br /><small>@item.CoQuan</small></td>
+                <td>@item.ThuTu</td>
+                <td>
+                    <a href="/admin/doanthe/Edit/@item.Id" class="admin-btn admin-btn-warning btn-sm"><i class="fas fa-edit"></i> Sửa</a>
+                    <form action="/admin/doanthe/Delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Xóa thành viên này?');">
+                        <button type="submit" class="admin-btn admin-btn-danger btn-sm"><i class="fas fa-trash"></i> Xóa</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

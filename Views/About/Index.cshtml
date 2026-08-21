@@ -1,9 +1,15 @@
-@model WebMTTQ.Models.AboutPageViewModel
+@using WebMTTQ.Models
+@using System.Linq
+@inject DataMTTQContext _context
+
 @{
     ViewData["Title"] = "Giới thiệu tổ chức";
     ViewData["IsAbout"] = true;
-}
 
+    // Lấy dữ liệu tổ chức từ DB
+    var cap1 = _context.DoanTheToChucs.Where(x => x.CapDo == 1 && x.DaXoa != true).OrderBy(x => x.ThuTu).ToList();
+    var cap2 = _context.DoanTheToChucs.Where(x => x.CapDo == 2 && x.DaXoa != true).OrderBy(x => x.ThuTu).ToList();
+}
 <style>
     /* RESET & BASE */
     .org-wrapper {
@@ -333,8 +339,90 @@
             Ủy ban Mặt trận Tổ quốc Việt Nam phường và các tổ chức chính trị - xã hội là lực lượng nòng cốt trong việc xây dựng khối đại đoàn kết toàn dân tộc, phát huy quyền làm chủ của Nhân dân, đại diện, bảo vệ quyền và lợi ích hợp pháp, chính đáng của đoàn viên, hội viên và Nhân dân. Với mô hình hoạt động thống nhất, gồm Ủy ban MTTQ Việt Nam, Đoàn Thanh niên Cộng sản Hồ Chí Minh, Hội Liên hiệp Phụ nữ, Hội Nông dân và Hội Cựu chiến binh, các tổ chức luôn phối hợp chặt chẽ trong công tác tuyên truyền, vận động Nhân dân, thực hiện các phong trào thi đua yêu nước, các cuộc vận động, giám sát, phản biện xã hội và tham gia xây dựng Đảng, chính quyền trong sạch, vững mạnh. Ban Thường trực Ủy ban MTTQ Việt Nam phường Tân Định gồm:
         </p>
     </section>
+    <!-- KHU VỰC SƠ ĐỒ TỔ CHỨC ĐỘNG TỪ CSDL -->
+    <section class="tree-container">
 
-    <!-- KHU VỰC SƠ ĐỒ TỔ CHỨC -->
+        <!-- LEVEL 1: CHỦ TỊCH MTTQ -->
+        <div class="tree-level-1">
+            @foreach (var root in cap1)
+            {
+                <div class="org-card-root" style="border-color: @root.MauSac;">
+                    <div class="root-ava">
+                        <img src="@root.HinhAnh" alt="Logo" />
+                    </div>
+                    <div class="root-info">
+                        <div class="root-name" style="background: @root.MauSac;">@root.HoTen</div>
+
+                        @if (!string.IsNullOrEmpty(root.VaiTroBoSung))
+                        {
+                            var roles = root.VaiTroBoSung.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                            foreach (var role in roles)
+                            {
+                                <div class="root-role">@role</div>
+                            }
+                        }
+
+                        <div class="root-title" style="color: @root.MauSac;">@root.ChucVu</div>
+                        <div class="root-sub">@root.CoQuan</div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Cây nối dọc từ Chủ tịch xuống ngã 4 -->
+        @if (cap1.Any() && cap2.Any())
+        {
+            <div class="tree-connector"></div>
+        }
+
+        <!-- LEVEL 2: CÁC THÀNH VIÊN -->
+        <div class="tree-level-2">
+            @foreach (var node in cap2)
+            {
+                <div class="tree-item">
+                    <!-- Gắn động mã màu vào border -->
+                    <div class="org-card" style="border-color: @node.MauSac;">
+
+                        <!-- Gắn động mã màu vào viền avatar -->
+                        <div class="org-ava" style="border-color: @node.MauSac;">
+                            <img src="@node.HinhAnh" alt="Logo" />
+                        </div>
+
+                        <!-- Gắn động mã màu vào nền tên -->
+                        <div><span class="org-name" style="background: @node.MauSac;">@node.HoTen</span></div>
+
+                        <div class="org-body">
+                            @if (!string.IsNullOrEmpty(node.VaiTroBoSung))
+                            {
+                                var subRoles = node.VaiTroBoSung.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                                foreach (var role in subRoles)
+                                {
+                                    <div class="role-row">
+                                        <!-- Gắn động mã màu vào icon mũi tên -->
+                                        <svg style="color: @node.MauSac;" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" /></svg>
+                                        <span>@role</span>
+                                    </div>
+                                }
+                            }
+                        </div>
+
+                        <div class="org-footer">
+                            <!-- Gắn động mã màu vào tên chức vụ -->
+                            <div class="org-title-role" style="color: @node.MauSac;">@node.ChucVu</div>
+                            <div class="org-subtitle-role">@node.CoQuan</div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+
+    <!-- FOOTER CHÂN TRANG -->
+    <div class="org-bottom-banner">
+        Đoàn kết – Đổi mới – Văn minh – Nghĩa tình
+    </div>
+</div>
+   @*  <!-- KHU VỰC SƠ ĐỒ TỔ CHỨC -->
     <section class="tree-container">
         
         <!-- LEVEL 1: CHỦ TỊCH MTTQ -->
@@ -458,4 +546,4 @@
     <div class="org-bottom-banner">
         Đoàn kết – Đổi mới – Văn minh – Nghĩa tình
     </div>
-</div>
+</div> *@

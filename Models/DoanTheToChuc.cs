@@ -1,27 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
-namespace WebMTTQ.Models;
-
-[Table("DoanTheToChuc")]
-public partial class DoanTheToChuc
+namespace WebMTTQ.Models
 {
-    [Key]
-    [Column("IDDonVi")]
-    public int IddonVi { get; set; }
-
-    [StringLength(255)]
-    public string TenDonVi { get; set; } = null!;
-
-    public byte[]? LogoDaiDien { get; set; }
-
-    [StringLength(20)]
-    [Unicode(false)]
-    public string? MauSacHienThi { get; set; }
-
-    [InverseProperty("IddonViNavigation")]
-    public virtual ICollection<DiaDiemBanDo> DiaDiemBanDos { get; set; } = new List<DiaDiemBanDo>();
+    [Table("DoanTheToChuc")]
+    public class DoanTheToChuc
+    {
+        [Key]
+        public int Id { get; set; }
+        public string? HoTen { get; set; }
+        public string? ChucVu { get; set; }
+        public string? CoQuan { get; set; }
+        public string? VaiTroBoSung { get; set; }
+        public string? HinhAnh { get; set; }
+        public string? MauSac { get; set; }
+        public int? CapDo { get; set; }
+        public int? ThuTu { get; set; }
+        public bool? DaXoa { get; set; }
+    }
 }

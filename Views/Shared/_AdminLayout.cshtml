@@ -14,8 +14,8 @@
 
     <style>
             /* ========================================================
-                       CỤM CSS CHO TOAST NOTIFICATION
-                       ======================================================== */
+                                   CỤM CSS CHO TOAST NOTIFICATION
+                                   ======================================================== */
             .admin-toast-container {
                 position: fixed;
                 top: 80px;
@@ -94,8 +94,8 @@
             }
 
             /* ========================================================
-                       CỤM CSS CHO ACCORDION MENU SIDEBAR (MENU THẢ XUỐNG)
-                       ======================================================== */
+                                   CỤM CSS CHO ACCORDION MENU SIDEBAR (MENU THẢ XUỐNG)
+                                   ======================================================== */
             .nav-group {
                 margin-bottom: 5px;
             }
@@ -176,8 +176,8 @@
                     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
                     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
 
-                    // Logic kiểm tra Active cho từng Group
-bool isNoiDungActive = currentController == "AdminNews" || currentController == "AdminVanBanTaiLieu" || currentController == "AdminTrangChu" || currentController == "AdminBanner" || currentController == "AdminTimeline";
+                    // Logic kiểm tra Active cho từng Group. Đã thêm "AdminDoanTheToChuc" vào group Quản lý nội dung
+                    bool isNoiDungActive = currentController == "AdminNews" || currentController == "AdminVanBanTaiLieu" || currentController == "AdminTrangChu" || currentController == "AdminBanner" || currentController == "AdminTimeline" || currentController == "AdminDoanTheToChuc";
                     bool isNguoiNgheoActive = currentController == "AdminThongTin" || currentController == "AdminDanhSachUngHo" || currentController == "AdminSoDuQuy" || currentController == "AdminKetQuaChamLo" || currentController == "AdminDiaDiemBanDo";
                     bool isBienDaoActive = currentController == "AdminQuyBienDao";
                     bool isCuuTroActive = currentController == "AdminQuyCuuTro";
@@ -192,7 +192,7 @@ bool isNoiDungActive = currentController == "AdminNews" || currentController == 
                 <div class="nav-sep"></div>
 
                 <!-- GROUP 1: QUẢN LÝ NỘI DUNG -->
-                    <div class="nav-group @(isNoiDungActive ? "is-open" : "")">
+                <div class="nav-group @(isNoiDungActive ? "is-open" : "")">
                     <div class="nav-group-toggle">
                         <span>Quản lý nội dung</span>
                         <i class="fas fa-chevron-down caret"></i>
@@ -210,6 +210,12 @@ bool isNoiDungActive = currentController == "AdminNews" || currentController == 
                             <a href="/AdminTrangChu/Index" class="@(currentController == "AdminTrangChu" || currentController == "AdminBanner" || currentController == "AdminTimeline" ? "is-active" : "")">
                                 <i class="fas fa-home"></i>
                                 <span>Cài đặt Trang chủ</span>
+                            </a>
+
+                            <!-- THÊM MỚI: QUẢN LÝ SƠ ĐỒ ĐOÀN THỂ TỔ CHỨC -->
+                            <a href="/admin/doanthe" class="@(currentController == "AdminDoanTheToChuc" ? "is-active" : "")">
+                                <i class="fas fa-sitemap"></i>
+                                <span>Đoàn thể tổ chức</span>
                             </a>
                         }
                         @if (coQuyen(WebMTTQ.Models.ModuleQuyen.VanBanTaiLieu))

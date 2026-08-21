@@ -66,7 +66,7 @@ app.MapControllerRoute(
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<DataMTTQContext>();
-    await context.Database.MigrateAsync();
+//    await context.Database.MigrateAsync();
     await SystemSettingsSeeder.SeedAsync(context);
     await SystemUserSeeder.SeedAsync(context);
 }

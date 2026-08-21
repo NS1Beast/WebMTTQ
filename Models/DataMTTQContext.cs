@@ -26,7 +26,7 @@ public partial class DataMTTQContext : DbContext
     public DbSet<NguoiDanCanTroGiup> NguoiDanCanTroGiups { get; set; }
     public virtual DbSet<ChuyenMuc> ChuyenMucs { get; set; }
     public virtual DbSet<DanhMucQuy> DanhMucQuies { get; set; }
-    public virtual DbSet<DiaDiemBanDo> DiaDiemBanDos { get; set; }
+
     public virtual DbSet<DoanTheToChuc> DoanTheToChucs { get; set; }
     public virtual DbSet<DonXinHoTro> DonXinHoTros { get; set; }
     public virtual DbSet<HopThuGopY> HopThuGopies { get; set; }
@@ -58,11 +58,11 @@ public partial class DataMTTQContext : DbContext
     public DbSet<SoDuQuy> SoDuQues { get; set; }
     public DbSet<KetQuaHoatDong> KetQuaHoatDongs { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Server=.;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");
-    //    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-    //        => optionsBuilder.UseSqlServer("Server=DESKTOP-C5LJ9BM\\SQL2025_DEV;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");
+    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    //    => optionsBuilder.UseSqlServer("Server=.;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");
+       protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+   #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+    => optionsBuilder.UseSqlServer("Server=DESKTOP-C5LJ9BM\\SQL2025_DEV;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<BaiViet>(entity =>
@@ -110,21 +110,21 @@ public partial class DataMTTQContext : DbContext
             entity.Property(e => e.TrangThai).HasDefaultValue("HoatDong");
         });
 
-        modelBuilder.Entity<DiaDiemBanDo>(entity =>
-        {
-            entity.HasKey(e => e.IddiaDiem).HasName("PK__DiaDiemB__3DD0D654483F5641");
+        //modelBuilder.Entity<DiaDiemBanDo>(entity =>
+        //{
+        //    entity.HasKey(e => e.IddiaDiem).HasName("PK__DiaDiemB__3DD0D654483F5641");
 
-            entity.Property(e => e.ViDo).HasColumnType("decimal(12, 8)");
-            entity.Property(e => e.KinhDo).HasColumnType("decimal(12, 8)");
+        //    entity.Property(e => e.ViDo).HasColumnType("decimal(12, 8)");
+        //    entity.Property(e => e.KinhDo).HasColumnType("decimal(12, 8)");
 
-            entity.Property(e => e.TrangThai).HasDefaultValue("HienThi");
+        //    entity.Property(e => e.TrangThai).HasDefaultValue("HienThi");
 
-            entity.HasOne(d => d.IddonViNavigation).WithMany(p => p.DiaDiemBanDos).HasConstraintName("FK_DiaDiem_DonVi");
-        });
+        //    //entity.HasOne(d => d.IddonViNavigation).WithMany(p => p.DiaDiemBanDos).HasConstraintName("FK_DiaDiem_DonVi");
+        //});
 
         modelBuilder.Entity<DoanTheToChuc>(entity =>
         {
-            entity.HasKey(e => e.IddonVi).HasName("PK__DoanTheT__082302BFBA08A593");
+            entity.HasKey(e => e.Id).HasName("PK__DoanTheT__082302BFBA08A593");
         });
 
         modelBuilder.Entity<DonXinHoTro>(entity =>
