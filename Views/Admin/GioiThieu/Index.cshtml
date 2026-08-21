@@ -1,0 +1,44 @@
+﻿@model IEnumerable<WebMTTQ.Models.GioiThieuChung>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Quản lý Lời Giới Thiệu";
+}
+<div class="admin-page-header">
+    <div>
+        <h2>Quản lý Lời Giới Thiệu (Slogan & Nội dung)</h2>
+    </div>
+    <a href="/admin/gioithieu/Create" class="admin-btn admin-btn-primary"><i class="fas fa-plus"></i> Thêm mới</a>
+</div>
+
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>Tiêu đề chính</th>
+            <th>Slogan</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td style="font-weight:bold; color: #1565c0;">@item.TieuDeChinh <br /><span style="color:#d32f2f;">@item.TieuDePhu</span></td>
+                <td>@item.Slogan</td>
+                <td>
+                    <form action="/admin/gioithieu/Toggle/@item.Id" method="post" style="display:inline;">
+                        <button type="submit" class="badge @(item.TrangThai == true ? "bg-success" : "bg-warning")" style="border:none; cursor:pointer;">
+                            @(item.TrangThai == true ? "Đang hiển thị" : "Đang ẩn")
+                        </button>
+                    </form>
+                </td>
+                <td>
+                    <a href="/admin/gioithieu/Edit/@item.Id" class="admin-btn admin-btn-warning btn-sm"><i class="fas fa-edit"></i> Sửa</a>
+                    <form action="/admin/gioithieu/Delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Xóa phần này?');">
+                        <button type="submit" class="admin-btn admin-btn-danger btn-sm"><i class="fas fa-trash"></i> Xóa</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

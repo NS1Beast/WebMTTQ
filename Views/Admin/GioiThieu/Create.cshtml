@@ -1,0 +1,135 @@
+﻿@model WebMTTQ.Models.GioiThieuChung
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<style>
+    .admin-form-container {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        padding: 30px;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+        .form-header h2 {
+            margin: 0;
+            font-size: 1.4rem;
+            color: #333;
+        }
+
+    .admin-form-group {
+        margin-bottom: 15px;
+    }
+
+        .admin-form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #444;
+        }
+
+    .admin-input, .admin-textarea, .admin-select {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        box-sizing: border-box;
+    }
+
+        .admin-input:focus, .admin-textarea:focus {
+            border-color: #8a1527;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(138, 21, 39, 0.1);
+        }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .btn-cancel {
+        padding: 10px 20px;
+        border: 1px solid #ddd;
+        color: #555;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .btn-save {
+        padding: 10px 25px;
+        border: none;
+        background: #28a745;
+        color: #fff;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+</style>
+
+<div class="admin-form-container">
+    <div class="form-header">
+        <a href="/admin/gioithieu" class="back-btn" style="color: #555; text-decoration: none; font-size: 1.2rem;"><i class="fas fa-arrow-left"></i></a>
+        <h2>Thêm/Sửa Nội dung Giới thiệu</h2>
+    </div>
+
+    <form asp-action="@(Model?.Id > 0 ? "Edit" : "Create")" method="post">
+        @if (Model?.Id > 0)
+        {
+            <input type="hidden" asp-for="Id" />
+        }
+
+        <div class="admin-form-group">
+            <label>Khúc Tiêu Đề Chính (Màu Xanh)</label>
+            <input asp-for="TieuDeChinh" class="admin-input" placeholder="VD: ỦY BAN MẶT TRẬN TỔ QUỐC VIỆT NAM PHƯỜNG" required />
+        </div>
+
+        <div class="admin-form-group">
+            <label>Chữ in nghiêng ở giữa</label>
+            <input asp-for="ChuNghieng" class="admin-input" placeholder="VD: và các" />
+        </div>
+
+        <div class="admin-form-group">
+            <label>Khúc Tiêu Đề Phụ (Màu Đỏ)</label>
+            <input asp-for="TieuDePhu" class="admin-input" placeholder="VD: TỔ CHỨC CHÍNH TRỊ - XÃ HỘI" />
+        </div>
+
+        <div class="admin-form-group">
+            <label>Câu Slogan (Trong nền màu xanh)</label>
+            <input asp-for="Slogan" class="admin-input" placeholder="VD: ★ ĐOÀN KẾT – ĐỔI MỚI – VĂN MINH – NGHĨA TÌNH ★" />
+        </div>
+
+        <div class="admin-form-group">
+            <label>Nội dung giới thiệu chi tiết</label>
+            <textarea asp-for="NoiDung" class="admin-textarea" rows="6" placeholder="Nhập đoạn văn bản giới thiệu..."></textarea>
+        </div>
+
+        <div class="admin-form-group">
+            <label>Trạng thái</label>
+            <select asp-for="TrangThai" class="admin-select">
+                <option value="true">Hiển thị ra trang chủ</option>
+                <option value="false">Ẩn (Bản nháp)</option>
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <a href="/admin/gioithieu" class="btn-cancel">Hủy</a>
+            <button type="submit" class="btn-save"><i class="fas fa-save"></i> Lưu thông tin</button>
+        </div>
+    </form>
+</div>
