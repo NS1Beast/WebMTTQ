@@ -5,7 +5,8 @@
 @{
     ViewData["Title"] = "Giới thiệu tổ chức";
     ViewData["IsAbout"] = true;
-
+    // Lấy lời giới thiệu đang được kích hoạt
+    var intro = _context.GioiThieuChungs.OrderByDescending(x => x.Id).FirstOrDefault(x => x.TrangThai == true);
     // Lấy dữ liệu tổ chức từ DB
     var cap1 = _context.DoanTheToChucs.Where(x => x.CapDo == 1 && x.DaXoa != true).OrderBy(x => x.ThuTu).ToList();
     var cap2 = _context.DoanTheToChucs.Where(x => x.CapDo == 2 && x.DaXoa != true).OrderBy(x => x.ThuTu).ToList();
@@ -320,23 +321,24 @@
 </style>
 
 <div class="org-wrapper">
-    <!-- KHU VỰC TIÊU ĐỀ & GIỚI THIỆU -->
+    <!-- KHU VỰC TIÊU ĐỀ & GIỚI THIỆU LẤY TỪ DB -->
     <section class="org-header">
         <h1 class="org-title">
-            ỦY BAN MẶT TRẬN TỔ QUỐC VIỆT NAM PHƯỜNG<br/>
+            @(intro?.TieuDeChinh ?? "ỦY BAN MẶT TRẬN TỔ QUỐC VIỆT NAM PHƯỜNG")<br />
             <div class="org-subtitle-row">
                 <div class="org-line left"></div>
-                <span style="font-style: italic; color: #1565c0;">và các </span> <span class="text-red">TỔ CHỨC CHÍNH TRỊ - XÃ HỘI</span>
+                <span style="font-style: italic; color: #1565c0;">@(intro?.ChuNghieng ?? "và các") </span>
+                <span class="text-red">@(intro?.TieuDePhu ?? "TỔ CHỨC CHÍNH TRỊ - XÃ HỘI")</span>
                 <div class="org-line right"></div>
             </div>
         </h1>
-        
+
         <div class="org-slogan-pill">
-            ★ ĐOÀN KẾT – ĐỔI MỚI – VĂN MINH – NGHĨA TÌNH ★
+            @(intro?.Slogan ?? "★ ĐOÀN KẾT – ĐỔI MỚI – VĂN MINH – NGHĨA TÌNH ★")
         </div>
-        
+
         <p class="org-intro-text">
-            Ủy ban Mặt trận Tổ quốc Việt Nam phường và các tổ chức chính trị - xã hội là lực lượng nòng cốt trong việc xây dựng khối đại đoàn kết toàn dân tộc, phát huy quyền làm chủ của Nhân dân, đại diện, bảo vệ quyền và lợi ích hợp pháp, chính đáng của đoàn viên, hội viên và Nhân dân. Với mô hình hoạt động thống nhất, gồm Ủy ban MTTQ Việt Nam, Đoàn Thanh niên Cộng sản Hồ Chí Minh, Hội Liên hiệp Phụ nữ, Hội Nông dân và Hội Cựu chiến binh, các tổ chức luôn phối hợp chặt chẽ trong công tác tuyên truyền, vận động Nhân dân, thực hiện các phong trào thi đua yêu nước, các cuộc vận động, giám sát, phản biện xã hội và tham gia xây dựng Đảng, chính quyền trong sạch, vững mạnh. Ban Thường trực Ủy ban MTTQ Việt Nam phường Tân Định gồm:
+            @(intro?.NoiDung ?? "Ủy ban Mặt trận Tổ quốc Việt Nam phường và các tổ chức chính trị - xã hội là lực lượng nòng cốt trong việc xây dựng khối đại đoàn kết toàn dân tộc, phát huy quyền làm chủ của Nhân dân, đại diện, bảo vệ quyền và lợi ích hợp pháp, chính đáng của đoàn viên, hội viên và Nhân dân. Với mô hình hoạt động thống nhất, gồm Ủy ban MTTQ Việt Nam, Đoàn Thanh niên Cộng sản Hồ Chí Minh, Hội Liên hiệp Phụ nữ, Hội Nông dân và Hội Cựu chiến binh, các tổ chức luôn phối hợp chặt chẽ trong công tác tuyên truyền, vận động Nhân dân, thực hiện các phong trào thi đua yêu nước, các cuộc vận động, giám sát, phản biện xã hội và tham gia xây dựng Đảng, chính quyền trong sạch, vững mạnh. Ban Thường trực Ủy ban MTTQ Việt Nam phường Tân Định gồm:")
         </p>
     </section>
     <!-- KHU VỰC SƠ ĐỒ TỔ CHỨC ĐỘNG TỪ CSDL -->

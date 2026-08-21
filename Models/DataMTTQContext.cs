@@ -46,7 +46,7 @@ public partial class DataMTTQContext : DbContext
     public virtual DbSet<VaiTro> VaiTros { get; set; }
     public virtual DbSet<VaiTroQuyen> VaiTroQuyens { get; set; }
     public virtual DbSet<VanBanTaiLieu> VanBanTaiLieus { get; set; }
-
+    public virtual DbSet<GioiThieuChung> GioiThieuChungs { get; set; }
     public DbSet<ThongTinNhanUngHoBienDao> ThongTinNhanUngHoBienDaos { get; set; }
     public DbSet<SoDuQuyBienDao> SoDuQuyBienDaos { get; set; }
     public DbSet<DanhSachUngHoBienDao> DanhSachUngHoBienDaos { get; set; }
