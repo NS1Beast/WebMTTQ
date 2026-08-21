@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebMTTQ.Models;
 using WebMTTQ.Services;
 
@@ -7,10 +8,12 @@ namespace WebMTTQ.Controllers;
 public class AboutController : Controller
 {
     private readonly ISystemSettingsService _settings;
+    private readonly DataMTTQContext _context;
 
-    public AboutController(ISystemSettingsService settings)
+    public AboutController(ISystemSettingsService settings, DataMTTQContext context)
     {
         _settings = settings;
+        _context = context;
     }
 
     public async Task<IActionResult> Index()
@@ -20,6 +23,13 @@ public class AboutController : Controller
         {
             return View("~/Views/Home/UnderConstruction.cshtml");
         }
+
+        // Lấy các section nội dung đang hiển thị
+        var sections = await _context.GioiThieuSections
+            .Where(x => x.TrangThai == true)
+            .OrderBy(x => x.ThuTu)
+            .ThenBy(x => x.Id)
+            .ToListAsync();
 
         var model = new AboutPageViewModel
         {
@@ -80,6 +90,7 @@ public class AboutController : Controller
             }
         };
 
+        ViewBag.Sections = sections;
         return View(model);
     }
 }

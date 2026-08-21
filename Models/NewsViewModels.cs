@@ -1,3 +1,5 @@
+using WebMTTQ.Services;
+
 namespace WebMTTQ.Models;
 
 public sealed class NewsIndexViewModel
@@ -16,6 +18,9 @@ public sealed class NewsIndexViewModel
     // Trạng thái chuyên mục hiện tại
     public string CurrentCategoryName { get; init; } = "Tin tức";
     public bool HasArticles { get; init; } = true;
+
+    // Thống kê truy cập
+    public ThongKeTruyCapResult ThongKeTruyCap { get; init; } = new();
 }
 
 public sealed class NewsCategoryInfo
@@ -65,4 +70,7 @@ public sealed class NewsDetailViewModel
     public string CategoryName { get; init; } = "";
     public string CategorySlug { get; init; } = "";
     public IReadOnlyList<NewsArticleItem> RelatedArticles { get; init; } = [];
+
+    // Thống kê truy cập
+    public ThongKeTruyCapResult ThongKeTruyCap { get; init; } = new();
 }

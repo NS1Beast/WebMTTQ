@@ -20,7 +20,7 @@
         </div>
     }
 
-    <form asp-action="Edit" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn lưu các thay đổi của mục này?');">
+    <form asp-action="Edit" method="post" enctype="multipart/form-data" onsubmit="return confirm('Bạn có chắc chắn muốn lưu các thay đổi của mục này?');">
         @Html.AntiForgeryToken()
         <input type="hidden" asp-for="Id" />
 
@@ -36,12 +36,23 @@
                 <select asp-for="Loai" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: white;">
                     <option value="tin-tuc">Tin tức nổi bật</option>
                     <option value="hinh-anh">Thư viện hình ảnh</option>
-                    <option value="thong-tin">Thông tin giới thiệu</option>
                     <option value="video">Video</option>
-                    <option value="lien-ket">Liên kết nhanh</option>
                     <option value="van-ban">Văn bản</option>
                 </select>
             </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label asp-for="HinhAnh" style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">Ảnh đại diện mục (tùy chọn)</label>
+            @if (!string.IsNullOrEmpty(Model.HinhAnh))
+            {
+                <div style="margin-bottom: 10px;">
+                    <img src="@Model.HinhAnh" alt="Ảnh hiện tại" style="max-width: 200px; max-height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd;" />
+                    <div style="font-size: 0.8rem; color: #888; margin-top: 4px;">Ảnh hiện tại</div>
+                </div>
+            }
+            <input type="file" name="FileAnh" accept="image/*" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: white;" />
+            <small style="color: #888;">Để trống nếu giữ ảnh hiện tại. Định dạng: JPG, PNG, GIF. Kích thước tối đa 3MB.</small>
         </div>
 
         <div class="form-group" style="margin-bottom: 20px;">
@@ -55,17 +66,17 @@
             <small style="color: #888;">Số càng nhỏ hiển thị càng trước.</small>
         </div>
 
-        @if (Model.Loai == "tin-tuc")
+        @if (Model.Loai == "tin-tuc" || Model.Loai == "hinh-anh" || Model.Loai == "video" || Model.Loai == "van-ban" || Model.Loai == "lien-ket")
         {
             <div style="margin-top: 15px; padding: 15px; background: #e7f7ff; border-radius: 8px; border-left: 4px solid #17a2b8;">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
-                    <i class="fas fa-newspaper" style="color: #17a2b8; font-size: 1.1rem;"></i>
+                    <i class="fas @(Model.Loai == "tin-tuc" ? "fa-newspaper" : Model.Loai == "hinh-anh" ? "fa-images" : Model.Loai == "video" ? "fa-video" : Model.Loai == "van-ban" ? "fa-file-alt" : "fa-link")" style="color: #17a2b8; font-size: 1.1rem;"></i>
                     <strong style="color: #004085; font-size: 0.95rem;">
-                        Mục tin tức này có @Model.TinTucs?.Count(t => t.TrangThai) mục tin đang hiển thị
+                        Mục này có @Model.TinTucs?.Count(t => t.TrangThai) nội dung đang hiển thị
                     </strong>
                 </div>
-                <a href="@Url.Action("TinTucList", "AdminTrangChu", new { id = Model.Id })" style="display: inline-flex; align-items: center; gap: 6px; color: #004085; text-decoration: none; font-weight: 500; padding: 6px 14px; border: 1px solid #bee5eb; border-radius: 6px;">
-                    <i class="fas fa-list"></i> Xem & quản lý tin tức trong mục này
+                <a href="@Url.Action("ItemList", "AdminTrangChu", new { id = Model.Id })" style="display: inline-flex; align-items: center; gap: 6px; color: #004085; text-decoration: none; font-weight: 500; padding: 6px 14px; border: 1px solid #bee5eb; border-radius: 6px;">
+                    <i class="fas fa-list"></i> Xem & quản lý nội dung trong mục này
                 </a>
             </div>
         }

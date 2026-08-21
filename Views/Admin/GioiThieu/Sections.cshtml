@@ -1,0 +1,127 @@
+@model IEnumerable<WebMTTQ.Models.GioiThieuSection>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Nội dung giới thiệu";
+    var sections = Model.ToList();
+    var totalCount = sections.Count;
+}
+
+<style>
+    .gt-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 0; }
+    .gt-tab {
+        padding: 12px 24px; border-radius: 8px 8px 0 0; text-decoration: none;
+        font-weight: 600; font-size: 0.95rem; color: #666; background: #f8f9fa;
+        border: 1px solid #eee; border-bottom: none; transition: all 0.3s;
+        display: inline-flex; align-items: center; gap: 8px;
+    }
+    .gt-tab:hover { background: #e9ecef; color: #333; }
+    .gt-tab.active { background: #8b1a2b; color: white; border-color: #8b1a2b; }
+
+    .gt-card { background:#fff; border-radius:12px; padding:25px; box-shadow:0 4px 15px rgba(0,0,0,0.05); margin-bottom:25px; }
+    .gt-section-card { background:#f8f9fa; border:1px solid #e0e0e0; border-radius:10px; padding:15px 20px; margin-bottom:10px; display:flex; align-items:center; gap:15px; transition:all .3s; }
+    .gt-section-card:hover { box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+    .gt-sort-btns { display:flex; flex-direction:column; gap:2px; }
+    .gt-sort-btn { border:none; background:#e9ecef; color:#555; width:28px; height:24px; border-radius:4px; cursor:pointer; font-size:0.7rem; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+    .gt-sort-btn:hover:not(:disabled) { background:#8b1a2b; color:#fff; }
+    .gt-sort-btn:disabled { opacity:0.3; cursor:not-allowed; }
+    .gt-thumb { width:60px; height:60px; border-radius:8px; object-fit:cover; border:1px solid #ddd; background:#fff; flex-shrink:0; }
+    .gt-content { flex:1; min-width:0; }
+    .gt-content h4 { margin:0 0 4px; font-size:0.95rem; font-weight:700; color:#222; }
+    .gt-content p { margin:0; font-size:0.85rem; color:#666; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+    .gt-actions { display:flex; align-items:center; gap:8px; white-space:nowrap; }
+    .gt-btn { border:none; background:none; cursor:pointer; font-size:0.9rem; padding:4px 8px; border-radius:5px; text-decoration:none; }
+    .gt-btn:hover { background:#e9ecef; }
+    .badge { padding:4px 10px; border-radius:15px; font-size:0.75rem; font-weight:600; }
+    .badge-on { background:#d4edda; color:#155724; }
+    .badge-off { background:#f8d7da; color:#721c24; }
+</style>
+
+<div style="max-width:1100px; margin:0 auto;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="margin:0; color:#333;">Nội dung giới thiệu</h2>
+        <a href="/admin/gioithieu/sections/create" class="admin-btn admin-btn-primary"><i class="fas fa-plus"></i> Thêm section</a>
+    </div>
+
+    <!-- Tabs -->
+    <div class="gt-tabs">
+        <a href="/admin/gioithieu" class="gt-tab"><i class="fas fa-info-circle"></i> Giới thiệu chung</a>
+        <a href="/admin/gioithieu/sections" class="gt-tab active"><i class="fas fa-layer-group"></i> Nội dung giới thiệu</a>
+        <a href="/admin/doanthe" class="gt-tab"><i class="fas fa-sitemap"></i> Đoàn thể tổ chức</a>
+    </div>
+
+    <!-- Danh sách section -->
+    <div class="gt-card">
+        <h3 style="margin:0 0 20px; font-size:1.1rem; color:#555; display:flex; align-items:center; gap:8px;">
+            <i class="fas fa-stream"></i> Danh sách section
+            <small style="color:#888; font-weight:normal;">(Sử dụng mũi tên lên/xuống để sắp xếp)</small>
+        </h3>
+
+        @if (totalCount > 0)
+        {
+            @for (int i = 0; i < totalCount; i++)
+            {
+                var item = sections[i];
+                var isFirst = i == 0;
+                var isLast = i == totalCount - 1;
+                <div class="gt-section-card">
+                    <div class="gt-sort-btns">
+                        <form action="/admin/gioithieu/sections/moveup/@item.Id" method="post" style="display:inline;">
+                            <button type="submit" class="gt-sort-btn" title="Di chuyển lên" @(isFirst ? "disabled" : "")>
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                        </form>
+                        <form action="/admin/gioithieu/sections/movedown/@item.Id" method="post" style="display:inline;">
+                            <button type="submit" class="gt-sort-btn" title="Di chuyển xuống" @(isLast ? "disabled" : "")>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(item.HinhAnh))
+                    {
+                        <img src="@item.HinhAnh" class="gt-thumb" alt="@item.AltText" />
+                    }
+                    else
+                    {
+                        <div class="gt-thumb" style="display:flex;align-items:center;justify-content:center;color:#ccc;">
+                            <i class="fas fa-image"></i>
+                        </div>
+                    }
+
+                    <div class="gt-content">
+                        <h4>@item.TieuDe</h4>
+                        @if (!string.IsNullOrEmpty(item.NoiDung))
+                        {
+                            var plainText = System.Text.RegularExpressions.Regex.Replace(item.NoiDung, "<[^>]+>", " ");
+                            <p>@plainText</p>
+                        }
+                        @if (!string.IsNullOrEmpty(item.LoaiSection))
+                        {
+                            <small style="color:#888;"><i class="fas fa-tag"></i> @item.LoaiSection</small>
+                        }
+                    </div>
+
+                    <span class="badge @(item.TrangThai ? "badge-on" : "badge-off")">@(item.TrangThai ? "Hiển thị" : "Ẩn")</span>
+
+                    <div class="gt-actions">
+                        <form action="/admin/gioithieu/sections/toggle/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái hiển thị section @item.TieuDe?');">
+                            <button type="submit" class="gt-btn" title="Bật/tắt"><i class="fas fa-eye@(item.TrangThai ? "-slash" : "")"></i></button>
+                        </form>
+                        <a href="/admin/gioithieu/sections/edit/@item.Id" class="gt-btn" title="Sửa"><i class="fas fa-edit" style="color:#17a2b8;"></i></a>
+                        <form action="/admin/gioithieu/sections/delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Xóa section này?');">
+                            <button type="submit" class="gt-btn" title="Xóa"><i class="fas fa-trash" style="color:#dc3545;"></i></button>
+                        </form>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div style="text-align:center; padding:30px; color:#888;">
+                <i class="fas fa-inbox" style="font-size:2rem; opacity:0.3;"></i>
+                <p>Chưa có section nào.</p>
+                <a href="/admin/gioithieu/sections/create" style="color:#17a2b8;">+ Thêm section đầu tiên</a>
+            </div>
+        }
+    </div>
+</div>

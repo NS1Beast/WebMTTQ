@@ -1,0 +1,273 @@
+@model IEnumerable<WebMTTQ.Models.TrangChuTinTuc>
+
+@{
+    ViewData["Title"] = "Quản lý nội dung - Trang chủ";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var sec = ViewBag.Section as WebMTTQ.Models.TrangChuMuc;
+    var sections = ViewBag.Sections as List<WebMTTQ.Models.TrangChuMuc> ?? new List<WebMTTQ.Models.TrangChuMuc>();
+    var hasEnoughSections = sections.Count >= 2;
+
+    string loaiLabel = sec?.Loai switch
+    {
+        "tin-tuc" => "Tin tức",
+        "hinh-anh" => "Hình ảnh",
+        "video" => "Video",
+        "van-ban" => "Văn bản",
+        _ => sec?.Loai ?? ""
+    };
+
+    string icon = sec?.Loai switch
+    {
+        "tin-tuc" => "fa-newspaper",
+        "hinh-anh" => "fa-images",
+        "video" => "fa-video",
+        "van-ban" => "fa-file-alt",
+        _ => "fa-th-list"
+    };
+}
+
+<div class="admin-card" style="background:#fff; padding:25px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+        <div>
+            <h2 style="margin: 0; color: #333; font-size: 1.5rem;">
+                <i class="fas @icon"></i> Danh sách nội dung: @(sec?.TieuDe ?? "")
+            </h2>
+            <p style="margin: 5px 0 0; color: #888; font-size: 0.9rem;">
+                Loại mục: <strong>@loaiLabel</strong>
+                - Quản lý các nội dung hiển thị trong mục này
+            </p>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <a href="@Url.Action("Edit", "AdminTrangChu", new { id = sec?.Id })" style="color: #17a2b8; text-decoration: none; padding: 8px 16px; border: 1px solid #17a2b8; border-radius: 6px; font-size: 0.9rem;">
+                <i class="fas fa-cog"></i> Sửa mục
+            </a>
+            <a href="@Url.Action("Index", "AdminTrangChu")" style="color: #6c757d; text-decoration: none; padding: 8px 16px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem;">
+                <i class="fas fa-arrow-left"></i> Quay lại danh sách mục
+            </a>
+            <a href="@Url.Action("ItemCreate", "AdminTrangChu", new { id = sec?.Id })" class="btn" style="background: #28a745; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fas fa-plus"></i> Thêm nội dung
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="table-responsive">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f8f9fa; text-align: left; border-bottom: 2px solid #ddd;">
+                    <th style="padding: 15px; min-width: 120px;">Hình ảnh</th>
+                    <th style="padding: 15px;">Tiêu đề</th>
+                    <th style="padding: 15px;">Mô tả / Tóm tắt</th>
+                    <th style="padding: 15px;">Liên kết</th>
+                    <th style="padding: 15px; width: 80px;">Thứ tự</th>
+                    <th style="padding: 15px; width: 100px;">Trạng thái</th>
+                    <th style="padding: 15px; text-align: center; min-width: 180px;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 10px 15px;">
+                                @if (!string.IsNullOrEmpty(item.HinhAnh))
+                                {
+                                    <img src="@item.HinhAnh" alt="@item.TieuDe" style="width: 120px; height: 70px; object-fit: cover; border-radius: 6px; border: 1px solid #ddd;" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%2270%22 viewBox=%220 0 120 70%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22120%22 height=%2270%22/%3E%3Ctext fill=%22%23999%22 font-family=%22Arial%22 font-size=%2212%22 text-anchor=%22middle%22 x=%2260%22 y=%2240%22%3ENo Image%3C/text%3E%3C/svg%3E'" />
+                                }
+                                else
+                                {
+                                    <div style="width: 120px; height: 70px; background: #f0f0f0; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 0.8rem;">
+                                        <i class="fas fa-image"></i>
+                                    </div>
+                                }
+                            </td>
+                            <td style="padding: 15px; font-weight: bold; max-width: 250px; overflow: hidden; text-overflow: ellipsis;">
+                                @item.TieuDe
+                            </td>
+                            <td style="padding: 15px; color: #666; font-size: 0.9rem; max-width: 300px;">
+                                @(item.TomTat?.Length > 80 ? item.TomTat.Substring(0, 80) + "..." : item.TomTat ?? "")
+                            </td>
+                            <td style="padding: 15px; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                @if (!string.IsNullOrEmpty(item.LienKet))
+                                {
+                                    <a href="@item.LienKet" target="_blank" style="color: #17a2b8; font-size: 0.85rem; text-decoration: none;">
+                                        <i class="fas fa-external-link-alt"></i> @item.LienKet
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span style="color: #aaa; font-size: 0.85rem;">—</span>
+                                }
+                            </td>
+                            <td style="padding: 15px; text-align: center;">@item.ThuTu</td>
+                            <td style="padding: 15px;">
+                                @if (item.TrangThai)
+                                {
+                                    <span style="background: #d4edda; color: #155724; padding: 5px 10px; border-radius: 20px; font-size: 0.85rem;">Hiển thị</span>
+                                }
+                                else
+                                {
+                                    <span style="background: #f8d7da; color: #721c24; padding: 5px 10px; border-radius: 20px; font-size: 0.85rem;">Đang ẩn</span>
+                                }
+                            </td>
+                            <td style="padding: 15px; text-align: center;">
+                                <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+                                    @if (hasEnoughSections)
+                                    {
+                                        <button type="button"
+                                            onclick="openMoveModal(@item.Id, @item.IdTrangChuMuc, '@(item.TieuDe?.Replace("'", "\\'") ?? "")')"
+                                            style="color: #17a2b8; background: none; border: 1px solid #17a2b8; cursor: pointer; font-size: 0.85rem; padding: 5px 12px; border-radius: 4px;">
+                                            <i class="fas fa-share-alt"></i> Chuyển
+                                        </button>
+                                    }
+                                    <a href="@Url.Action("ItemEdit", "AdminTrangChu", new { id = item.Id })" style="color: #17a2b8; text-decoration: none; padding: 5px 12px; border: 1px solid #17a2b8; border-radius: 4px; font-size: 0.85rem;">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </a>
+                                    <form asp-action="ItemToggleStatus" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Xác nhận thay đổi trạng thái hiển thị nội dung này?');">
+                                        <button type="submit" style="color: @(item.TrangThai ? "#ffc107" : "#28a745"); background: none; border: 1px solid @(item.TrangThai ? "#ffc107" : "#28a745"); cursor: pointer; font-size: 0.85rem; padding: 5px 12px; border-radius: 4px;">
+                                            <i class="fas @(item.TrangThai ? "fa-eye-slash" : "fa-eye")"></i> @(item.TrangThai ? "Ẩn" : "Hiện")
+                                        </button>
+                                    </form>
+                                    <form asp-action="ItemDelete" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa nội dung này?');">
+                                        <button type="submit" style="color: #dc3545; background: none; border: 1px solid #dc3545; cursor: pointer; font-size: 0.85rem; padding: 5px 12px; border-radius: 4px;">
+                                            <i class="fas fa-trash"></i> Xóa
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #888;">
+                            <div style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;">
+                                <i class="fas @icon"></i>
+                            </div>
+                            <p style="font-size: 1.1rem; margin-bottom: 5px;">Chưa có nội dung nào trong mục này.</p>
+                            <p style="font-size: 0.9rem;">Nhấn nút "Thêm nội dung" để bắt đầu thêm.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal chuyển mục -->
+<div id="moveModal" class="modal-overlay" style="display:none;" onclick="closeMoveModal(event)">
+    <div class="modal-box" style="background:#fff; border-radius:12px; max-width:500px; width:90%; padding:0; box-shadow:0 10px 40px rgba(0,0,0,0.2);" onclick="event.stopPropagation()">
+        <div style="padding:20px 25px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0; color:#333; font-size:1.2rem;">
+                <i class="fas fa-share-alt"></i> Chuyển nội dung sang mục khác
+            </h3>
+            <button type="button" onclick="document.getElementById('moveModal').style.display='none'" style="background:none; border:none; font-size:1.5rem; color:#999; cursor:pointer;line-height:1;">&times;</button>
+        </div>
+        <div style="padding:25px;">
+            <p id="moveItemName" style="color:#555; font-size:0.95rem; margin-bottom:20px; line-height:1.5;"></p>
+            <form method="post" action="/AdminTrangChu/ItemMove" id="moveForm" onsubmit="return confirmMove(event)">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" id="moveItemId" />
+                <input type="hidden" name="newSectionId" id="moveNewSectionId" />
+                <div style="margin-bottom:25px;">
+                    <label style="display:block; font-weight:600; font-size:0.9rem; margin-bottom:8px; color:#333;">Mục đích:</label>
+                    <select id="moveSectionSelect" class="admin-input" style="width:100%; padding:10px 12px; border:1px solid #ddd; border-radius:8px; font-size:0.95rem;" onchange="document.getElementById('moveNewSectionId').value = this.value;">
+                        <option value="">-- Chọn mục --</option>
+                        @foreach (var s in sections)
+                        {
+                            <option value="@s.Id">@s.TieuDe</option>
+                        }
+                    </select>
+                </div>
+                <div style="display:flex; gap:10px; justify-content:flex-end;">
+                    <button type="button" onclick="document.getElementById('moveModal').style.display='none'" class="admin-btn" style="background:#fff; color:#666; border:1px solid #ddd;">
+                        Hủy
+                    </button>
+                    <button type="submit" class="admin-btn admin-btn-primary">
+                        <i class="fas fa-check"></i> Xác nhận chuyển
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table-responsive {
+        overflow-x: auto;
+    }
+    .table-responsive table {
+        min-width: 900px;
+    }
+    .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        function openMoveModal(itemId, currentSectionId, itemTitle) {
+            document.getElementById('moveItemId').value = itemId;
+            document.getElementById('moveNewSectionId').value = '';
+            document.getElementById('moveItemName').innerHTML = 'Chọn mục đích để chuyển nội dung: <strong>"' + itemTitle + '"</strong>';
+
+            var select = document.getElementById('moveSectionSelect');
+            var options = select.options;
+            for (var i = 0; i < options.length; i++) {
+                var val = parseInt(options[i].value);
+                if (!isNaN(val) && val === currentSectionId) {
+                    options[i].disabled = true;
+                    options[i].textContent = options[i].textContent + ' (đang chứa nội dung này)';
+                } else {
+                    options[i].disabled = false;
+                }
+            }
+            select.value = '';
+            document.getElementById('moveModal').style.display = 'flex';
+        }
+
+        function closeMoveModal(event) {
+            if (!event || event.target === event.currentTarget) {
+                document.getElementById('moveModal').style.display = 'none';
+            }
+        }
+
+        function confirmMove(event) {
+            var newSectionId = document.getElementById('moveNewSectionId').value;
+            if (!newSectionId) {
+                event.preventDefault();
+                alert('Vui lòng chọn mục đích để chuyển!');
+                return false;
+            }
+
+            var select = document.getElementById('moveSectionSelect');
+            var selText = select.options[select.selectedIndex].textContent;
+
+            if (!confirm('Bạn có chắc chắn muốn chuyển nội dung này sang mục "' + selText + '" không?')) {
+                event.preventDefault();
+                return false;
+            }
+            return true;
+        }
+    </script>
+}

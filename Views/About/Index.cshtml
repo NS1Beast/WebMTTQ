@@ -419,6 +419,36 @@
         </div>
     </section>
 
+    <!-- KHU VỰC CÁC SECTION NỘI DUNG ĐỘNG TỪ CSDL -->
+    @{
+        var sections = ViewBag.Sections as List<WebMTTQ.Models.GioiThieuSection> ?? new List<WebMTTQ.Models.GioiThieuSection>();
+    }
+    @if (sections.Any())
+    {
+        <section class="org-sections" style="max-width:1100px; margin:0 auto; padding:2rem 1rem;">
+            @foreach (var sec in sections)
+            {
+                <div class="org-section-item" style="margin-bottom:2.5rem; background:#fff; border-radius:12px; padding:2rem; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+                    <h2 style="font-family:'Be Vietnam Pro',sans-serif; font-weight:800; font-size:1.4rem; color:#1565c0; margin:0 0 1rem; border-bottom:2px solid #d32f2f; padding-bottom:0.75rem;">
+                        @sec.TieuDe
+                    </h2>
+                    @if (!string.IsNullOrEmpty(sec.HinhAnh))
+                    {
+                        <div style="text-align:center; margin:0 auto 1rem; display:flex; justify-content:center;">
+                            <img src="@sec.HinhAnh" alt="@sec.AltText" style="max-width:100%; max-height:300px; border-radius:8px; object-fit:cover; display:block; margin:0 auto;" />
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(sec.NoiDung))
+                    {
+                        <div class="org-section-content" style="font-size:0.95rem; line-height:1.7; color:#333; text-align:justify;">
+                            @Html.Raw(sec.NoiDung)
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+    }
+
     <!-- FOOTER CHÂN TRANG -->
     <div class="org-bottom-banner">
         Đoàn kết – Đổi mới – Văn minh – Nghĩa tình

@@ -56,7 +56,7 @@
                     <th style="padding: 15px;">Tiêu đề</th>
                     <th style="padding: 15px;">Loại</th>
                     <th style="padding: 15px; width: 80px;">Thứ tự</th>
-                    <th style="padding: 15px; width: 100px;">Số tin tức</th>
+                    <th style="padding: 15px; width: 100px;">Số nội dung</th>
                     <th style="padding: 15px; width: 120px;">Trạng thái</th>
                     <th style="padding: 15px; text-align: center; min-width: 220px;">Thao tác</th>
                 </tr>
@@ -94,14 +94,8 @@
                                     case "hinh-anh":
                                         <span style="background: #d4edda; color: #155724; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem;">Hình ảnh</span>
                                         break;
-                                    case "thong-tin":
-                                        <span style="background: #fff3cd; color: #856404; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem;">Thông tin</span>
-                                        break;
                                     case "video":
                                         <span style="background: #f8d7da; color: #721c24; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem;">Video</span>
-                                        break;
-                                    case "lien-ket":
-                                        <span style="background: #e2d5f1; color: #563d7c; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem;">Liên kết</span>
                                         break;
                                     default:
                                         <span style="background: #e9ecef; color: #495057; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem;">@item.Loai</span>
@@ -113,7 +107,7 @@
                                 <span style="background: #e9ecef; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem;">@(item.TinTucs?.Count ?? 0)</span>
                                 @if (item.TinTucs != null && item.TinTucs.Count > 0)
                                 {
-                                    <div style="font-size: 0.7rem; color: #dc3545; margin-top: 4px;">@item.TinTucs.Count tin tức</div>
+                                    <div style="font-size: 0.7rem; color: #dc3545; margin-top: 4px;">@item.TinTucs.Count nội dung</div>
                                 }
                             </td>
                             <td style="padding: 15px;">
@@ -128,10 +122,10 @@
                             </td>
                             <td style="padding: 15px; text-align: center;">
                                 <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
-                                    @if (item.Loai == "tin-tuc")
+                                    @if (item.Loai == "tin-tuc" || item.Loai == "hinh-anh" || item.Loai == "video" || item.Loai == "van-ban")
                                     {
-                                        <a href="@Url.Action("TinTucList", "AdminTrangChu", new { id = item.Id })" style="color: #28a745; text-decoration: none; padding: 5px 12px; border: 1px solid #28a745; border-radius: 4px; font-size: 0.85rem;">
-                                            <i class="fas fa-newspaper"></i> Quản lý tin tức
+                                        <a href="@Url.Action("ItemList", "AdminTrangChu", new { id = item.Id })" style="color: #28a745; text-decoration: none; padding: 5px 12px; border: 1px solid #28a745; border-radius: 4px; font-size: 0.85rem;">
+                                            <i class="fas @(item.Loai == "tin-tuc" ? "fa-newspaper" : item.Loai == "hinh-anh" ? "fa-images" : item.Loai == "video" ? "fa-video" : "fa-file-alt")"></i> Quản lý nội dung
                                         </a>
                                     }
                                     <a href="@Url.Action("Edit", "AdminTrangChu", new { id = item.Id })" style="color: #17a2b8; text-decoration: none; padding: 5px 12px; border: 1px solid #17a2b8; border-radius: 4px; font-size: 0.85rem;">

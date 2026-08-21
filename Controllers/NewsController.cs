@@ -12,11 +12,13 @@ namespace WebMTTQ.Controllers
     {
         private readonly DataMTTQContext _context;
         private readonly ISystemSettingsService _settings;
+        private readonly ITruyCapService _truyCapService;
 
-        public NewsController(DataMTTQContext context, ISystemSettingsService settings)
+        public NewsController(DataMTTQContext context, ISystemSettingsService settings, ITruyCapService truyCapService)
         {
             _context = context;
             _settings = settings;
+            _truyCapService = truyCapService;
         }
 
         // Trang danh sách tin tức theo chuyên mục
@@ -27,6 +29,10 @@ namespace WebMTTQ.Controllers
             {
                 return View("~/Views/Home/UnderConstruction.cshtml");
             }
+
+            // Ghi nhận lượt truy cập
+            await GhiNhanTruyCapAsync();
+            var thongKe = await _truyCapService.LayThongKeAsync();
 
             const int pageSize = 10;
 
@@ -109,7 +115,8 @@ namespace WebMTTQ.Controllers
                     TotalPages = totalPages,
                     BaseUrl = "/News?category=" + category
                 },
-                RecentDocs = recentDocs
+                RecentDocs = recentDocs,
+                ThongKeTruyCap = thongKe
             };
 
             ViewBag.Title = model.PageTitle;
@@ -124,6 +131,10 @@ namespace WebMTTQ.Controllers
             {
                 return View("~/Views/Home/UnderConstruction.cshtml");
             }
+
+            // Ghi nhận lượt truy cập
+            await GhiNhanTruyCapAsync();
+            var thongKe = await _truyCapService.LayThongKeAsync();
 
             var article = await _context.BaiViets
                 .Include(b => b.IdchuyenMucNavigation)
@@ -172,12 +183,28 @@ namespace WebMTTQ.Controllers
                     ImageUrl = GetImageUrl(a),
                     Date = a.NgayXuatBan?.ToString("dd/MM/yyyy") ?? "",
                     Excerpt = a.TomTat ?? ""
-                }).ToList()
+                }).ToList(),
+                ThongKeTruyCap = thongKe
             };
 
             ViewBag.Title = model.Title;
             ViewBag.Categories = categories;
             return View(model);
+        }
+
+        /// <summary>
+        /// Ghi nhận lượt truy cập dựa trên session hiện tại.
+        /// </summary>
+        private async Task GhiNhanTruyCapAsync()
+        {
+            // Ghi dữ liệu vào session để đảm bảo session được khởi tạo
+            // và giữ nguyên SessionId giữa các request (tránh tạo session mới mỗi lần)
+            HttpContext.Session.SetString("Visited", "true");
+
+            var sessionId = HttpContext.Session.Id;
+            var duongDan = HttpContext.Request.Path + HttpContext.Request.QueryString;
+
+            await _truyCapService.GhiNhanTruyCapAsync(sessionId, duongDan);
         }
 
         private string GetImageUrl(BaiViet baiViet)

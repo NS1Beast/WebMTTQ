@@ -1,43 +1,65 @@
 ﻿@model IEnumerable<WebMTTQ.Models.DoanTheToChuc>
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    ViewData["Title"] = "Sơ đồ Tổ chức";
+    ViewData["Title"] = "Đoàn thể tổ chức";
 }
-<div class="admin-page-header">
-    <div>
-        <h2>Sơ đồ tổ chức</h2>
-        <div class="subtitle">Quản lý nhân sự hiển thị trên trang Giới thiệu</div>
-    </div>
-    <a href="/admin/doanthe/Create" class="admin-btn admin-btn-primary"><i class="fas fa-plus"></i> Thêm thành viên</a>
-</div>
 
-<table class="admin-table">
-    <thead>
-        <tr>
-            <th>Ảnh</th>
-            <th>Cấp độ</th>
-            <th>Họ Tên</th>
-            <th>Chức vụ / Cơ quan</th>
-            <th>Thứ tự</th>
-            <th>Thao tác</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<style>
+    .gt-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 0; }
+    .gt-tab {
+        padding: 12px 24px; border-radius: 8px 8px 0 0; text-decoration: none;
+        font-weight: 600; font-size: 0.95rem; color: #666; background: #f8f9fa;
+        border: 1px solid #eee; border-bottom: none; transition: all 0.3s;
+        display: inline-flex; align-items: center; gap: 8px;
+    }
+    .gt-tab:hover { background: #e9ecef; color: #333; }
+    .gt-tab.active { background: #8b1a2b; color: white; border-color: #8b1a2b; }
+</style>
+
+<div style="max-width:1100px; margin:0 auto;">
+    <div class="admin-page-header">
+        <div>
+            <h2>Đoàn thể tổ chức</h2>
+            <div class="subtitle">Quản lý nhân sự hiển thị trên trang Giới thiệu</div>
+        </div>
+        <a href="/admin/doanthe/Create" class="admin-btn admin-btn-primary"><i class="fas fa-plus"></i> Thêm thành viên</a>
+    </div>
+
+    <!-- Tabs -->
+    <div class="gt-tabs">
+        <a href="/admin/gioithieu" class="gt-tab"><i class="fas fa-info-circle"></i> Giới thiệu chung</a>
+        <a href="/admin/gioithieu/sections" class="gt-tab"><i class="fas fa-layer-group"></i> Nội dung giới thiệu</a>
+        <a href="/admin/doanthe" class="gt-tab active"><i class="fas fa-sitemap"></i> Đoàn thể tổ chức</a>
+    </div>
+
+    <table class="admin-table">
+        <thead>
             <tr>
-                <td><img src="@item.HinhAnh" style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid @item.MauSac;" /></td>
-                <td><span class="badge @(item.CapDo == 1 ? "bg-danger" : "bg-primary")">Cấp @item.CapDo</span></td>
-                <td style="font-weight:bold;">@item.HoTen</td>
-                <td>@item.ChucVu<br /><small>@item.CoQuan</small></td>
-                <td>@item.ThuTu</td>
-                <td>
-                    <a href="/admin/doanthe/Edit/@item.Id" class="admin-btn admin-btn-warning btn-sm"><i class="fas fa-edit"></i> Sửa</a>
-                    <form action="/admin/doanthe/Delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Xóa thành viên này?');">
-                        <button type="submit" class="admin-btn admin-btn-danger btn-sm"><i class="fas fa-trash"></i> Xóa</button>
-                    </form>
-                </td>
+                <th>Ảnh</th>
+                <th>Cấp độ</th>
+                <th>Họ Tên</th>
+                <th>Chức vụ / Cơ quan</th>
+                <th>Thứ tự</th>
+                <th>Thao tác</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><img src="@item.HinhAnh" style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid @item.MauSac;" /></td>
+                    <td><span class="badge @(item.CapDo == 1 ? "bg-danger" : "bg-primary")">Cấp @item.CapDo</span></td>
+                    <td style="font-weight:bold;">@item.HoTen</td>
+                    <td>@item.ChucVu<br /><small>@item.CoQuan</small></td>
+                    <td>@item.ThuTu</td>
+                    <td>
+                        <a href="/admin/doanthe/Edit/@item.Id" class="admin-btn admin-btn-warning btn-sm"><i class="fas fa-edit"></i> Sửa</a>
+                        <form action="/admin/doanthe/Delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Xóa thành viên này?');">
+                            <button type="submit" class="admin-btn admin-btn-danger btn-sm"><i class="fas fa-trash"></i> Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

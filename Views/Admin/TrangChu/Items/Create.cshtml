@@ -1,0 +1,168 @@
+@model WebMTTQ.Models.TrangChuTinTuc
+
+@{
+    ViewData["Title"] = "Thêm nội dung - Trang chủ";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var sec = ViewBag.Section as WebMTTQ.Models.TrangChuMuc;
+    var vanBans = ViewBag.VanBans as List<WebMTTQ.Models.VanBanTaiLieu> ?? new List<WebMTTQ.Models.VanBanTaiLieu>();
+
+    string loaiLabel = sec?.Loai switch
+    {
+        "tin-tuc" => "Tin tức",
+        "hinh-anh" => "Hình ảnh",
+        "video" => "Video",
+        "van-ban" => "Văn bản",
+        _ => sec?.Loai ?? ""
+    };
+
+    string icon = sec?.Loai switch
+    {
+        "tin-tuc" => "fa-newspaper",
+        "hinh-anh" => "fa-images",
+        "video" => "fa-video",
+        "van-ban" => "fa-file-alt",
+        _ => "fa-th-list"
+    };
+}
+
+<div class="admin-card" style="background:#fff; padding:25px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05); max-width: 900px; margin: 0 auto;">
+    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+        <a href="@Url.Action("ItemList", "AdminTrangChu", new { id = sec?.Id })" style="color: #666; text-decoration: none; font-size: 1.2rem;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 style="margin: 0; color: #333; font-size: 1.4rem;">
+            <i class="fas @icon"></i> Thêm nội dung: @(sec?.TieuDe ?? "")
+        </h2>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <div asp-validation-summary="All"></div>
+        </div>
+    }
+
+    <form asp-action="ItemCreate" method="post" enctype="multipart/form-data" onsubmit="return confirm('Bạn có chắc chắn muốn thêm nội dung này?');">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="sectionId" value="@sec?.Id" />
+
+        @if (sec?.Loai == "van-ban")
+        {
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">
+                    Chọn văn bản từ danh sách <span style="color: #dc3545;">*</span>
+                </label>
+                <select name="VanBanId" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: white;" required>
+                    <option value="">-- Chọn văn bản --</option>
+                    @foreach (var vb in vanBans)
+                    {
+                        <option value="@vb.IdvanBan">
+                            @(vb.SoHieu != null ? $"[{vb.SoHieu}] " : "")@vb.TenVanBan
+                            @(vb.NgayBanHanh.HasValue ? $" - {vb.NgayBanHanh.Value:dd/MM/yyyy}" : "")
+                        </option>
+                    }
+                </select>
+                @if (!vanBans.Any())
+                {
+                    <small style="color: #dc3545;">Chưa có văn bản nào trong hệ thống. Vui lòng thêm văn bản trong phần "Văn bản tài liệu" trước.</small>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">
+                    @switch (sec?.Loai)
+                    {
+                        case "hinh-anh": <text>Chú thích ảnh</text> break;
+                        case "video": <text>Tiêu đề video</text> break;
+                        default: <text>Tiêu đề</text> break;
+                    }
+                    <span style="color: #dc3545;">*</span>
+                </label>
+                <input name="TieuDe" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" required
+                       placeholder="@(sec?.Loai == "hinh-anh" ? "VD: Lễ kỷ niệm 90 năm MTTQ Việt Nam" : sec?.Loai == "video" ? "VD: Video giới thiệu về MTTQ" : "VD: Tiêu đề nội dung")" />
+            </div>
+        }
+
+        @if (sec?.Loai == "hinh-anh" || sec?.Loai == "tin-tuc" || sec?.Loai == "video")
+        {
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">
+                    @if (sec?.Loai == "hinh-anh")
+                    {
+                        <text>Ảnh <span style="color: #dc3545;">*</span></text>
+                    }
+                    else if (sec?.Loai == "video")
+                    {
+                        <text>Ảnh đại diện (thumbnail)</text>
+                    }
+                    else
+                    {
+                        <text>Ảnh đại diện</text>
+                    }
+                </label>
+                <input type="file" name="FileAnh" accept="image/*" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: white;" />
+                <small style="color: #888;">Định dạng: JPG, PNG, GIF. Kích thước tối đa 5MB.</small>
+            </div>
+        }
+
+        @if (sec?.Loai == "video" || sec?.Loai == "tin-tuc")
+        {
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">
+                    @if (sec?.Loai == "video")
+                    {
+                        <text>URL video <span style="color: #dc3545;">*</span></text>
+                    }
+                    else
+                    {
+                        <text>Liên kết (tùy chọn)</text>
+                    }
+                </label>
+                @if (sec?.Loai == "video")
+                {
+                    <input name="LienKet" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;"
+                           placeholder="VD: https://www.youtube.com/watch?v=..." required />
+                    <small style="color: #888;">Hỗ trợ YouTube, Vimeo, Google Drive. Video sẽ được phát trực tiếp trên trang chủ.</small>
+                }
+                else
+                {
+                    <input name="LienKet" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;"
+                           placeholder="VD: https://example.com" />
+                }
+            </div>
+        }
+
+        @if (sec?.Loai != "hinh-anh" && sec?.Loai != "van-ban")
+        {
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">
+                    @if (sec?.Loai == "video")
+                    {
+                        <text>Mô tả video</text>
+                    }
+                    else
+                    {
+                        <text>Tóm tắt</text>
+                    }
+                </label>
+                <textarea name="TomTat" class="form-control" rows="4" style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;"
+                          placeholder="Nhập mô tả ngắn gọn..."></textarea>
+            </div>
+        }
+
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">Thứ tự hiển thị</label>
+            <input name="ThuTu" class="form-control" type="number" min="0" value="0" style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" />
+            <small style="color: #888;">Số càng nhỏ hiển thị càng trước.</small>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid #eee; padding-top: 20px;">
+            <a href="@Url.Action("ItemList", "AdminTrangChu", new { id = sec?.Id })" class="btn" style="padding: 10px 24px; border: 1px solid #ddd; border-radius: 6px; text-decoration: none; color: #666; font-weight: 500;">Hủy</a>
+            <button type="submit" class="btn" style="padding: 10px 24px; background: #28a745; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+                <i class="fas fa-save"></i> Lưu nội dung
+            </button>
+        </div>
+    </form>
+</div>

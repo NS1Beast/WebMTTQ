@@ -20,7 +20,7 @@
         </div>
     }
 
-    <form asp-action="Create" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn tạo mục mới này?');">
+    <form asp-action="Create" method="post" enctype="multipart/form-data" onsubmit="return confirm('Bạn có chắc chắn muốn tạo mục mới này?');">
         @Html.AntiForgeryToken()
 
         <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
@@ -35,12 +35,16 @@
                 <select asp-for="Loai" class="form-control" style="width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: white;">
                     <option value="tin-tuc">Tin tức nổi bật</option>
                     <option value="hinh-anh">Thư viện hình ảnh</option>
-                    <option value="thong-tin">Thông tin giới thiệu</option>
                     <option value="video">Video</option>
-                    <option value="lien-ket">Liên kết nhanh</option>
                     <option value="van-ban">Văn bản</option>
                 </select>
             </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 20px;">
+            <label asp-for="HinhAnh" style="display: block; font-weight: 600; margin-bottom: 6px; color: #333;">Ảnh đại diện mục (tùy chọn)</label>
+            <input type="file" name="FileAnh" accept="image/*" class="form-control" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; background: white;" />
+            <small style="color: #888;">Định dạng: JPG, PNG, GIF. Kích thước tối đa 3MB.</small>
         </div>
 
         <div class="form-group" style="margin-bottom: 20px;">

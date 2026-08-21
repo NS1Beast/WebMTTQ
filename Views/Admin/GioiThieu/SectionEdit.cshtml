@@ -1,0 +1,162 @@
+@model WebMTTQ.Models.GioiThieuSection
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Sửa section";
+}
+
+<style>
+    .admin-form-container {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        padding: 30px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    .form-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .form-header h2 { margin: 0; font-size: 1.4rem; color: #333; }
+    .form-header .back-btn { color: #555; text-decoration: none; font-size: 1.2rem; transition: 0.2s; }
+    .form-header .back-btn:hover { color: #8a1527; transform: translateX(-3px); }
+    .admin-form-group { margin-bottom: 15px; }
+    .admin-form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: #444; font-size: 0.9rem; }
+    .admin-input, .admin-select, .admin-textarea {
+        width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 8px;
+        font-size: 0.95rem; transition: border-color 0.3s; box-sizing: border-box;
+    }
+    .admin-input:focus, .admin-select:focus, .admin-textarea:focus {
+        border-color: #8a1527; outline: none; box-shadow: 0 0 0 3px rgba(138, 21, 39, 0.1);
+    }
+    .form-actions {
+        display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px;
+        padding-top: 20px; border-top: 1px solid #f0f0f0;
+    }
+    .btn-cancel {
+        padding: 10px 20px; border: 1px solid #ddd; background: #fff; color: #555;
+        border-radius: 8px; text-decoration: none; font-weight: 600; transition: 0.2s;
+    }
+    .btn-cancel:hover { background: #f5f5f5; color: #333; }
+    .btn-save {
+        padding: 10px 25px; border: none; background: #28a745; color: #fff;
+        border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .btn-save:hover { background: #218838; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3); }
+    .img-preview-box {
+        margin-top: 10px; width: 120px; height: 80px; border-radius: 8px;
+        border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center;
+        overflow: hidden; background: #f9f9f9;
+    }
+    .img-preview-box img { width: 100%; height: 100%; object-fit: cover; }
+    .editor-hint { font-size: 0.8rem; color: #888; margin-top: 6px; }
+    .news-editor-wrap { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: #fff; }
+</style>
+
+<div class="admin-form-container">
+    <div class="form-header">
+        <a href="/admin/gioithieu/sections" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+        <h2>Sửa section nội dung</h2>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <div asp-validation-summary="All"></div>
+        </div>
+    }
+
+    <form asp-action="SectionEdit" method="post" enctype="multipart/form-data" id="sectionForm">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+
+        <div class="admin-form-group">
+            <label>Tiêu đề section <span style="color:red;">*</span></label>
+            <input asp-for="TieuDe" class="admin-input" placeholder="VD: Lịch sử hình thành" required />
+            <span asp-validation-for="TieuDe" style="color: #dc3545; font-size: 0.85rem;"></span>
+        </div>
+
+        <div class="admin-form-group">
+            <label>Loại section (phân loại)</label>
+            <select asp-for="LoaiSection" class="admin-select">
+                <option value="">-- Chọn loại --</option>
+                <option value="lichsu">Lịch sử hình thành</option>
+                <option value="sumenh">Sứ mệnh</option>
+                <option value="nhiemvu">Chức năng / Nhiệm vụ</option>
+                <option value="thanhtuu">Thành tựu</option>
+                <option value="noidung">Nội dung chung</option>
+                <option value="khac">Khác</option>
+            </select>
+        </div>
+
+        <div class="admin-form-group">
+            <label>Nội dung section</label>
+            <div class="news-editor-wrap">
+                <textarea asp-for="NoiDung" id="NoiDung" style="min-height: 300px;"></textarea>
+            </div>
+            <div class="editor-hint">
+                <i class="fas fa-info-circle"></i> Sử dụng thanh công cụ để định dạng văn bản, chèn ảnh, video, bảng biểu...
+            </div>
+        </div>
+
+        <div class="admin-form-group">
+            <label>Hình ảnh đại diện</label>
+            @if (!string.IsNullOrEmpty(Model.HinhAnh))
+            {
+                <div style="margin-bottom:10px;">
+                    <img src="@Model.HinhAnh" alt="@Model.AltText" style="max-width:200px; max-height:120px; border-radius:8px; border:1px solid #ddd;" />
+                </div>
+            }
+            <input type="file" name="FileAnh" id="FileAnh" class="admin-input" accept="image/*" />
+            <small style="color: #888;">Chấp nhận JPG, PNG, GIF, WEBP, BMP. Tối đa 5MB. Nếu không chọn ảnh mới, ảnh hiện tại sẽ được giữ nguyên.</small>
+            <div class="img-preview-box">
+                <img id="preview" src="#" alt="Preview" style="display:none;" />
+                <i class="fas fa-image" id="previewIcon" style="color: #ccc; font-size: 1.5rem;"></i>
+            </div>
+        </div>
+
+        <div class="admin-form-group">
+            <label>Alt text cho hình ảnh</label>
+            <input asp-for="AltText" class="admin-input" placeholder="Mô tả ngắn cho hình ảnh (SEO)" />
+        </div>
+
+        <div class="form-actions">
+            <a href="/admin/gioithieu/sections" class="btn-cancel">Hủy</a>
+            <button type="submit" class="btn-save"><i class="fas fa-save"></i> Lưu thay đổi</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/news-editor.js"></script>
+    <script>
+        // Xem trước ảnh
+        document.getElementById('FileAnh').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview').src = e.target.result;
+                    document.getElementById('preview').style.display = 'block';
+                    document.getElementById('previewIcon').style.display = 'none';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('preview').style.display = 'none';
+                document.getElementById('previewIcon').style.display = 'block';
+            }
+        });
+
+        // Khởi tạo NewsEditor
+        var editor = new NewsEditor('NoiDung', {
+            uploadUrl: '@Url.Action("UploadImage", "AdminGioiThieu")',
+            height: 300,
+            placeholder: 'Nhập nội dung section...'
+        });
+    </script>
+}

@@ -38,17 +38,19 @@ namespace WebMTTQ.Controllers
                 .ThenByDescending(s => s.NgayTao)
                 .ToListAsync();
 
-            // Load TrangChuTinTuc items cho các mục loại "tin-tuc" (tối đa 6 tin: 1 tin to + 5 tin nhỏ)
+            // Load TrangChuTinTuc items cho các mục có quản lý nội dung con
+            // (tin-tuc: tối đa 6, hinh-anh/video/van-ban/lien-ket: tối đa 12)
             var sectionNews = new Dictionary<int, List<TrangChuTinTuc>>();
-            foreach (var sec in sections.Where(s => s.Loai == "tin-tuc" && s.TrangThai))
+            foreach (var sec in sections.Where(s => s.TrangThai))
             {
-                var tinTucs = await _context.TrangChuTinTucs
+                int maxItems = sec.Loai == "tin-tuc" ? 6 : 12;
+                var items = await _context.TrangChuTinTucs
                     .Where(t => t.IdTrangChuMuc == sec.Id && t.TrangThai)
                     .OrderBy(t => t.ThuTu)
                     .ThenByDescending(t => t.NgayTao)
-                    .Take(6)
+                    .Take(maxItems)
                     .ToListAsync();
-                sectionNews[sec.Id] = tinTucs;
+                sectionNews[sec.Id] = items;
             }
 
             // Timeline Section

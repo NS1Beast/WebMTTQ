@@ -177,7 +177,7 @@
                     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
 
                     // Logic kiểm tra Active cho từng Group. Đã thêm "AdminDoanTheToChuc" vào group Quản lý nội dung
-                    bool isNoiDungActive = currentController == "AdminNews" || currentController == "AdminVanBanTaiLieu" || currentController == "AdminTrangChu" || currentController == "AdminBanner" || currentController == "AdminTimeline" || currentController == "AdminDoanTheToChuc";
+                    bool isNoiDungActive = currentController == "AdminNews" || currentController == "AdminVanBanTaiLieu" || currentController == "AdminTrangChu" || currentController == "AdminBanner" || currentController == "AdminTimeline" || currentController == "AdminDoanTheToChuc" || currentController == "AdminGioiThieu";
                     bool isNguoiNgheoActive = currentController == "AdminThongTin" || currentController == "AdminDanhSachUngHo" || currentController == "AdminSoDuQuy" || currentController == "AdminKetQuaChamLo" || currentController == "AdminDiaDiemBanDo";
                     bool isBienDaoActive = currentController == "AdminQuyBienDao";
                     bool isCuuTroActive = currentController == "AdminQuyCuuTro";
@@ -212,16 +212,21 @@
                                 <span>Cài đặt Trang chủ</span>
                             </a>
 
-                            <!-- THÊM MỚI: QUẢN LÝ SƠ ĐỒ ĐOÀN THỂ TỔ CHỨC -->
-                            <a href="/admin/doanthe" class="@(currentController == "AdminDoanTheToChuc" ? "is-active" : "")">
+                            <!-- TRANG GIỚI THIỆU (Menu cha) -->
+                            <a href="/admin/gioithieu" class="@(currentController == "AdminGioiThieu" || currentController == "AdminDoanTheToChuc" ? "is-active" : "")">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Trang giới thiệu</span>
+                            </a>
+                            @* <!-- Submenu: Nội dung giới thiệu -->
+                            <a href="/admin/gioithieu/sections" class="@(currentController == "AdminGioiThieu" && ViewContext.RouteData.Values["action"]?.ToString() == "Sections" ? "is-active" : "")" style="padding-left:45px !important; font-size:0.9rem;">
+                                <i class="fas fa-layer-group"></i>
+                                <span>Nội dung giới thiệu</span>
+                            </a>
+                            <!-- Submenu: Đoàn thể tổ chức -->
+                            <a href="/admin/doanthe" class="@(currentController == "AdminDoanTheToChuc" ? "is-active" : "")" style="padding-left:45px !important; font-size:0.9rem;">
                                 <i class="fas fa-sitemap"></i>
                                 <span>Đoàn thể tổ chức</span>
-                            </a>
-                            <!-- THÊM MỚI: QUẢN LÝ Giới thiệu chung -->
-                            <a href="/admin/gioithieu" class="@(currentController == "AdminGioiThieu" ? "is-active" : "")">
-                                <i class="fas fa-info-circle"></i>
-                                <span>Giới thiệu chung</span>
-                            </a>
+                            </a> *@
                         }
                         @if (coQuyen(WebMTTQ.Models.ModuleQuyen.VanBanTaiLieu))
                         {
@@ -264,20 +269,13 @@
                             </a>
                         }
                         @if (coQuyen(WebMTTQ.Models.ModuleQuyen.KetQuaChamLo))
-                        {
-                            <a href="/admin/ketquachamlo" class="@(currentController == "AdminKetQuaChamLo" ? "is-active" : "")">
-                                <i class="fas fa-hand-holding-heart"></i>
-                                <span>Kết quả chăm lo</span>
-                            </a>
-                        }
-                        @if (coQuyen(WebMTTQ.Models.ModuleQuyen.DiaDiemBanDo))
-                        {
-                            <a href="/AdminDiaDiemBanDo/Index" class="@(currentController == "AdminDiaDiemBanDo" ? "is-active" : "")">
-                                <i class="fas fa-map-marked-alt"></i>
-                                <span>Bản đồ an sinh</span>
-                            </a>
-                        }
-                    </div>
+                            {
+                                <a href="/admin/ketquachamlo" class="@(currentController == "AdminKetQuaChamLo" ? "is-active" : "")">
+                                    <i class="fas fa-hand-holding-heart"></i>
+                                    <span>Kết quả chăm lo</span>
+                                </a>
+                            }
+                        </div>
                 </div>
 
                 <!-- GROUP 3: QUỸ VÌ BIỂN ĐẢO -->

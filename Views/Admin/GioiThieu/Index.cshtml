@@ -1,44 +1,67 @@
 ﻿@model IEnumerable<WebMTTQ.Models.GioiThieuChung>
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    ViewData["Title"] = "Quản lý Lời Giới Thiệu";
+    ViewData["Title"] = "Trang giới thiệu";
 }
-<div class="admin-page-header">
-    <div>
-        <h2>Quản lý Lời Giới Thiệu (Slogan & Nội dung)</h2>
-    </div>
-    <a href="/admin/gioithieu/Create" class="admin-btn admin-btn-primary"><i class="fas fa-plus"></i> Thêm mới</a>
-</div>
 
-<table class="admin-table">
-    <thead>
-        <tr>
-            <th>Tiêu đề chính</th>
-            <th>Slogan</th>
-            <th>Trạng thái</th>
-            <th>Thao tác</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<style>
+    .gt-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 0; }
+    .gt-tab {
+        padding: 12px 24px; border-radius: 8px 8px 0 0; text-decoration: none;
+        font-weight: 600; font-size: 0.95rem; color: #666; background: #f8f9fa;
+        border: 1px solid #eee; border-bottom: none; transition: all 0.3s;
+        display: inline-flex; align-items: center; gap: 8px;
+    }
+    .gt-tab:hover { background: #e9ecef; color: #333; }
+    .gt-tab.active { background: #8b1a2b; color: white; border-color: #8b1a2b; }
+</style>
+
+<div style="max-width:1100px; margin:0 auto;">
+    <div class="admin-page-header">
+        <div>
+            <h2>Trang giới thiệu</h2>
+            <div class="subtitle">Quản lý nội dung giới thiệu chung (Slogan & Nội dung)</div>
+        </div>
+        <a href="/admin/gioithieu/Create" class="admin-btn admin-btn-primary"><i class="fas fa-plus"></i> Thêm mới</a>
+    </div>
+
+    <!-- Tabs -->
+    <div class="gt-tabs">
+        <a href="/admin/gioithieu" class="gt-tab active"><i class="fas fa-info-circle"></i> Giới thiệu chung</a>
+        <a href="/admin/gioithieu/sections" class="gt-tab"><i class="fas fa-layer-group"></i> Nội dung giới thiệu</a>
+        <a href="/admin/doanthe" class="gt-tab"><i class="fas fa-sitemap"></i> Đoàn thể tổ chức</a>
+    </div>
+
+    <table class="admin-table">
+        <thead>
             <tr>
-                <td style="font-weight:bold; color: #1565c0;">@item.TieuDeChinh <br /><span style="color:#d32f2f;">@item.TieuDePhu</span></td>
-                <td>@item.Slogan</td>
-                <td>
-                    <form action="/admin/gioithieu/Toggle/@item.Id" method="post" style="display:inline;">
-                        <button type="submit" class="badge @(item.TrangThai == true ? "bg-success" : "bg-warning")" style="border:none; cursor:pointer;">
-                            @(item.TrangThai == true ? "Đang hiển thị" : "Đang ẩn")
-                        </button>
-                    </form>
-                </td>
-                <td>
-                    <a href="/admin/gioithieu/Edit/@item.Id" class="admin-btn admin-btn-warning btn-sm"><i class="fas fa-edit"></i> Sửa</a>
-                    <form action="/admin/gioithieu/Delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Xóa phần này?');">
-                        <button type="submit" class="admin-btn admin-btn-danger btn-sm"><i class="fas fa-trash"></i> Xóa</button>
-                    </form>
-                </td>
+                <th>Tiêu đề chính</th>
+                <th>Slogan</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td style="font-weight:bold; color: #1565c0;">@item.TieuDeChinh <br /><span style="color:#d32f2f;">@item.TieuDePhu</span></td>
+                    <td>@item.Slogan</td>
+                    <td>
+                        <form action="/admin/gioithieu/Toggle/@item.Id" method="post" style="display:inline;">
+                            <button type="submit" class="badge @(item.TrangThai == true ? "bg-success" : "bg-warning")" style="border:none; cursor:pointer;">
+                                @(item.TrangThai == true ? "Đang hiển thị" : "Đang ẩn")
+                            </button>
+                        </form>
+                    </td>
+                    <td>
+                        <a href="/admin/gioithieu/Edit/@item.Id" class="admin-btn admin-btn-warning btn-sm"><i class="fas fa-edit"></i> Sửa</a>
+                        <form action="/admin/gioithieu/Delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Xóa phần này?');">
+                            <button type="submit" class="admin-btn admin-btn-danger btn-sm"><i class="fas fa-trash"></i> Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -25,6 +25,9 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 // 4.2. Đăng ký Quyền Truy Cập Service
 builder.Services.AddScoped<IQuyenTruyCapService, QuyenTruyCapService>();
 
+// 4.3. Đăng ký Thống Kê Truy Cập Service
+builder.Services.AddScoped<ITruyCapService, TruyCapService>();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddMemoryCache();

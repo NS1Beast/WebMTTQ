@@ -43,7 +43,7 @@ namespace WebMTTQ.Controllers
         // POST: /AdminTrangChu/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(TrangChuMuc section)
+        public async Task<IActionResult> Create(TrangChuMuc section, IFormFile? FileAnh)
         {
             ModelState.Remove("HinhAnh");
             ModelState.Remove("NgayTao");
@@ -53,6 +53,38 @@ namespace WebMTTQ.Controllers
             {
                 section.NgayTao = DateTime.Now;
                 section.TrangThai = true;
+
+                // Upload ảnh đại diện mục nếu có
+                if (FileAnh != null && FileAnh.Length > 0)
+                {
+                    if (FileAnh.Length > 3 * 1024 * 1024)
+                    {
+                        ModelState.AddModelError("HinhAnh", "Kích thước ảnh không được vượt quá 3MB.");
+                        return View("~/Views/Admin/TrangChu/Create.cshtml", section);
+                    }
+
+                    try
+                    {
+                        string webRoot = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                        string uploadsFolder = Path.Combine(webRoot, "uploads", "trangchu");
+                        Directory.CreateDirectory(uploadsFolder);
+
+                        string ext = Path.GetExtension(FileAnh.FileName);
+                        string uniqueFileName = $"{Guid.NewGuid()}{ext}";
+                        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                        using var ms = new MemoryStream();
+                        await FileAnh.CopyToAsync(ms);
+                        await System.IO.File.WriteAllBytesAsync(filePath, ms.ToArray());
+
+                        section.HinhAnh = "/uploads/trangchu/" + uniqueFileName;
+                    }
+                    catch (Exception ex)
+                    {
+                        ModelState.AddModelError("HinhAnh", $"Lỗi khi tải ảnh lên: {ex.Message}");
+                        return View("~/Views/Admin/TrangChu/Create.cshtml", section);
+                    }
+                }
 
                 _context.TrangChuMucs.Add(section);
                 await _context.SaveChangesAsync();
@@ -76,7 +108,7 @@ namespace WebMTTQ.Controllers
         // POST: /AdminTrangChu/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, TrangChuMuc section)
+        public async Task<IActionResult> Edit(int id, TrangChuMuc section, IFormFile? FileAnh)
         {
             if (id != section.Id) return NotFound();
 
@@ -94,6 +126,38 @@ namespace WebMTTQ.Controllers
                 existing.NoiDung = section.NoiDung;
                 existing.ThuTu = section.ThuTu;
                 existing.TrangThai = section.TrangThai;
+
+                // Upload ảnh đại diện mục nếu có
+                if (FileAnh != null && FileAnh.Length > 0)
+                {
+                    if (FileAnh.Length > 3 * 1024 * 1024)
+                    {
+                        ModelState.AddModelError("HinhAnh", "Kích thước ảnh không được vượt quá 3MB.");
+                        return View("~/Views/Admin/TrangChu/Edit.cshtml", existing);
+                    }
+
+                    try
+                    {
+                        string webRoot = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                        string uploadsFolder = Path.Combine(webRoot, "uploads", "trangchu");
+                        Directory.CreateDirectory(uploadsFolder);
+
+                        string ext = Path.GetExtension(FileAnh.FileName);
+                        string uniqueFileName = $"{Guid.NewGuid()}{ext}";
+                        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                        using var ms = new MemoryStream();
+                        await FileAnh.CopyToAsync(ms);
+                        await System.IO.File.WriteAllBytesAsync(filePath, ms.ToArray());
+
+                        existing.HinhAnh = "/uploads/trangchu/" + uniqueFileName;
+                    }
+                    catch (Exception ex)
+                    {
+                        ModelState.AddModelError("HinhAnh", $"Lỗi khi tải ảnh lên: {ex.Message}");
+                        return View("~/Views/Admin/TrangChu/Edit.cshtml", existing);
+                    }
+                }
 
                 existing.NgayCapNhat = DateTime.Now;
 
@@ -516,16 +580,17 @@ namespace WebMTTQ.Controllers
         }
 
         // ============================================================
-        // CRUD for TrangChuTinTuc (individual news items within a section)
+        // CRUD for TrangChuTinTuc (individual items within a section)
+        // Works for ALL section types: tin-tuc, hinh-anh, video, van-ban, lien-ket
         // ============================================================
 
-        // GET: /AdminTrangChu/TinTuc/5
-        public async Task<IActionResult> TinTucList(int id)
+        // GET: /AdminTrangChu/Items/5
+        public async Task<IActionResult> ItemList(int id)
         {
             var section = await _context.TrangChuMucs.FindAsync(id);
             if (section == null) return NotFound();
 
-            var tinTucs = await _context.TrangChuTinTucs
+            var items = await _context.TrangChuTinTucs
                 .Where(t => t.IdTrangChuMuc == id)
                 .OrderBy(t => t.ThuTu)
                 .ThenByDescending(t => t.NgayTao)
@@ -533,71 +598,84 @@ namespace WebMTTQ.Controllers
 
             ViewBag.Section = section;
             ViewBag.Sections = await _context.TrangChuMucs
-                .Where(s => s.Loai == "tin-tuc")
+                .Where(s => s.Loai == section.Loai)
                 .OrderBy(s => s.ThuTu)
                 .ToListAsync();
-            return View("~/Views/Admin/TrangChu/TinTuc/Index.cshtml", tinTucs);
+            return View("~/Views/Admin/TrangChu/Items/Index.cshtml", items);
         }
 
-        // POST: /AdminTrangChu/TinTuc/Move/5
+        // POST: /AdminTrangChu/Items/Move/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> TinTucMove(int id, int newSectionId)
+        public async Task<IActionResult> ItemMove(int id, int newSectionId)
         {
-            var tinTuc = await _context.TrangChuTinTucs.FindAsync(id);
-            if (tinTuc == null)
+            var item = await _context.TrangChuTinTucs.FindAsync(id);
+            if (item == null)
             {
-                TempData["ErrorMessage"] = "Không tìm thấy tin tức cần chuyển!";
+                TempData["ErrorMessage"] = "Không tìm thấy nội dung cần chuyển!";
                 return RedirectToAction(nameof(Index));
             }
 
-            // Kiểm tra mục đích tồn tại
+            var currentSection = await _context.TrangChuMucs.FindAsync(item.IdTrangChuMuc);
+            if (currentSection == null) return NotFound();
+
+            // Kiểm tra mục đích tồn tại và cùng loại
             var newSection = await _context.TrangChuMucs
-                .FirstOrDefaultAsync(s => s.Id == newSectionId && s.Loai == "tin-tuc");
+                .FirstOrDefaultAsync(s => s.Id == newSectionId && s.Loai == currentSection.Loai);
             if (newSection == null)
             {
-                TempData["ErrorMessage"] = "Mục đích không tồn tại!";
-                return RedirectToAction(nameof(TinTucList), new { id = tinTuc.IdTrangChuMuc });
+                TempData["ErrorMessage"] = "Mục đích không tồn tại hoặc không cùng loại!";
+                return RedirectToAction(nameof(ItemList), new { id = item.IdTrangChuMuc });
             }
 
             // Kiểm tra mục mới khác mục hiện tại
-            if (tinTuc.IdTrangChuMuc == newSectionId)
+            if (item.IdTrangChuMuc == newSectionId)
             {
-                TempData["ErrorMessage"] = "Tin tức đang ở trong mục này rồi!";
-                return RedirectToAction(nameof(TinTucList), new { id = tinTuc.IdTrangChuMuc });
+                TempData["ErrorMessage"] = "Nội dung đang ở trong mục này rồi!";
+                return RedirectToAction(nameof(ItemList), new { id = item.IdTrangChuMuc });
             }
 
-            // Kiểm tra có ít nhất 2 mục
+            // Kiểm tra có ít nhất 2 mục cùng loại
             var totalSections = await _context.TrangChuMucs
-                .CountAsync(s => s.Loai == "tin-tuc");
+                .CountAsync(s => s.Loai == currentSection.Loai);
             if (totalSections < 2)
             {
-                TempData["ErrorMessage"] = "Cần ít nhất 2 mục tin tức để chuyển qua lại!";
-                return RedirectToAction(nameof(TinTucList), new { id = tinTuc.IdTrangChuMuc });
+                TempData["ErrorMessage"] = $"Cần ít nhất 2 mục cùng loại để chuyển qua lại!";
+                return RedirectToAction(nameof(ItemList), new { id = item.IdTrangChuMuc });
             }
 
-            int oldSectionId = tinTuc.IdTrangChuMuc;
-            tinTuc.IdTrangChuMuc = newSectionId;
+            int oldSectionId = item.IdTrangChuMuc;
+            item.IdTrangChuMuc = newSectionId;
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = $"Đã chuyển tin tức \"{tinTuc.TieuDe}\" sang mục \"{newSection.TieuDe}\" thành công!";
-            return RedirectToAction(nameof(TinTucList), new { id = oldSectionId });
+            TempData["SuccessMessage"] = $"Đã chuyển \"{item.TieuDe}\" sang mục \"{newSection.TieuDe}\" thành công!";
+            return RedirectToAction(nameof(ItemList), new { id = oldSectionId });
         }
 
-        // GET: /AdminTrangChu/TinTuc/Create/5
+        // GET: /AdminTrangChu/Items/Create/5
         [HttpGet]
-        public async Task<IActionResult> TinTucCreate(int id)
+        public async Task<IActionResult> ItemCreate(int id)
         {
             var section = await _context.TrangChuMucs.FindAsync(id);
             if (section == null) return NotFound();
             ViewBag.Section = section;
-            return View("~/Views/Admin/TrangChu/TinTuc/Create.cshtml");
+
+            // Load danh sách văn bản tài liệu nếu mục là loại van-ban
+            if (section.Loai == "van-ban")
+            {
+                ViewBag.VanBans = await _context.VanBanTaiLieus
+                    .OrderByDescending(v => v.NgayBanHanh)
+                    .ThenByDescending(v => v.IdvanBan)
+                    .ToListAsync();
+            }
+
+            return View("~/Views/Admin/TrangChu/Items/Create.cshtml");
         }
 
-        // POST: /AdminTrangChu/TinTuc/Create/5
+        // POST: /AdminTrangChu/Items/Create/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> TinTucCreate(IFormFile? FileAnh)
+        public async Task<IActionResult> ItemCreate(IFormFile? FileAnh)
         {
             // Read sectionId from form data manually to avoid model binding conflicts
             var sectionIdStr = Request.Form["sectionId"].FirstOrDefault();
@@ -608,7 +686,7 @@ namespace WebMTTQ.Controllers
             if (section == null) return NotFound();
 
             // Create new instance manually - no model binding to avoid Id conflict
-            var tinTuc = new TrangChuTinTuc
+            var item = new TrangChuTinTuc
             {
                 IdTrangChuMuc = sectionId,
                 TieuDe = Request.Form["TieuDe"].FirstOrDefault() ?? "",
@@ -619,13 +697,31 @@ namespace WebMTTQ.Controllers
                 NgayTao = DateTime.Now
             };
 
+            // Nếu mục là loại van-ban, cho phép chọn từ danh sách văn bản tài liệu
+            if (section.Loai == "van-ban")
+            {
+                var vanBanIdStr = Request.Form["VanBanId"].FirstOrDefault();
+                if (int.TryParse(vanBanIdStr, out int vanBanId) && vanBanId > 0)
+                {
+                    var vanBan = await _context.VanBanTaiLieus.FindAsync(vanBanId);
+                    if (vanBan != null)
+                    {
+                        item.TieuDe = vanBan.TenVanBan;
+                        item.LienKet = $"/VanBanTaiLieu/Download/{vanBan.IdvanBan}";
+                        item.TomTat = !string.IsNullOrEmpty(vanBan.SoHieu)
+                            ? $"Số hiệu: {vanBan.SoHieu}" + (vanBan.NgayBanHanh.HasValue ? $" - Ngày ban hành: {vanBan.NgayBanHanh.Value:dd/MM/yyyy}" : "")
+                            : (vanBan.NgayBanHanh.HasValue ? $"Ngày ban hành: {vanBan.NgayBanHanh.Value:dd/MM/yyyy}" : "");
+                    }
+                }
+            }
+
             if (FileAnh != null && FileAnh.Length > 0)
             {
                 if (FileAnh.Length > 5 * 1024 * 1024)
                 {
                     ModelState.AddModelError("HinhAnh", "Kích thước ảnh không được vượt quá 5MB.");
                     ViewBag.Section = section;
-                    return View("~/Views/Admin/TrangChu/TinTuc/Create.cshtml", tinTuc);
+                    return View("~/Views/Admin/TrangChu/Items/Create.cshtml", item);
                 }
 
                 try
@@ -643,48 +739,75 @@ namespace WebMTTQ.Controllers
                     await FileAnh.CopyToAsync(ms);
                     await System.IO.File.WriteAllBytesAsync(filePath, ms.ToArray());
 
-                    tinTuc.HinhAnh = "/uploads/trangchu/" + uniqueFileName;
+                    item.HinhAnh = "/uploads/trangchu/" + uniqueFileName;
                 }
                 catch (Exception ex)
                 {
                     ModelState.AddModelError("HinhAnh", $"Lỗi khi tải ảnh lên: {ex.Message}");
                     ViewBag.Section = section;
-                    return View("~/Views/Admin/TrangChu/TinTuc/Create.cshtml", tinTuc);
+                    return View("~/Views/Admin/TrangChu/Items/Create.cshtml", item);
                 }
             }
 
-            if (string.IsNullOrWhiteSpace(tinTuc.TieuDe))
+            // Validate: TieuDe required for all types
+            if (string.IsNullOrWhiteSpace(item.TieuDe))
             {
                 ModelState.AddModelError("TieuDe", "Tiêu đề không được để trống.");
                 ViewBag.Section = section;
-                return View("~/Views/Admin/TrangChu/TinTuc/Create.cshtml", tinTuc);
+                return View("~/Views/Admin/TrangChu/Items/Create.cshtml", item);
             }
 
-            _context.TrangChuTinTucs.Add(tinTuc);
+            // Validate: HinhAnh required for hinh-anh type
+            if (section.Loai == "hinh-anh" && string.IsNullOrEmpty(item.HinhAnh))
+            {
+                ModelState.AddModelError("HinhAnh", "Vui lòng chọn ảnh cho thư viện.");
+                ViewBag.Section = section;
+                return View("~/Views/Admin/TrangChu/Items/Create.cshtml", item);
+            }
+
+            // Validate: LienKet required for video type
+            if (section.Loai == "video" && string.IsNullOrWhiteSpace(item.LienKet))
+            {
+                ModelState.AddModelError("LienKet", "Vui lòng nhập URL video (YouTube, Vimeo...).");
+                ViewBag.Section = section;
+                return View("~/Views/Admin/TrangChu/Items/Create.cshtml", item);
+            }
+
+            _context.TrangChuTinTucs.Add(item);
             await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = "Thêm tin tức thành công!";
-            return RedirectToAction(nameof(TinTucList), new { id = sectionId });
+            TempData["SuccessMessage"] = "Thêm nội dung thành công!";
+            return RedirectToAction(nameof(ItemList), new { id = sectionId });
         }
 
-        // GET: /AdminTrangChu/TinTuc/Edit/5
+        // GET: /AdminTrangChu/Items/Edit/5
         [HttpGet]
-        public async Task<IActionResult> TinTucEdit(int id)
+        public async Task<IActionResult> ItemEdit(int id)
         {
-            var tinTuc = await _context.TrangChuTinTucs
+            var item = await _context.TrangChuTinTucs
                 .Include(t => t.TrangChuMuc)
                 .FirstOrDefaultAsync(t => t.Id == id);
-            if (tinTuc == null) return NotFound();
+            if (item == null) return NotFound();
 
-            ViewBag.Section = tinTuc.TrangChuMuc;
-            return View("~/Views/Admin/TrangChu/TinTuc/Edit.cshtml", tinTuc);
+            ViewBag.Section = item.TrangChuMuc;
+
+            // Load danh sách văn bản tài liệu nếu mục là loại van-ban
+            if (item.TrangChuMuc?.Loai == "van-ban")
+            {
+                ViewBag.VanBans = await _context.VanBanTaiLieus
+                    .OrderByDescending(v => v.NgayBanHanh)
+                    .ThenByDescending(v => v.IdvanBan)
+                    .ToListAsync();
+            }
+
+            return View("~/Views/Admin/TrangChu/Items/Edit.cshtml", item);
         }
 
-        // POST: /AdminTrangChu/TinTuc/Edit/5
+        // POST: /AdminTrangChu/Items/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> TinTucEdit(int id, TrangChuTinTuc tinTuc, IFormFile? FileAnh)
+        public async Task<IActionResult> ItemEdit(int id, TrangChuTinTuc item, IFormFile? FileAnh)
         {
-            if (id != tinTuc.Id) return NotFound();
+            if (id != item.Id) return NotFound();
 
             var existing = await _context.TrangChuTinTucs
                 .Include(t => t.TrangChuMuc)
@@ -696,11 +819,29 @@ namespace WebMTTQ.Controllers
 
             if (ModelState.IsValid)
             {
-                existing.TieuDe = tinTuc.TieuDe;
-                existing.TomTat = tinTuc.TomTat;
-                existing.LienKet = tinTuc.LienKet;
-                existing.ThuTu = tinTuc.ThuTu;
-                existing.TrangThai = tinTuc.TrangThai;
+                existing.TieuDe = item.TieuDe;
+                existing.TomTat = item.TomTat;
+                existing.LienKet = item.LienKet;
+                existing.ThuTu = item.ThuTu;
+                existing.TrangThai = item.TrangThai;
+
+                // Nếu mục là loại van-ban, cho phép chọn từ danh sách văn bản tài liệu
+                if (existing.TrangChuMuc?.Loai == "van-ban")
+                {
+                    var vanBanIdStr = Request.Form["VanBanId"].FirstOrDefault();
+                    if (int.TryParse(vanBanIdStr, out int vanBanId) && vanBanId > 0)
+                    {
+                        var vanBan = await _context.VanBanTaiLieus.FindAsync(vanBanId);
+                        if (vanBan != null)
+                        {
+                            existing.TieuDe = vanBan.TenVanBan;
+                            existing.LienKet = $"/VanBanTaiLieu/Download/{vanBan.IdvanBan}";
+                            existing.TomTat = !string.IsNullOrEmpty(vanBan.SoHieu)
+                                ? $"Số hiệu: {vanBan.SoHieu}" + (vanBan.NgayBanHanh.HasValue ? $" - Ngày ban hành: {vanBan.NgayBanHanh.Value:dd/MM/yyyy}" : "")
+                                : (vanBan.NgayBanHanh.HasValue ? $"Ngày ban hành: {vanBan.NgayBanHanh.Value:dd/MM/yyyy}" : "");
+                        }
+                    }
+                }
 
                 if (FileAnh != null && FileAnh.Length > 0)
                 {
@@ -708,7 +849,7 @@ namespace WebMTTQ.Controllers
                     {
                         ModelState.AddModelError("HinhAnh", "Kích thước ảnh không được vượt quá 5MB.");
                         ViewBag.Section = existing.TrangChuMuc;
-                        return View("~/Views/Admin/TrangChu/TinTuc/Edit.cshtml", existing);
+                        return View("~/Views/Admin/TrangChu/Items/Edit.cshtml", existing);
                     }
 
                     try
@@ -731,46 +872,46 @@ namespace WebMTTQ.Controllers
                     {
                         ModelState.AddModelError("HinhAnh", $"Lỗi khi tải ảnh lên: {ex.Message}");
                         ViewBag.Section = existing.TrangChuMuc;
-                        return View("~/Views/Admin/TrangChu/TinTuc/Edit.cshtml", existing);
+                        return View("~/Views/Admin/TrangChu/Items/Edit.cshtml", existing);
                     }
                 }
 
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Cập nhật tin tức thành công!";
-                return RedirectToAction(nameof(TinTucList), new { id = existing.IdTrangChuMuc });
+                TempData["SuccessMessage"] = "Cập nhật nội dung thành công!";
+                return RedirectToAction(nameof(ItemList), new { id = existing.IdTrangChuMuc });
             }
             ViewBag.Section = existing.TrangChuMuc;
-            return View("~/Views/Admin/TrangChu/TinTuc/Edit.cshtml", existing);
+            return View("~/Views/Admin/TrangChu/Items/Edit.cshtml", existing);
         }
 
-        // POST: /AdminTrangChu/TinTuc/Delete/5
+        // POST: /AdminTrangChu/Items/Delete/5
         [HttpPost]
-        public async Task<IActionResult> TinTucDelete(int id)
+        public async Task<IActionResult> ItemDelete(int id)
         {
-            var tinTuc = await _context.TrangChuTinTucs.FindAsync(id);
-            if (tinTuc != null)
+            var item = await _context.TrangChuTinTucs.FindAsync(id);
+            if (item != null)
             {
-                int sectionId = tinTuc.IdTrangChuMuc;
-                _context.TrangChuTinTucs.Remove(tinTuc);
+                int sectionId = item.IdTrangChuMuc;
+                _context.TrangChuTinTucs.Remove(item);
                 await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Xóa tin tức thành công!";
-                return RedirectToAction(nameof(TinTucList), new { id = sectionId });
+                TempData["SuccessMessage"] = "Xóa nội dung thành công!";
+                return RedirectToAction(nameof(ItemList), new { id = sectionId });
             }
-            TempData["ErrorMessage"] = "Không tìm thấy tin tức này!";
+            TempData["ErrorMessage"] = "Không tìm thấy nội dung này!";
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: /AdminTrangChu/TinTuc/ToggleStatus/5
+        // POST: /AdminTrangChu/Items/ToggleStatus/5
         [HttpPost]
-        public async Task<IActionResult> TinTucToggleStatus(int id)
+        public async Task<IActionResult> ItemToggleStatus(int id)
         {
-            var tinTuc = await _context.TrangChuTinTucs.FindAsync(id);
-            if (tinTuc != null)
+            var item = await _context.TrangChuTinTucs.FindAsync(id);
+            if (item != null)
             {
-                tinTuc.TrangThai = !tinTuc.TrangThai;
+                item.TrangThai = !item.TrangThai;
                 await _context.SaveChangesAsync();
             }
-            return RedirectToAction(nameof(TinTucList), new { id = tinTuc?.IdTrangChuMuc ?? 0 });
+            return RedirectToAction(nameof(ItemList), new { id = item?.IdTrangChuMuc ?? 0 });
         }
     }
 }

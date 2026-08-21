@@ -47,6 +47,7 @@ public partial class DataMTTQContext : DbContext
     public virtual DbSet<VaiTroQuyen> VaiTroQuyens { get; set; }
     public virtual DbSet<VanBanTaiLieu> VanBanTaiLieus { get; set; }
     public virtual DbSet<GioiThieuChung> GioiThieuChungs { get; set; }
+    public DbSet<GioiThieuSection> GioiThieuSections { get; set; }
     public DbSet<ThongTinNhanUngHoBienDao> ThongTinNhanUngHoBienDaos { get; set; }
     public DbSet<SoDuQuyBienDao> SoDuQuyBienDaos { get; set; }
     public DbSet<DanhSachUngHoBienDao> DanhSachUngHoBienDaos { get; set; }
@@ -57,6 +58,7 @@ public partial class DataMTTQContext : DbContext
     public DbSet<KetQuaHoatDongCuuTro> KetQuaHoatDongCuuTros { get; set; }
     public DbSet<SoDuQuy> SoDuQues { get; set; }
     public DbSet<KetQuaHoatDong> KetQuaHoatDongs { get; set; }
+    public DbSet<LuotTruyCap> LuotTruyCaps { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseSqlServer("Server=.;Database=DataMTTQ;Integrated Security=True;TrustServerCertificate=True;Command Timeout=300;");
@@ -354,6 +356,18 @@ public partial class DataMTTQContext : DbContext
         modelBuilder.Entity<KetQuaHoatDong>(entity =>
         {
             entity.Property(e => e.KinhPhi).HasPrecision(18, 2);
+        });
+
+        modelBuilder.Entity<LuotTruyCap>(entity =>
+        {
+            entity.HasKey(e => e.IdLuotTruyCap).HasName("PK__LuotTruyCap");
+            entity.Property(e => e.ThoiGianTruyCap).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.LanTruyCapCuoi).HasDefaultValueSql("(getdate())");
+
+            // Index trên SessionId để tối ưu truy vấn thống kê
+            entity.HasIndex(e => e.SessionId).HasDatabaseName("IX_LuotTruyCap_SessionId");
+            // Index trên LanTruyCapCuoi để tối ưu truy vấn "đang truy cập"
+            entity.HasIndex(e => e.LanTruyCapCuoi).HasDatabaseName("IX_LuotTruyCap_LanTruyCapCuoi");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -441,6 +441,76 @@
     .bento-card-secondary .bento-cta { color: var(--m26-red, #8b1a2b); }
     .bento-card:hover .bento-cta { gap: 14px; }
 
+    /* ================= GALLERY (THƯ VIỆN ẢNH) ================= */
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .gallery-item {
+        position: relative; border-radius: 12px; overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08); cursor: pointer;
+        transition: all 0.4s ease; background: #fff;
+    }
+    .gallery-item:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(0,0,0,0.15); }
+    .gallery-item img { width: 100%; height: 220px; object-fit: cover; display: block; transition: transform 0.6s ease; }
+    .gallery-item:hover img { transform: scale(1.05); }
+    .gallery-caption {
+        position: absolute; bottom: 0; left: 0; right: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+        color: #fff; padding: 30px 16px 14px; font-size: 0.9rem; font-weight: 600;
+        line-height: 1.4;
+    }
+
+    /* ================= VIDEO GRID ================= */
+    .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+    .video-card {
+        background: #fff; border-radius: 12px; overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: all 0.4s ease;
+        text-decoration: none; color: inherit; display: block;
+    }
+    .video-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(0,0,0,0.15); }
+    .video-embed-wrap { position: relative; width: 100%; padding-top: 56.25%; /* 16:9 aspect ratio */ background: #000; }
+    .video-embed-wrap iframe {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        border: none; display: block;
+    }
+    .video-body { padding: 16px 20px; }
+    .video-title { font-size: 1rem; font-weight: 700; color: #222; line-height: 1.4; margin: 0 0 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .video-desc { font-size: 0.85rem; color: #666; line-height: 1.5; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+    /* ================= VĂN BẢN LIST ================= */
+    .vanban-list { display: flex; flex-direction: column; gap: 12px; max-width: 900px; margin: 0 auto; }
+    .vanban-item {
+        display: flex; align-items: center; gap: 16px;
+        background: #fff; border-radius: 10px; padding: 16px 20px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06); text-decoration: none;
+        color: inherit; transition: all 0.3s ease; border-left: 4px solid #8b1a2b;
+    }
+    .vanban-item:hover { transform: translateX(6px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+    .vanban-icon {
+        width: 48px; height: 48px; border-radius: 10px; flex-shrink: 0;
+        background: rgba(139,26,43,0.1); color: #8b1a2b;
+        display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+    }
+    .vanban-content { flex: 1; min-width: 0; }
+    .vanban-title { font-size: 0.95rem; font-weight: 700; color: #222; margin: 0 0 4px; line-height: 1.4; }
+    .vanban-desc { font-size: 0.82rem; color: #666; margin: 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .vanban-download { color: #8b1a2b; font-size: 1.2rem; flex-shrink: 0; }
+
+    /* ================= LIÊN KẾT GRID ================= */
+    .link-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+    .link-card {
+        display: flex; align-items: center; gap: 14px;
+        background: #fff; border-radius: 10px; padding: 16px 18px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06); text-decoration: none;
+        color: inherit; transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.04);
+    }
+    .link-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); border-color: rgba(139,26,43,0.2); }
+    .link-icon {
+        width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
+        background: #fdf6e3; color: #8b1a2b;
+        display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+    }
+    .link-title { font-size: 0.9rem; font-weight: 700; color: #222; margin: 0; line-height: 1.4; }
+    .link-arrow { margin-left: auto; color: #8b1a2b; font-size: 0.9rem; flex-shrink: 0; }
+
     /* ================= TIMELINE ================= */
     .timeline-section { padding: 60px 0; background: #f8f6f4; }
     .timeline-header { text-align: center; margin-bottom: 50px; }
@@ -515,6 +585,13 @@
         .featured-side-thumb { width: 35%; min-width: 80px; }
         .section-featured-article { min-height: 340px; }
         .section-news-side-thumb { width: 35%; min-width: 80px; }
+        .gallery-grid { grid-template-columns: 1fr; }
+        .video-grid { grid-template-columns: 1fr; }
+        .link-grid { grid-template-columns: 1fr; }
+        .gallery-item img { height: 200px; }
+        .video-thumb { height: 180px; }
+        .vanban-item { flex-direction: column; align-items: flex-start; gap: 10px; }
+        .vanban-download { align-self: flex-end; }
     }
 </style>
 
@@ -539,8 +616,8 @@
             </div>
             <nav class="m26-quick" aria-label="Truy cập nhanh">
                 <a asp-controller="GopY" asp-action="Index"><span class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8px"><path d="M20 11.5a7.5 7.5 0 0 1-10.9 6.7L4.5 19.5l1.3-4.3A7.5 7.5 0 1 1 20 11.5Z" /><path d="M8.5 10.8h7M8.5 13.8h4.5" /></svg></span><span>Phản ánh</span></a>
-                <a asp-controller="Home" asp-action="UnderConstruction"><span class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8px"><path d="M6 2h9l5 5v15H6z" /><path d="M14 2v6h6" /><path d="M9 13h6M9 17h5" /></svg></span><span>Văn bản</span></a>
-                <a asp-controller="Home" asp-action="UnderConstruction"><span class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8px"><path d="M4 5h13v14H4z" /><path d="M17 8h3v9a2 2 0 0 1-2 2h-1" /><path d="M7 8h7M7 12h7M7 16h4" /></svg></span><span>Tin tức</span></a>
+                <a asp-controller="VanBanTaiLieu" asp-action="Index"><span class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8px"><path d="M6 2h9l5 5v15H6z" /><path d="M14 2v6h6" /><path d="M9 13h6M9 17h5" /></svg></span><span>Văn bản</span></a>
+                <a asp-controller="News" asp-action="Index"><span class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8px"><path d="M4 5h13v14H4z" /><path d="M17 8h3v9a2 2 0 0 1-2 2h-1" /><path d="M7 8h7M7 12h7M7 16h4" /></svg></span><span>Tin tức</span></a>
                 <a asp-controller="CongThongTinAnSXH" asp-action="Index"><span class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8px"><path d="M12 21s-7-4.4-7-10a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 5.6-7 10-7 10Z" /></svg></span><span>Tiếp nhận ủng hộ</span></a>
                 <a asp-controller="About" asp-action="Index"><span class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8px"><circle cx="9" cy="8" r="3.1" /><path d="M3.6 20a5.4 5.4 0 0 1 10.8 0" /><path d="M16 5.6a3 3 0 0 1 0 5.6" /><path d="M17.6 20a5 5 0 0 0-2.7-4.4" /></svg></span><span>Giới thiệu</span></a>
             </nav>
@@ -780,24 +857,116 @@
                         }
                         break;
                     case "hinh-anh":
-                        @if (!string.IsNullOrEmpty(sec.HinhAnh))
+                        var galleryItems = Model.SectionNews != null && Model.SectionNews.ContainsKey(sec.Id)
+                            ? Model.SectionNews[sec.Id]
+                            : new List<TrangChuTinTuc>();
+                        @if (galleryItems.Any())
                         {
-                            <div style="display:flex;justify-content:center;">
-                                <img src="@sec.HinhAnh" alt="@sec.TieuDe" style="max-width:100%;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.1);" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22400%22 viewBox=%220 0 800 400%22%3E%3Crect fill=%22%23e8b84b%22 width=%22800%22 height=%22400%22/%3E%3Ctext fill=%22%23333%22 font-family=%22Arial%22 font-size=%2224%22 text-anchor=%22middle%22 x=%22400%22 y=%22215%22%3EMTTQ%3C/text%3E%3C/svg%3E';" />
+                            <div class="gallery-grid">
+                                @foreach (var img in galleryItems)
+                                {
+                                    <div class="gallery-item" onclick="window.open('@img.HinhAnh', '_blank')">
+                                        <img src="@img.HinhAnh" alt="@img.TieuDe" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22 viewBox=%220 0 400 300%22%3E%3Crect fill=%22%23e8b84b%22 width=%22400%22 height=%22300%22/%3E%3Ctext fill=%22%23333%22 font-family=%22Arial%22 font-size=%2220%22 text-anchor=%22middle%22 x=%22200%22 y=%22160%22%3EMTTQ%3C/text%3E%3C/svg%3E'" />
+                                        @if (!string.IsNullOrEmpty(img.TieuDe))
+                                        {
+                                            <div class="gallery-caption">@img.TieuDe</div>
+                                        }
+                                    </div>
+                                }
                             </div>
                         }
                         else
                         {
                             <div class="empty-state">
-                                <i class="fas fa-image" style="font-size:2rem;opacity:0.3;"></i>
+                                <i class="fas fa-images" style="font-size:2rem;opacity:0.3;"></i>
                                 <p>Chưa có hình ảnh cho mục này.</p>
                             </div>
                         }
                         break;
-                    case "thong-tin":
-                    case "van-ban":
-                    case "lien-ket":
                     case "video":
+                        var videoItems = Model.SectionNews != null && Model.SectionNews.ContainsKey(sec.Id)
+                            ? Model.SectionNews[sec.Id]
+                            : new List<TrangChuTinTuc>();
+                        @if (videoItems.Any())
+                        {
+                            <div class="video-grid">
+                                @foreach (var video in videoItems)
+                                {
+                                    var embedUrl = video.LienKet ?? "";
+                                    // Chuyển đổi URL YouTube sang embed
+                                    if (embedUrl.Contains("youtube.com/watch?v="))
+                                    {
+                                        embedUrl = embedUrl.Replace("youtube.com/watch?v=", "youtube.com/embed/");
+                                    }
+                                    else if (embedUrl.Contains("youtu.be/"))
+                                    {
+                                        embedUrl = embedUrl.Replace("youtu.be/", "youtube.com/embed/");
+                                    }
+                                    else if (embedUrl.Contains("drive.google.com/file/d/"))
+                                    {
+                                        // Google Drive: chuyển sang preview
+                                        var driveId = embedUrl.Split("/file/d/")[1].Split("/")[0];
+                                        embedUrl = $"https://drive.google.com/file/d/{driveId}/preview";
+                                    }
+                                    else if (embedUrl.Contains("vimeo.com/"))
+                                    {
+                                        var vimeoId = embedUrl.Split("vimeo.com/")[1].Split("?")[0];
+                                        embedUrl = $"https://player.vimeo.com/video/{vimeoId}";
+                                    }
+                                    <div class="video-card">
+                                        <div class="video-embed-wrap">
+                                            <iframe src="@embedUrl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                        </div>
+                                        <div class="video-body">
+                                            <h3 class="video-title">@video.TieuDe</h3>
+                                            @if (!string.IsNullOrEmpty(video.TomTat))
+                                            {
+                                                <p class="video-desc">@video.TomTat</p>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="empty-state">
+                                <i class="fas fa-video" style="font-size:2rem;opacity:0.3;"></i>
+                                <p>Chưa có video nào trong mục này.</p>
+                            </div>
+                        }
+                        break;
+                    case "van-ban":
+                        var vanbanItems = Model.SectionNews != null && Model.SectionNews.ContainsKey(sec.Id)
+                            ? Model.SectionNews[sec.Id]
+                            : new List<TrangChuTinTuc>();
+                        @if (vanbanItems.Any())
+                        {
+                            <div class="vanban-list">
+                                @foreach (var vb in vanbanItems)
+                                {
+                                    <a href="@(!string.IsNullOrEmpty(vb.LienKet) ? vb.LienKet : "#")" target="@(!string.IsNullOrEmpty(vb.LienKet) ? "_blank" : "_self")" class="vanban-item">
+                                        <div class="vanban-icon"><i class="fas fa-file-pdf"></i></div>
+                                        <div class="vanban-content">
+                                            <h3 class="vanban-title">@vb.TieuDe</h3>
+                                            @if (!string.IsNullOrEmpty(vb.TomTat))
+                                            {
+                                                <p class="vanban-desc">@vb.TomTat</p>
+                                            }
+                                        </div>
+                                        <div class="vanban-download"><i class="fas fa-download"></i></div>
+                                    </a>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="empty-state">
+                                <i class="fas fa-file-alt" style="font-size:2rem;opacity:0.3;"></i>
+                                <p>Chưa có văn bản nào trong mục này.</p>
+                            </div>
+                        }
+                        break;
                     default:
                         <div style="display:flex;justify-content:center;">
                             <div style="background:#fff;padding:30px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.06);max-width:800px;width:100%;border:1px solid rgba(0,0,0,0.04);">
