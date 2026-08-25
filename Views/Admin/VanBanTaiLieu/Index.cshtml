@@ -71,6 +71,7 @@
                                         <i class="fas fa-edit"></i> Sửa
                                     </a>
                                     <form action="/AdminVanBanTaiLieu/Delete" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa văn bản này?');">
+                                        @Html.AntiForgeryToken()
                                         <input type="hidden" name="id" value="@item.IdvanBan" />
                                         <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
                                             <i class="fas fa-trash"></i> Xóa

@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebMTTQ.Models;
 using System.Linq;
@@ -97,9 +97,7 @@ namespace WebMTTQ.Controllers
                 return Json(new { success = false, message = "Kích thước ảnh không được vượt quá 10MB." });
             }
 
-            var allowedExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp" };
-            string ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-            if (!allowedExts.Contains(ext))
+            if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(file, out var ext) || ext == null)
             {
                 return Json(new { success = false, message = "Định dạng ảnh không hợp lệ. Chỉ chấp nhận JPG, PNG, GIF, WEBP, BMP." });
             }
@@ -146,7 +144,6 @@ namespace WebMTTQ.Controllers
                 baiViet.DuongDan = GenerateSlug(baiViet.TieuDe);
                 baiViet.NgayXuatBan = DateTime.Now;
                 baiViet.LuotXem = 0;
-                baiViet.LaTinNoiBat = false;
                 baiViet.TrangThai = string.IsNullOrEmpty(baiViet.TrangThai) ? "DaDang" : baiViet.TrangThai;
 
                 // Lấy ID người dùng hiện tại từ session
@@ -169,11 +166,18 @@ namespace WebMTTQ.Controllers
 
                     try
                     {
+                        if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(FileAnh, out var ext) || ext == null)
+                        {
+                            ModelState.AddModelError("HinhAnh", "Định dạng ảnh không hợp lệ.");
+                            var cats = await _context.ChuyenMucs.Where(c => c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc).ToListAsync();
+                            ViewBag.Categories = cats;
+                            return View("~/Views/Admin/News/Create.cshtml", baiViet);
+                        }
+
                         string webRoot = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
                         string uploadsFolder = Path.Combine(webRoot, "uploads", "news");
                         Directory.CreateDirectory(uploadsFolder);
 
-                        string ext = Path.GetExtension(FileAnh.FileName);
                         string uniqueFileName = $"{Guid.NewGuid()}{ext}";
                         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -262,11 +266,18 @@ namespace WebMTTQ.Controllers
 
                     try
                     {
+                        if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(FileAnh, out var ext) || ext == null)
+                        {
+                            ModelState.AddModelError("HinhAnh", "Định dạng ảnh không hợp lệ.");
+                            var cats = await _context.ChuyenMucs.Where(c => c.LoaiChuyenMuc == LoaiChuyenMucConstants.TinTuc).ToListAsync();
+                            ViewBag.Categories = cats;
+                            return View("~/Views/Admin/News/Edit.cshtml", existing);
+                        }
+
                         string webRoot = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
                         string uploadsFolder = Path.Combine(webRoot, "uploads", "news");
                         Directory.CreateDirectory(uploadsFolder);
 
-                        string ext = Path.GetExtension(FileAnh.FileName);
                         string uniqueFileName = $"{Guid.NewGuid()}{ext}";
                         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -297,6 +308,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /AdminNews/Delete/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             var baiViet = await _context.BaiViets.FindAsync(id);
@@ -311,6 +323,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /AdminNews/ToggleStatus/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleStatus(int id)
         {
             var baiViet = await _context.BaiViets.FindAsync(id);
@@ -421,6 +434,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /AdminNews/CategoryDelete/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CategoryDelete(int id)
         {
             var chuyenMuc = await _context.ChuyenMucs.FindAsync(id);
@@ -489,6 +503,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /AdminNews/CategoryToggleStatus/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CategoryToggleStatus(int id)
         {
             var chuyenMuc = await _context.ChuyenMucs.FindAsync(id);

@@ -1,4 +1,4 @@
-@model WebMTTQ.Models.KetQuaHoatDong
+﻿@model WebMTTQ.Models.KetQuaHoatDong
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Thêm hoạt động Cứu trợ";
@@ -17,6 +17,7 @@
 <div class="admin-card">
     <div class="admin-card-body">
         <form action="/Admin/QuyCuuTro/ThemKetQua" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn thêm hoạt động mới này?');">
+            @Html.AntiForgeryToken()
 
             <div class="admin-form-row">
                 <div class="admin-form-group">

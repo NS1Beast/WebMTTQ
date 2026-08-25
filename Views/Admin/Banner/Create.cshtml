@@ -14,6 +14,7 @@
     </div>
 
     <form asp-action="BannerCreate" asp-controller="AdminTrangChu" method="post" enctype="multipart/form-data" onsubmit="return confirm('Bạn có chắc chắn muốn thêm Banner mới này?');">
+        @Html.AntiForgeryToken()
         <div style="margin-bottom: 20px;">
             <label style="display: block; font-weight: bold; margin-bottom: 8px;">Chọn Hình ảnh (Tối đa 3MB) <span style="color:red;">*</span></label>
             <input type="file" name="FileAnh" id="FileAnh" accept="image/*" class="form-control" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;" required />
@@ -56,6 +57,7 @@
                         <option value="slide">Trượt ngang (Slide)</option>
                         <option value="fade">Mờ dần (Fade)</option>
                         <option value="zoom">Thu phóng (Zoom)</option>
+                        <option value="centered">Carousel căn giữa (Centered Carousel)</option>
                     </select>
                 </div>
                 <div>

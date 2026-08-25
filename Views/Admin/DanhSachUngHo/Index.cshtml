@@ -39,7 +39,7 @@
     <div class="admin-toolbar-left">
         <div class="admin-search-box">
             <i class="fas fa-search"></i>
-            <input type="text" id="searchBox" class="admin-form-control" placeholder="Tìm theo đơn vị/cá nhân..." onkeyup="filterTable()" />
+            <input type="text" id="searchBox" class="admin-form-control" placeholder="Tìm theo đơn vị/cá nhân..." />
         </div>
     </div>
     <div class="admin-toolbar-right">
@@ -54,6 +54,31 @@
             <i class="fas fa-plus"></i> Thêm mới
         </a>
     </div>
+</div>
+
+<div class="fund-filter-bar">
+    <div class="fund-filter-item">
+        <label>Từ ngày</label>
+        <input type="date" id="dateFrom" class="admin-form-control" />
+    </div>
+    <div class="fund-filter-item">
+        <label>Đến ngày</label>
+        <input type="date" id="dateTo" class="admin-form-control" />
+    </div>
+    <div class="fund-filter-item">
+        <label>Sắp xếp</label>
+        <select id="sortSelect" class="admin-form-control">
+            <option value="moiNhat">Thời gian mới nhất</option>
+            <option value="cuNhat">Thời gian cũ nhất</option>
+            <option value="tienGiam">Số tiền từ cao → thấp</option>
+            <option value="tienTang">Số tiền từ thấp → cao</option>
+            <option value="tenAZ">Tên A → Z</option>
+            <option value="tenZA">Tên Z → A</option>
+        </select>
+    </div>
+    <button type="button" class="admin-btn admin-btn-ghost admin-btn-sm" id="btnReset">
+        <i class="fas fa-undo"></i> Xóa bộ lọc
+    </button>
 </div>
 
 <div class="admin-card">
@@ -75,7 +100,7 @@
                         var index = 1;
                         foreach (var item in Model)
                         {
-                            <tr>
+                            <tr data-ten="@item.TenNguoiUngHo" data-ngay="@item.NgayUngHo.ToString("yyyy-MM-dd")" data-money="@item.SoTien.ToString(System.Globalization.CultureInfo.InvariantCulture)">
                                 <td class="cell-center" style="color:var(--admin-muted);">@index</td>
                                 <td><strong>@item.TenNguoiUngHo</strong></td>
                                 <td class="cell-center"><span class="admin-badge gray">@item.NgayUngHo.ToString("dd/MM/yyyy")</span></td>
@@ -84,6 +109,7 @@
                                     <div class="admin-row-actions">
                                         <a href="/admin/danhsachungho/Edit/@item.Id" class="admin-btn admin-btn-warning admin-btn-sm"><i class="fas fa-edit"></i> Sửa</a>
                                         <form action="/admin/danhsachungho/Delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn chắc chắn muốn xóa?');">
+                                            @Html.AntiForgeryToken()
                                             <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm"><i class="fas fa-trash"></i> Xóa</button>
                                         </form>
                                     </div>
@@ -94,7 +120,7 @@
                     }
                     else
                     {
-                        <tr>
+                        <tr id="rowEmpty" style="display:none;">
                             <td colspan="5">
                                 <div class="admin-empty">
                                     <i class="fas fa-hand-holding-usd"></i>
@@ -107,31 +133,15 @@
             </table>
         </div>
         <div class="admin-result-info" style="padding: 14px 16px;">
-            <span>Hiển thị <strong id="rowCount">@tongNgay</strong> trong tổng số <strong>@tongNgay</strong></span>
+            <span>Hiển thị <strong id="rowCount">@tongNgay</strong> trong tổng số <strong id="totalCount">@tongNgay</strong></span>
             <span>Tổng: <strong>@tongTien.ToString("N0")đ</strong></span>
+        </div>
+        <div class="admin-pagination" id="pagination" style="display:none;">
+            <button type="button" class="page-btn" id="pagePrev"><i class="fas fa-chevron-left"></i></button>
+            <div id="pagesWrap" style="display:flex;align-items:center;gap:6px;"></div>
+            <button type="button" class="page-btn" id="pageNext"><i class="fas fa-chevron-right"></i></button>
         </div>
     </div>
 </div>
 
-<script>
-function filterTable() {
-    var input = document.getElementById('searchBox');
-    var filter = input.value.toLowerCase();
-    var table = document.getElementById('dataTable');
-    var rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-    var visible = 0;
-    for (var i = 0; i < rows.length; i++) {
-        var name = rows[i].getElementsByTagName('td')[1];
-        if (name) {
-            if (name.textContent.toLowerCase().indexOf(filter) > -1) {
-                rows[i].style.display = '';
-                visible++;
-            } else {
-                rows[i].style.display = 'none';
-            }
-        }
-    }
-    var countEl = document.getElementById('rowCount');
-    if (countEl) countEl.textContent = visible;
-}
-</script>
+<script src="/js/admin/admin-danhsach.js"></script>

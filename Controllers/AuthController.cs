@@ -1,10 +1,13 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebMTTQ.Models;
 using WebMTTQ.Services;
 using System;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace WebMTTQ.Controllers
 {
@@ -14,6 +17,24 @@ namespace WebMTTQ.Controllers
         private readonly IQuyenTruyCapService _quyenService;
         private readonly IEmailService _emailService;
         private readonly ISystemSettingsService _settingsService;
+
+        // ==== Phase 3: OTP & password-reset hardening constants (no schema change) ====
+        private const int MaxOtpAttempts = 5;                          // failed guesses per OTP-window before invalidation
+        private const int MaxOtpRequestsPerEmailPerHour = 10;         // "send OTP" limit per email
+        private const int MaxOtpRequestsPerIpPerHour = 20;            // "send OTP" limit per IP
+        private static readonly int OtpAttemptWindowSeconds = 120;    // 2 min
+        private static readonly int OtpRequestWindowSeconds = 3600;   // 1 hour
+        private static readonly int ResetWindowSeconds = 300;         // bounded 5 min post-verification reset window
+
+        // ==== Phase 5: Login brute-force protection (no schema change) ====
+        private const int MaxLoginFailuresPerIp = 10;                 // failed password attempts per IP / window
+        private const int MaxLoginFailuresPerUser = 6;                // failed password attempts per username / window
+        private static readonly int LoginWindowSeconds = 900;         // sliding 15-minute window
+
+        // In-memory rate-limit / attempt counters (single-instance only; reset on restart).
+        // key -> long[2] = { windowStartTicks, count }
+        private static readonly ConcurrentDictionary<string, long[]> _rateCounters = new();
+        private static readonly ConcurrentDictionary<string, long[]> _attemptCounters = new();
 
         public AuthController(DataMTTQContext context, IQuyenTruyCapService quyenService, IEmailService emailService, ISystemSettingsService settingsService)
         {
@@ -54,17 +75,45 @@ namespace WebMTTQ.Controllers
                 return View(model);
             }
 
+            // ===== Phase 5: Login brute-force protection =====
+            // Chỉ áp dụng cho lần đăng nhập THẤT BẠI; không chặn user bình thường đăng nhập thành công.
+            // In-memory fixed-window (single-instance; reset on restart) - tương tự Phase 3.
+            var remoteIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            var normalizedUser = string.IsNullOrWhiteSpace(model.TenDangNhap) ? "" : model.TenDangNhap.Trim();
+
+            // Nếu IP hoặc tài khoản đã vượt ngưỡng thất bại trong cửa sổ hiện tại -> từ chối sớm
+            // (không chạy PBKDF2 tốn CPU, chống brute-force).
+            if (LoginLimitExceeded($"login_ip:{remoteIp}", MaxLoginFailuresPerIp, LoginWindowSeconds)
+                || LoginLimitExceeded($"login_user:{normalizedUser}", MaxLoginFailuresPerUser, LoginWindowSeconds))
+            {
+                ModelState.AddModelError("", "Quá nhiều lần đăng nhập thất bại. Vui lòng thử lại sau vài phút.");
+                return View(model);
+            }
+
             var user = await _context.NguoiDungs
                 .Include(u => u.IdvaiTroNavigation)
                 .FirstOrDefaultAsync(u => u.TenDangNhap == model.TenDangNhap);
 
             if (user != null && PasswordHelper.VerifyPassword(model.MatKhau, user.MatKhau))
             {
+                // Phase 5: đăng nhập thành công → reset bộ đếm lỗi cho tài khoản/IP này
+                // (đảm bảo user hợp lệ không bị khóa vĩnh viễn/kéo dài sau khi fix).
+                ResetLoginLimits(remoteIp, normalizedUser);
+
                 // Kiểm tra trạng thái tài khoản
                 if (user.TrangThai == "BiXoa" || user.TrangThai == "Khoa")
                 {
                     ModelState.AddModelError("", "Tài khoản này đã bị khóa hoặc vô hiệu hóa. Vui lòng liên hệ quản trị viên.");
                     return View(model);
+                }
+
+                // Re-hash automatique: si le mot de passe stocké utilise encore les
+                // anciens paramètres (10.000 iterations, format legacy), on le re-hashé
+                // avec 100.000 iterations dès que l'utilisateur s'est authentifié.
+                if (PasswordHelper.NeedsRehash(user.MatKhau))
+                {
+                    user.MatKhau = PasswordHelper.HashPassword(model.MatKhau);
+                    await _context.SaveChangesAsync();
                 }
 
                 // Kiểm tra xem có phải Admin không
@@ -107,6 +156,10 @@ namespace WebMTTQ.Controllers
 
                 return RedirectToAction("Index", "Admin");
             }
+
+            // Phase 5: ghi nhận lần đăng nhập sai (per-IP + per-username).
+            RecordLoginFailure($"login_ip:{remoteIp}", MaxLoginFailuresPerIp, LoginWindowSeconds);
+            RecordLoginFailure($"login_user:{normalizedUser}", MaxLoginFailuresPerUser, LoginWindowSeconds);
 
             ModelState.AddModelError("", "Tên đăng nhập hoặc mật khẩu không đúng.");
             return View(model);
@@ -245,22 +298,32 @@ namespace WebMTTQ.Controllers
 
             model.Email = model.Email.Trim().ToLower();
 
-            // Kiểm tra email có tồn tại trong hệ thống không
+            var remoteIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+            // Chống spam: giới hạn "gửi OTP" per-email + per-IP (cửa sổ in-memory).
+            if (IsRateLimited($"otp_req_email:{model.Email}", MaxOtpRequestsPerEmailPerHour, OtpRequestWindowSeconds)
+                || IsRateLimited($"otp_req_ip:{remoteIp}", MaxOtpRequestsPerIpPerHour, OtpRequestWindowSeconds))
+            {
+                // Phản hồi chung (không tiết lộ sự tồn tại của tài khoản).
+                TempData["InfoMessage"] = "Nếu tài khoản tồn tại, mã xác thực sẽ được gửi đến email của bạn.";
+                return RedirectToAction(nameof(XacNhanOtp), new { email = model.Email });
+            }
+
+            // Kiểm tra sự tồn tại của tài khoản mà không tiết lộ ra client (chống liệt kê).
             var user = await _context.NguoiDungs
-                .Include(u => u.IdvaiTroNavigation)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Email == model.Email);
+
+            // Phản hồi giống nhau cho mọi trạng thái (có/không có tài khoản).
+            TempData["InfoMessage"] = "Nếu tài khoản tồn tại, mã xác thực sẽ được gửi đến email của bạn.";
 
             if (user == null)
             {
-                // Email không tồn tại - hiển thị thông báo trên trang quên mật khẩu
-                model.IsEmailExists = false;
-                return View(model);
+                // Tài khoản không tồn tại: không tạo OTP, không gửi email. Redirect giống nhau.
+                return RedirectToAction(nameof(XacNhanOtp), new { email = model.Email });
             }
 
-            // Email tồn tại - hiển thị thông báo thành công
-            model.IsEmailExists = true;
-
-            // Kiểm tra thời gian gửi lại OTP (tối thiểu 2 phút giữa các lần gửi)
+            // Tài khoản tồn tại: không cho gửi lại nếu OTP đang hoạt động còn hơn 90 giây.
             var lastOtp = await _context.MaXacThus
                 .Where(o => o.Email == model.Email && !o.DaSuDung)
                 .OrderByDescending(o => o.NgayTao)
@@ -269,25 +332,29 @@ namespace WebMTTQ.Controllers
             if (lastOtp != null && lastOtp.HanHet > DateTime.Now)
             {
                 var remainingSeconds = (int)(lastOtp.HanHet - DateTime.Now).TotalSeconds;
-                if (remainingSeconds > 90) // Chỉ còn < 30s thì cho gửi lại
+                if (remainingSeconds > 90)
                 {
-                    TempData["ErrorMessage"] = $"Mã OTP đã được gửi gần đây. Vui lòng đợi {Math.Ceiling(remainingSeconds / 60.0)} phút để gửi lại.";
                     return RedirectToAction(nameof(XacNhanOtp), new { email = model.Email });
                 }
             }
 
-            // Tạo mã OTP 6 số
-            Random random = new Random();
-            string otp = random.Next(100000, 999999).ToString();
+            // OTP single-active: vô hiệu hóa các OTP chưa dùng trước đó của cùng email.
+            await InvalidateActiveOtpsAsync(model.Email);
+
+            // Reset bộ đếm lần nhập sai cho tài khoản này.
+            ResetFailedAttempts(model.Email);
+
+            // Tạo OTP 6 số bằng CSPRNG (RandomNumberGenerator) của .NET.
+            string otp = RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
 
             var maXacThuc = new MaXacThuc
             {
                 Email = model.Email,
                 MaOtp = otp,
                 NgayTao = DateTime.Now,
-                HanHet = DateTime.Now.AddMinutes(2), // Tồn tại 2 phút
+                HanHet = DateTime.Now.AddMinutes(2), // Hiệu lực 2 phút
                 DaSuDung = false,
-                DiaChiIp = HttpContext.Connection.RemoteIpAddress?.ToString()
+                DiaChiIp = remoteIp
             };
 
             _context.MaXacThus.Add(maXacThuc);
@@ -298,7 +365,7 @@ namespace WebMTTQ.Controllers
 
             if (emailSent)
             {
-                // Chuyển hướng tới trang xác nhận OTP nơi ô nhập mã OTP hiển thị
+                // Chuyển tới trang xác nhận OTP
                 return RedirectToAction(nameof(XacNhanOtp), new { email = model.Email });
             }
 
@@ -309,6 +376,7 @@ namespace WebMTTQ.Controllers
             TempData["ErrorMessage"] = "Đã có lỗi khi gửi email. Vui lòng kiểm tra cấu hình SMTP trong trang quản trị hoặc thử lại sau.";
             return RedirectToAction(nameof(QuenMatKhau));
         }
+
 
         // ================================================
         // XÁC NHẬN OTP
@@ -344,6 +412,15 @@ namespace WebMTTQ.Controllers
 
             if (otpRecord == null)
             {
+                // Giới hạn số lần nhập sai. Khi vượt quá → vô hiệu hóa OTP để chống brute-force.
+                if (IncrementFailedAttempts(model.Email) >= MaxOtpAttempts)
+                {
+                    await InvalidateActiveOtpsAsync(model.Email);
+                    ResetFailedAttempts(model.Email);
+                    TempData["ErrorMessage"] = "Đã nhập sai quá nhiều lần. Vui lòng gửi lại mã OTP mới.";
+                    return RedirectToAction(nameof(QuenMatKhau));
+                }
+
                 ModelState.AddModelError("MaOtp", "Mã OTP không đúng hoặc đã hết hạn. Vui lòng thử lại.");
                 return View(model);
             }
@@ -352,8 +429,15 @@ namespace WebMTTQ.Controllers
             otpRecord.DaSuDung = true;
             await _context.SaveChangesAsync();
 
-            // Chuyển tới trang đặt lại mật khẩu
-            return RedirectToAction(nameof(DatLaiMatKhau), new { email = model.Email, otp = model.MaOtp });
+            // Reset bộ đếm lần nhập sai.
+            ResetFailedAttempts(model.Email);
+
+            // Lưu trạng thái reset vào session (không đưa OTP lên URL).
+            HttpContext.Session.SetString("ResetPasswordEmail", model.Email);
+            HttpContext.Session.SetString("ResetPasswordIssuedAt", DateTime.Now.Ticks.ToString());
+
+            // Chuyển tới trang đặt lại mật khẩu (không kèm OTP trong URL).
+            return RedirectToAction(nameof(DatLaiMatKhau));
         }
 
         // ================================================
@@ -361,13 +445,16 @@ namespace WebMTTQ.Controllers
         // ================================================
 
         [HttpGet]
-        public IActionResult DatLaiMatKhau(string email, string otp)
+        public IActionResult DatLaiMatKhau()
         {
-            var model = new DatLaiMatKhauViewModel
+            var email = HttpContext.Session.GetString("ResetPasswordEmail");
+            if (string.IsNullOrEmpty(email))
             {
-                Email = email ?? "",
-                MaOtp = otp ?? ""
-            };
+                TempData["ErrorMessage"] = "Phiên xác thực chưa được thiết lập. Vui lòng thực hiện lại từ đầu.";
+                return RedirectToAction(nameof(QuenMatKhau));
+            }
+
+            var model = new DatLaiMatKhauViewModel { Email = email };
             return View(model);
         }
 
@@ -383,18 +470,31 @@ namespace WebMTTQ.Controllers
             model.Email = model.Email.Trim().ToLower();
             model.MaOtp = model.MaOtp.Trim();
 
-            // Kiểm ra OTP đã được xác nhận (đã đánh dấu DaSuDung = true)
-            var otpRecord = await _context.MaXacThus
-                .Where(o => o.Email == model.Email
-                         && o.MaOtp == model.MaOtp
-                         && o.DaSuDung
-                         && o.HanHet > DateTime.Now.AddMinutes(-5)) // Cho phép trong vòng 5 phút kể từ khi OTP hết hạn
-                .OrderByDescending(o => o.NgayTao)
-                .FirstOrDefaultAsync();
+            // Kiểm tra trạng thái reset được lưu trong session (không tin tưởng email do client cung cấp).
+            var sessionEmail = HttpContext.Session.GetString("ResetPasswordEmail");
+            var issuedAtTicks = HttpContext.Session.GetString("ResetPasswordIssuedAt");
 
-            if (otpRecord == null)
+            if (string.IsNullOrEmpty(sessionEmail) || !long.TryParse(issuedAtTicks, out var issuedTicks))
             {
                 TempData["ErrorMessage"] = "Phiên xác thực không hợp lệ. Vui lòng thực hiện lại từ đầu.";
+                return RedirectToAction(nameof(QuenMatKhau));
+            }
+
+            // Ràng buộc email trong session với email đã xác minh (chống chuyển sang tài khoản khác).
+            if (!string.Equals(sessionEmail, model.Email, StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["ErrorMessage"] = "Phiên xác thực không hợp lệ. Vui lòng thực hiện lại từ đầu.";
+                return RedirectToAction(nameof(QuenMatKhau));
+            }
+
+            // Chỉ cho phép reset trong cửa sổ ResetWindow sau khi OTP được xác minh
+            // (thay thế cho grace 5 phút trước đây → chống replay).
+            var issuedAt = new DateTime(issuedTicks);
+            if (issuedAt.Ticks > DateTime.Now.AddMinutes(1).Ticks || (DateTime.Now - issuedAt).TotalSeconds > ResetWindowSeconds)
+            {
+                HttpContext.Session.Remove("ResetPasswordEmail");
+                HttpContext.Session.Remove("ResetPasswordIssuedAt");
+                TempData["ErrorMessage"] = "Phiên xác thực đã hết hạn. Vui lòng thực hiện lại từ đầu.";
                 return RedirectToAction(nameof(QuenMatKhau));
             }
 
@@ -413,6 +513,11 @@ namespace WebMTTQ.Controllers
             user.NgayCapNhat = DateTime.Now;
             await _context.SaveChangesAsync();
 
+            // Vô hiệu hóa mọi OTP đang hoạt động và xóa trạng thái reset → không cho reuse.
+            await InvalidateActiveOtpsAsync(model.Email);
+            HttpContext.Session.Remove("ResetPasswordEmail");
+            HttpContext.Session.Remove("ResetPasswordIssuedAt");
+
             TempData["SuccessMessage"] = "Đặt lại mật khẩu thành công! Bạn có thể đăng nhập bằng mật khẩu mới.";
             return RedirectToAction(nameof(Login));
         }
@@ -420,6 +525,123 @@ namespace WebMTTQ.Controllers
         // ================================================
         // HELPERS
         // ================================================
+
+        /// <summary>
+        /// Rate limiting per-email / per-IP cho "gửi OTP" (cửa sổ cố định in-memory).
+        /// Trả về true nếu yêu cầu đã đạt giới hạn trong cửa sổ hiện tại.
+        /// LƯU Ý: chỉ đúng cho single-instance; reset khi khởi động lại.
+        /// </summary>
+        private bool IsRateLimited(string key, int maxRequests, int windowSeconds)
+        {
+            var now = DateTime.Now;
+            var entry = _rateCounters.GetOrAdd(key, _ => new long[2] { now.Ticks, 0 });
+
+            lock (entry)
+            {
+                var windowStart = new DateTime(entry[0]);
+                if ((now - windowStart).TotalSeconds >= windowSeconds)
+                {
+                    // Cửa sổ mới.
+                    entry[0] = now.Ticks;
+                    entry[1] = 0;
+                }
+
+                entry[1]++;
+                return entry[1] > maxRequests;
+            }
+        }
+
+        /// <summary>
+        /// Tăng bộ đếm số lần nhập sai OTP (per-email, cửa sổ 2 phút).
+        /// </summary>
+        private int IncrementFailedAttempts(string email)
+        {
+            var now = DateTime.Now;
+            var entry = _attemptCounters.GetOrAdd(email, _ => new long[2] { now.Ticks, 0 });
+
+            lock (entry)
+            {
+                var windowStart = new DateTime(entry[0]);
+                if ((now - windowStart).TotalSeconds >= OtpAttemptWindowSeconds)
+                {
+                    entry[0] = now.Ticks;
+                    entry[1] = 0;
+                }
+
+                entry[1]++;
+                return (int)entry[1];
+            }
+        }
+
+        /// <summary>
+        /// Xóa bộ đếm lần nhập sai OTP cho email (khi OTP mới được gửi hoặc verify thành công).
+        /// </summary>
+        private void ResetFailedAttempts(string email)
+        {
+            _attemptCounters.TryRemove(email, out _);
+        }
+
+        // ================= Phase 5: Login brute-force helpers (in-memory, single-instance) =================
+        // Chỉ đếm số lần THẤT BẠI. User bình thường đăng nhập thành công không bị ảnh hưởng.
+
+        /// <summary>Peek: true nếu đã đạt/hoặc đang ở trên max trong cửa sổ (không tăng bộ đếm).</summary>
+        private bool LoginLimitExceeded(string key, int max, int windowSeconds)
+        {
+            var now = DateTime.Now;
+            var entry = _rateCounters.GetOrAdd(key, _ => new long[2] { now.Ticks, 0 });
+
+            lock (entry)
+            {
+                var windowStart = new DateTime(entry[0]);
+                if ((now - windowStart).TotalSeconds >= windowSeconds) return false; // cửa sổ đã hết
+                return entry[1] >= max;
+            }
+        }
+
+        /// <summary>Tăng bộ đếm lỗi login cho key trong cửa sổ cố định (mui trần tại max).</summary>
+        private void RecordLoginFailure(string key, int max, int windowSeconds)
+        {
+            var now = DateTime.Now;
+            var entry = _rateCounters.GetOrAdd(key, _ => new long[2] { now.Ticks, 0 });
+
+            lock (entry)
+            {
+                var windowStart = new DateTime(entry[0]);
+                if ((now - windowStart).TotalSeconds >= windowSeconds)
+                {
+                    entry[0] = now.Ticks;
+                    entry[1] = 0;
+                }
+                if (entry[1] < max) entry[1]++;
+            }
+        }
+
+        /// <summary>Xóa bộ đếm lỗi cho tài khoản/IP sau khi đăng nhập thành công.</summary>
+        private void ResetLoginLimits(string ip, string username)
+        {
+            _rateCounters.TryRemove($"login_ip:{ip}", out _);
+            _rateCounters.TryRemove($"login_user:{username}", out _);
+        }
+
+        /// <summary>
+        /// Vô hiệu hóa mọi OTP chưa dùng của email (single-active OTP policy).
+        /// </summary>
+        private async Task InvalidateActiveOtpsAsync(string email)
+        {
+            var active = await _context.MaXacThus
+                .Where(o => o.Email == email && !o.DaSuDung)
+                .ToListAsync();
+
+            foreach (var otp in active)
+            {
+                otp.DaSuDung = true;
+            }
+
+            if (active.Count > 0)
+            {
+                await _context.SaveChangesAsync();
+            }
+        }
 
         /// <summary>
         /// Kiểm tra xem hệ thống đã có tài khoản Admin chính hay không.

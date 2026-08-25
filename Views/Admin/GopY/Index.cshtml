@@ -12,6 +12,37 @@
     </div>
 </div>
 
+<div class="fund-filter-bar">
+    <div class="fund-filter-item">
+        <label>Tìm theo tên gửi</label>
+        <div class="admin-search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchBox" class="admin-form-control" placeholder="Tìm theo họ tên..." />
+        </div>
+    </div>
+    <div class="fund-filter-item">
+        <label>Từ ngày gửi</label>
+        <input type="date" id="dateFrom" class="admin-form-control" />
+    </div>
+    <div class="fund-filter-item">
+        <label>Đến ngày gửi</label>
+        <input type="date" id="dateTo" class="admin-form-control" />
+    </div>
+    <div class="fund-filter-item">
+        <label>Trạng thái xử lý</label>
+        <select id="statusFilter" class="admin-form-control">
+            <option value="">Tất cả</option>
+            <option value="Chưa xử lý">Chưa xử lý</option>
+            <option value="Đang xử lý">Đang xử lý</option>
+            <option value="Đã xử lý">Đã xử lý</option>
+            <option value="Từ chối">Từ chối</option>
+        </select>
+    </div>
+    <button type="button" class="admin-btn admin-btn-ghost admin-btn-sm" id="btnReset">
+        <i class="fas fa-undo"></i> Xóa bộ lọc
+    </button>
+</div>
+
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="admin-alert admin-alert-success">
@@ -23,7 +54,7 @@
 <div class="admin-card">
     <div class="admin-card-body p-0">
         <div class="admin-table-wrap">
-            <table class="admin-table">
+            <table class="admin-table" id="dataTable">
                 <thead>
                     <tr>
                         <th width="50">#</th>
@@ -41,7 +72,7 @@
                         int stt = 1;
                         foreach (var item in Model)
                         {
-                            <tr>
+                            <tr data-ten="@item.HoTen" data-ngay="@(item.NgayGui?.ToString("yyyy-MM-dd"))" data-trangthai="@item.TrangThai">
                                 <td>@stt</td>
                                 <td>@(item.NgayGui?.ToString("dd/MM/yyyy HH:mm"))</td>
                                 <td>
@@ -93,5 +124,10 @@
                 </tbody>
             </table>
         </div>
+        <div class="admin-result-info" style="padding: 14px 16px;">
+            <span>Hiển thị <strong id="rowCount">@(Model?.Count() ?? 0)</strong> / <strong id="totalCount">@(Model?.Count() ?? 0)</strong></span>
+        </div>
     </div>
 </div>
+
+<script src="/js/admin/admin-hopthu.js"></script>

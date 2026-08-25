@@ -40,9 +40,18 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
     options.Cookie.Name = ".MTTQAdmin.Session";
+    // Phase 5 - session cookie hardening (environment-aware).
+    // SameSite=Lax keeps the login/redirect flow working; SecurePolicy=SameAsRequest
+    // flags the cookie Secure when served over HTTPS (production) but still allows the
+    // cookie over plain HTTP in local Development, so login is not broken on HTTP dev.
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 });
 
 var app = builder.Build();
+
+// Phase 5: apply security response headers to every request (incl. static files & errors).
+app.UseSecurityHeaders();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

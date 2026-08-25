@@ -196,3 +196,37 @@
 .fund-summary-info .sum-number.green { color: #10b981; }
 .fund-summary-info .sum-number.blue { color: #3b82f6; }
 .fund-summary-info .sum-number.gold { color: var(--admin-gold-dark); }
+
+/* ---------- FILTER BAR (Danh sách ủng hộ) ---------- */
+.fund-filter-bar {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;
+  margin-bottom: 18px; padding: 12px 16px;
+  background: var(--admin-white); border: 1px solid var(--admin-line);
+  border-radius: 12px;
+}
+.fund-filter-item { display: flex; flex-direction: column; gap: 4px; }
+.fund-filter-item label {
+  font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.04em; color: var(--admin-muted);
+}
+.fund-filter-item .admin-form-control { min-width: 140px; padding-top: 8px; padding-bottom: 8px; }
+
+/* ---------- PAGINATION (Danh sách ủng hộ) ---------- */
+.admin-pagination {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 14px 16px; border-top: 1px solid var(--admin-line);
+}
+.admin-pagination .page-btn {
+  min-width: 34px; height: 34px; padding: 0 10px;
+  border: 1px solid var(--admin-line); border-radius: 8px;
+  background: var(--admin-white); color: var(--admin-muted);
+  font-size: 0.82rem; font-weight: 600; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.admin-pagination .page-btn:hover { border-color: var(--admin-red); color: var(--admin-red); }
+.admin-pagination .page-btn.is-active {
+  background: linear-gradient(135deg, var(--admin-red), var(--admin-red-mid));
+  color: var(--admin-white); border-color: transparent;
+}
+.admin-pagination .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.admin-pagination .page-ellipsis { padding: 0 2px; color: var(--admin-muted); }

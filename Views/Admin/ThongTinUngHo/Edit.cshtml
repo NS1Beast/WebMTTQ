@@ -18,6 +18,7 @@
     <div class="admin-card-body">
         <!-- Đã thêm enctype để gửi file ảnh -->
         <form asp-action="Edit" method="post" enctype="multipart/form-data" onsubmit="return confirm('Bạn có chắc chắn muốn lưu các thay đổi của tài khoản này?');">
+            @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="admin-alert admin-alert-danger"></div>
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="QrCodeUrl" /> <!-- Giữ lại đường link ảnh cũ -->

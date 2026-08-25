@@ -17,6 +17,7 @@
 <div class="admin-card" style="max-width: 800px;">
     <div class="admin-card-body">
         <form asp-action="Create" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn lưu hoạt động chăm lo mới này?');">
+            @Html.AntiForgeryToken()
             <div class="admin-form-row">
                 <div class="admin-form-group">
                     <label class="admin-form-label">Tháng thực hiện <span class="required">*</span></label>

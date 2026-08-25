@@ -17,6 +17,7 @@
 <div class="admin-card" style="max-width: 600px;">
     <div class="admin-card-body">
         <form asp-action="Create" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn lưu bản ghi số dư mới này?');">
+            @Html.AntiForgeryToken()
             <div class="admin-form-group">
                 <label class="admin-form-label">Tiền mặt (VNĐ) <span class="required">*</span></label>
                 <input asp-for="TienMat" type="number" class="admin-form-control" placeholder="Ví dụ: 100000000" required />

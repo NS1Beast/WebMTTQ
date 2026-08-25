@@ -184,6 +184,7 @@
     </div>
 
     <form asp-action="Edit" enctype="multipart/form-data" method="post">
+        @Html.AntiForgeryToken()
         <input type="hidden" asp-for="Id" />
 
         <div class="form-grid">

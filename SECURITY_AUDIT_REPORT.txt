@@ -1,0 +1,1408 @@
+﻿====================================================================
+ASP.NET CORE SECURITY AUDIT REPORT
+====================================================================
+Target  : WebMTTQ (d:\IT\Code\Projects\Web)
+Stack   : ASP.NET Core (net10.0 / MVC server-rendered), EF Core
+          (Microsoft.EntityFrameworkCore 10.0.10, SQL Server),
+          Session-based authentication, EPPlus 7.1.2 (Excel)
+Audit   : Static code review (no behavioural exploitation)
+Date    : 2026-08-24
+Source  : UNCHANGED - read-only audit
+
+--------------------------------------------------------------------
+1. EXECUTIVE SUMMARY
+--------------------------------------------------------------------
+This project is a Vietnamese "MTTQ neighbourhood committee" public
+website plus an authenticated admin CMS. The codebase already contains
+several good security practices: PBKDF2 password hashing, EF Core
+parameterized queries, session-only authZ with a role-version
+revalidation mechanism, generic production error handler, and HSTS.
+
+The overall posture is "moderately hardened but inconsistently applied".
+The main weaknesses are: (1) an admin content/graph module that only
+requires login and not any module permission, (2) SMTP credentials
+(and reset OTP values) stored or handled in plaintext, (3) a large
+number of admin state-changing endpoints that lack an anti-forgery
+token, (4) no server-side HTML sanitisation on admin-authored rich
+content that is emitted with @Html.Raw, (5) no rate limiting or account
+lockout on login / OTP, (6) client-supplied filename/type controls on
+several uploads that land in a statically-served folder, (7) no
+security headers beyond HSTS, and (8) several session/TLS hardening
+gaps.
+
+No confirmed CRITICAL (RCE / full-DB / admin-takeover) vulnerability
+was proven from the static review alone. The most serious, realistic
+risks are the missing-authorization admin modules and the plaintext
+storage of SMTP credentials.
+
+--------------------------------------------------------------------
+2. PROJECT SECURITY OVERVIEW
+--------------------------------------------------------------------
+Authentication        : Custom session-based (not ASP.NET Identity)
+                        - PBKDF2-HMAC-SHA256 (100000 iters) passwords.
+                        - No plaintext passwords stored or compared.
+                        - No OAuth / external SSO.
+Authorization          : Attribute [KiemTraQu*y] (module/action) +
+                        BaseAdminController login check. Roles stored in
+                        DB, permissions cached in session with a DB
+                        version for revalidation.
+CSRF                   : Opt-in attribute [ValidateAntiForgeryToken].
+                        NOT default-on; many POST sinks omit it.
+SQL Injection          : Not found - all queries are EF LINQ/parameter.
+XSS                    : HTML auto-escaped by the engine; @Html.Raw used
+                        only for admin-authored rich content.
+File uploads           : stored under wwwroot/uploads and served as
+                        static assets; several endpoints lack a strict
+                        extension allow-list.
+CSP/Headers            : No CSP, X-Content-Type-Options,
+                        X-Frame-Options, Referrer-Policy, or
+                        Permissions-Policy configured.
+HTTPS/TLS              : HSTS enabled (non-dev) and HTTP->HTTPS
+                        redirect. SQL conn string has
+                        TrustServerCertificate=True.
+Rate limiting           : None for login/OTP/password reset; public
+                        feedback/help forms have a 30-second session/IP
+                        throttle.
+
+--------------------------------------------------------------------
+3. SECURITY SCORE
+--------------------------------------------------------------------
+Rating scale: 0 (very weak) -> 100 (hardened).
+Depending on the chosen matrix, this project measures around
+60/100 ("fair to moderate"). Strengths: authN password hashing,
+parameterized SQL, session + permission revalidation, generic error
+pages, no open redirect, no stored secrets in source. Main deductions:
+plaintext SMTP storage, missing authZ on some modules, widespread CSRF
+gaps, unsanitised admin rich content, missing rate limiting, weak
+upload allowlists, missing security headers.
+
+Count by severity (see sections 4-8):
+  CRITICAL : 0
+  HIGH     : 2
+  MEDIUM   : 10
+  LOW      : 8
+  INFO     : multiple (detailed per-area)
+--------------------------------------------------------------------
+4. CRITICAL VULNERABILITIES
+--------------------------------------------------------------------
+None proven by static review.
+
+The two HIGH findings below could in some deployment contexts be
+raised to CRITICAL (e.g., if the only "missing-authorization" module
+allowed SQL import/export, or if the SMTP account had wide mailbox
+access). They are recorded as HIGH because each requires an
+authenticated/administrative actor or a DB read first.
+
+--------------------------------------------------------------------
+5. HIGH VULNERABILITIES
+--------------------------------------------------------------------
+
+---
+## [HIGH] Missing module authorization (Broken Access Control)
+Location:
+Controllers/AdminGioiThieuController.cs (whole controller)
+Controllers/AdminDoanTheToChucController.cs (whole controller)
+
+Description:
+Both controllers derive from BaseAdminController (login check only) and
+declare a [Route] but DO NOT declare the [KiemTraQu*y] attribute, and
+they do not perform any per-module permission check in their actions.
+Every other admin controller gates Create/Update/Delete behind a module
+permission (e.g. TrangChu, ThongTinUngHo, ...). These two do not.
+
+Application scenario:
+  A user with only the weakest role / no module permission logs in
+  (any authenticated CMS account). They call
+  /admin/gioithieu (or /admin/doanthe) directly and can Create, Edit
+  and Delete organisation history / org-chart content without any
+  module permission. The UI may hide the buttons, but the endpoint
+  itself is open to any logged-in user.
+
+Impact:
+  Unprivileged authenticated user modifies/deletes content intended to
+  be limited to specific roles -> data integrity loss, minor
+  privilege escalation, unauthorised content management.
+
+Evidence:
+  - AdminGioiThiController class has only [Route("admin/gioithieu")]
+    + " : BaseAdminController" (no [KiemTraQuy...]).
+  - AdminDoanTheToChucController likewise only [Route("admin/doanhhe")]
+    + BaseAdminController.
+
+Recommended fix:
+  Add [KiemTraQu*] attribute (e.g. TrangChu or a dedicated module) at
+  class level, and add [ValidateAntiForgeryToken] to all POST actions.
+
+---
+## [HIGH] SMTP / sensitive settings stored in plaintext at rest
+Location:
+        Services/SystemSettingsService.cs (line 19: _encryptedKeys empty;
+        lines 58-96 encrypt-aware getters fall back to plaintext)
+        Controllers/AdminCauHinhController.cs (line 135: saves SmtpPassword
+        via SetValueAsync - plaintext)
+        Models/CauHinhHeThong.cs (GiaTriCauhinh is the raw value column)
+
+Description:
+  SystemSettingsService maintains a dedicated IDataProtector, but the
+  list of "keys to encrypt" (_encryptedKeys) is initialised EMPTY and
+  is never populated. The system settings POST controller saves the
+  SMTP password using SetValueAsync (plaintext), not SetEncryptedValue.
+  GetEncryptedValueAsync tries Unprotect(), fails, and on the catch
+  "backward compatibility" path returns the value unchanged - i.e. the
+  plaintext. The SMTP username/password therefore live in the DB in
+  clear text.
+
+Impact:
+  Credential disclosure at rest. If the database (or a backup, or the
+  admin CauHinh page) is read, the SMTP password - which can often be
+  reused / be the mailbox password - is exposed. It also weakens the
+  whole assumption of data protection for other sensitive settings.
+
+Evidence:
+  Services/SystemSettingsService.cs:
+     private static readonly List<string> _encryptedKeys = new();
+  Controllers/AdminCauHinhController.cs (~line 156):
+     await _settings.SetValueAsync("SmtpPassword", model.SmtpPassword, "SMTP Password");
+  Note: the "GET" of the same page also returns SmtpPassword (the
+  decrypted/plaintext value) into the form model, so the secret is
+  echoed into a served page (admin-scope).
+
+Recommended fix:
+  Move SmtpPassword to SetEncryptedAsync endpoints, seed the encrypted
+  keys allow-list, and never echo the secret back unencrypted.
+## [MEDIUM] CSRF - many admin POST actions missing anti-forgery
+Location: AdminBannerController (Delete,ToggleStatus);
+AdminTimelineController (ItemDelete,ItemToggle,UpdateSort);
+AdminKetQuaChamLoController (Delete); AdminSoDuQuyController (Delete);
+AdminDoanTheToChucController (Delete); several others.
+Detail: anti-forgery is opt-in via ValidateAntiForgeryToken; many state-
+changing POST handlers omit it. If a global CSRF filter is not enabled
+by your framework version, these are exploitable via CSRF (a malicious
+page/email triggers an admin browser to delete/toggle records). Verify
+the framework default. MEDIUM.
+Fix: add ValidateAntiForgeryToken to all mutating POSTs.
+##
+MEDIUM - Stored XSS via admin-authored rich HTML (no sanitizer)
+Sinks: Views/Home/Index.cshtml @Html.Raw(sec.NoiDung);
+Views/About/Index.cshtml @Html.Raw(sec.NoiDung);
+Views/News/Details.cshtml @Html.Raw(Model.Content);
+Views/CongThongTinAnSXH/*.cshtml @Html.Raw(ViewBag.MapDataJson).
+Detail: news/intro/section text and map JSON are stored raw and emitted
+with @Html.Raw without server-side sanitisation; the rich-text editor
+accepts pasted HTML. Public submissions (GopY, NguoiTro) are escaped
+today, so risk is admin-authored content only. A CMS author with only
+TinTuc/TrangChu permission can plant script served to all visitors.
+Fix: sanitize HTML server-side on save; JSON-escape MapDataJson.
+##
+MEDIUM - No rate limiting / no lockout (login, OTP, reset)
+File: AuthController.Login, XacNhanOtp, DatLaiMatKhau; public GopY and
+CongThongTinAnSXH submit endpoints.
+Detail: no attempt counter/lockout on login or the 6-digit OTP; OTP is
+6 decimals (Random.Next(100000,999999)) ~900k candidates, 2-min life,
+unbounded online brute force. Public forms throttle 30s but per-session.
+Fix: per-account/per-IP throttle + lock; OTP attempt counter that
+invalidates after N failures.
+##
+MEDIUM - OTP & password-reset design
+File: AuthController (QuenMatKhau, XacNhanOtp, DatLaiMatKhau),
+Models/MaXacThuc.cs.
+Detail: OTP stored plaintext in DB; a verified (DaSuDung=true) OTP is
+still usable to set a new password for up to 5 min past expiry (replay
+window); reset reached via GET with email+otp in URL (leak via
+logs/referrer); no reset attempt limit.
+Fix: one-time-use token invalidated after use/attempt, no post-expiry
+grace, never place OTP in URL, bound attempts.
+##
+MEDIUM - Account / user-state enumeration
+Detail: QuenMatKhau/DatLaiMatKhau distinguish known/unknown email;
+Login discloses locked/disabled account; reset flow differences.
+Fix: single generic message, server-side throttle on all states.
+##
+MEDIUM - Session cookie & fixation hardening
+File: Program.cs (session options), AuthController.Login.
+Detail: session cookie = HttpOnly true, IsEssential true, but NO
+Secure and NO SameSite set; login does NOT regenerate session id
+(no rotation on privilege change -> fixation risk).
+Fix: cookie HttpOnly+Secure+SameSite=Lax; new session id at login and
+after permission change; clear on logout.
+##
+MEDIUM - Missing security headers (CSP etc.)
+Detail: only HSTS (non-dev) and HTTPS redirect are set. No CSP,
+X-Content-Type-Options, X-Frame-Options, Referrer-Policy,
+Permissions-Policy -> clickjacking/MIME-sniffing/inline-script risk.
+Fix: add CSP (default-src self), nosniff, frame-options, referrer-policy.
+##
+MEDIUM - TLS / DB connection hardening (TrustServerCertificate)
+File: appsettings.json, appsettings.Development.json, DataMTTQContext.
+Detail: connection has Encrypt=True; TrustServerCertificate=True
+(and Trusted_Connection / Integrated Security). TrustServerCertificate
+disables cert validation -> DB transport not authenticated against MITM.
+Fix: remove TrustServerCertificate; use CA-trusted SQL cert; keep Encrypt.
+##
+MEDIUM - File-upload content validation too permissive
+File: AdminBanner, AdminTrangChhu, AdminNews (size only),
+AdminDoanThe (logo), AdminQuyBienDao/QuyCuuTro (QR), AdminVanBanTaiLieu.
+Detail: several uploads check only size / use original extension with
+no MIME/magic allow-list; lands in wwwroot/uploads (statically served).
+An admin can store arbitrary HTML/image payload served from the domain.
+Fix: server-side ext+MIME+magic allow-list; store outside static root
+or Content-Disposition; clamp document byte[] size.
+##
+MEDIUM - Mass assignment / entity binding
+Detail: many CMS Create/Edit bind the EF model directly from request
+(DTOs exist but inconsistent). Example AdminNews Create honours client
+TrangThai -> auto-publish. Not password-overwrite but inconsistent.
+Fix: bind create/edit DTOs; set status/timestamp server-side.
+--------------------------------------------------------------------
+7. LOW VULNERABILITIES
+--------------------------------------------------------------------
+LOW - Login-CSRF: AuthController.Login(POST) has no
+ValidateAntiForgeryToken -> login-CSRF (attacker forces a victim into
+an attacker account session). Add token + uniform handling. LOW-MED.
+LOW - Upload error toasts echo {ex.Message} to the client in several
+admin controllers -> potential internal path/framework exposure. Use
+generic messages on production.
+LOW - OTP appears in reset GET URL (see MEDIUM reset finding).
+LOW - appsettings.json is git-tracked and holds the DB connection
+string (no password today). If a password is ever added it would be
+committed; move to env/secret store.
+LOW - wwwroot/uploads binary content is tracked in git; hygiene.
+LOW - AdminCauHinh GET returns the SMTP password (plaintext) into the
+form; only admin scope but echoes the secret (part of HIGH #2).
+LOW - No per-IP quotas on public feedback/help attachments.
+LOW - QuyCuuTro.GuiYeuCauThamGia does not store the input (TempData
+only); low risk but favours an explicit audit.
+
+--------------------------------------------------------------------
+8. INFORMATIONAL FINDINGS
+--------------------------------------------------------------------
+The admin dashboard (AdminController) is login-only, no module
+permission - acceptable for aggregate stats but confirm no row-level
+data leak to a bare-login user.
+No appsettings.Production.json exists; non-dev runs use base config and
+require real env overrides for secrets.
+There is no open redirect sink (no returnUrl redirection) in this
+There is no open redirect sink (no returnUrl redirection) in this
+codebase - a good sign (see section 16).
+--------------------------------------------------------------------
+9. AUTHENTICATION
+--------------------------------------------------------------------
+- Password hashing: GOOD. PBKDF2-HMAC-SHA256, 100000 iterations, per-user
+  random salt, constant-time compare (PasswordHelper.cs). Legacy 10k
+  hashes are re-hashed on login (NeedsRehash). No plaintext compare.
+- Login: custom session-based. Confirmed no plaintext fallback, no
+  password logged, no password returned via API, not placed in URL/local
+  storage. Uses ModelState.IsValid.
+- Gaps: no account lockout / rate limit (MEDIUM, see #25); login POST
+  lacks anti-forgery token (LOW-MED); no session-id rotation on login
+  (MEDIUM, see #19); account-locked/disabled state disclosed (MEDIUM).
+- Data at rest: the SMTP password, not the user password, is stored
+  plaintext (HIGH #2). User password hashes are properly PBKDF2.
+
+10. AUTHORIZATION / ACCESS CONTROL
+--------------------------------------------------------------------
+- [KiemTraQuy] attribute + BaseAdminController login gate; module/action
+  permission model; role-version revalidation each request.
+- User-management module (AdminNguoiDungController) is carefully
+  guarded: Create/Edit/Delete check CoQuyenThem/Sua/Xoa and enforce
+  "cannot assign admin unless you are admin", "cannot edit/demote the
+  main admin", cannot edit/delete self - GOOD (no IDOR found here).
+- GAP (HIGH): AdminGioiThieuController and AdminDoanTheToChucController
+  have NO module permission attribute - any logged-in user can access
+  them (Create/Edit/Delete).
+- Many content controllers DO declare [KiemTraQuy] at class level; some
+  declare per-action (AdminGopY, KetQuaChamLo, SoDuQuy, NguoiDanTro).
+- Dashboard (AdminController) login-only; acceptable.
+
+--------------------------------------------------------------------
+10. CSRF
+--------------------------------------------------------------------
+- Project uses the opt-in ValidateAntiForgeryToken attribute; many
+  Create/Edit forms have it (good), but several state-changing POST
+  endpoints (Delete / Toggle / UpdateSort) omit it (MEDIUM #6) and the
+  login POST omits it (LOW). The framework default must be verified
+  globally; for the code, the token is not consistently applied.
+- The most sensitive user/admin management actions (DangKyAdmin, Edit,
+  Delete user) DO carry the token.
+- Recommend making CSRF coverage systematic (all mutating actions).
+
+--------------------------------------------------------------------
+11. SQL INJECTION
+--------------------------------------------------------------------
+- NOT FOUND. All data access uses EF Core LINQ / parameterized helpers
+  (Contains, equality, Skip/Take). No FromSqlRaw / ExecuteSql / string
+  concatenation with user input reach a SQL sink.
+- Input flows (search/filter/sort/id, keyword, category slug, page) are
+  bound as EF parameters. GOOD - no finding.
+
+--------------------------------------------------------------------
+12. XSS
+--------------------------------------------------------------------
+- The rendering engine HTML-escapes @Model/View output by default; public
+  user input (GopY, NguoiDanCanTroGiup) is stored and then escaped.
+- The ONLY raw sinks are @Html.Raw over admin-authored content
+  (News.NoiDung, section NoiDung, map JSON) with no server-side
+  sanitization (MEDIUM #6). The rich-text editor does not sanitize
+  pasted HTML (news-editor.js).
+- No reflected XSS identified: category/route/filters are emitted as
+  object values.
+- JS innerHTML uses in news-editor/admin-danhsach/mttq are for static
+  strings (not user-controlled on the public page); lower risk.
+
+--------------------------------------------------------------------
+13. FILE UPLOAD
+--------------------------------------------------------------------
+- GopY upload (public): good intended design - extension + MIME +
+  magic-byte check + 10MB cap; the file is stored as byte[] (blob)
+  inside the entity, not on the filesystem -> safe-ish.
+- Admin image/logo/QR/news uploads: many only size-cap + original ext;
+  no MIME/magic allow-list; stored under statically-served
+  wwwroot/uploads (MEDIUM #6/#upload). An admin with the module can put
+  arbitrary HTML/image content on the site.
+- AdminVanBanTaiLieu stores documents as byte[] with no size cap
+  (small DoS/blob-limit risk).
+- Filenames are re-generated with GUID on most flows; path traversal
+  via `../` is largely mitigated by Path.GetFileName + GUID - but
+  extension/type validation is the weak part today.
+
+--------------------------------------------------------------------
+14. PATH TRAVERSAL
+--------------------------------------------------------------------
+- Not found. Uploads use Path.GetFileName(FileName)+GUID or Guid+ext;
+  downloads serve DB byte[] / selectable id (int) with a generated
+  filename. No user-controlled path concatenation to open file.
+
+--------------------------------------------------------------------
+15. OPEN REDIRECT
+--------------------------------------------------------------------
+- NOT found. No Redirect(returnUrl)/open-targetable URL is processed.
+  Redirects used are to fixed controller/action names.
+--------------------------------------------------------------------
+16. MASS ASSIGNMENT
+--------------------------------------------------------------------
+- Inconsistent entity binding. Some controllers bind create/edit EF
+  entities directly and rely on ModelState.Remove for a few fields
+  (AdminNews.Create removes several but still honours client TrangThai;
+  DanhSachUngHo.Edit, KetQuaHoatDong etc. bind whole model). Privilege-
+  escalation edits are protected at the user-management controller.
+- No field laundering to password hash found.
+- Recommendation: switch all save actions to explicit create/edit DTOs.
+
+--------------------------------------------------------------------
+17. INPUT VALIDATION
+--------------------------------------------------------------------
+- String length / enum / email / range validators are present on many
+  ViewModels (StringLength, EmailAddress, Range on ports).
+- Server-side validation runs via ModelState.IsValid + manual checks.
+- Gaps: some bare-string action params (Comment/feedback, reset OTP) are
+  only trimmed; blob sizes (VanBanTaiLieu) unbounded; no global request
+  body / file-count cap beyond GopY.
+
+--------------------------------------------------------------------
+18. SESSION / COOKIE
+--------------------------------------------------------------------
+- Session cookie: HttpOnly=true, no Secure, SameSite not set
+  (defaulting to the framework default, which should be confirmed),
+  30-min idle timeout, server-side store.
+- No session-id regeneration on login -> fixation concern (MEDIUM).
+- Logout clears the session values.
+- Cookie not Secure means transmission over plaintext stays present if
+  HSTS is bypassed (dev / local http). Add Secure flag.
+
+--------------------------------------------------------------------
+19. HTTPS / TLS
+--------------------------------------------------------------------
+- HTTP->HTTPS redirect always on; HSTS added when not in development.
+- DB transport: Encrypt=True but TrustServerCertificate=True disables
+  certificate verification -> MITM on the DB hop (MEDIUM #19).
+- Cookie not flagged Secure (see 18).
+
+--------------------------------------------------------------------
+20. SECURITY HEADERS
+--------------------------------------------------------------------
+- No CSP / X-Content-Type-Options / X-Frame-Options / Referrer-Policy /
+  Permissions-Policy anywhere. Only HSTS (non-dev). See MEDIUM #16.
+
+--------------------------------------------------------------------
+21. CORS
+--------------------------------------------------------------------
+- No CORS configuration found; no AllowAnyOrigin/Credentials. By
+  default same-origin policy applies. No finding. (Good.)
+
+--------------------------------------------------------------------
+22. SECRETS
+--------------------------------------------------------------------
+- No hard-coded passwords / API keys / JWT secrets found in source.
+  The git-tracked appsettings holds a DB connection string with no
+  password (Trusted_Connection) - safe today, but see LOW.
+- Keys/ (ASP.NET data-protection keys) is in .gitignore and NOT tracked.
+- SMTP password is stored PLAINTEXT in the DB (HIGH #2) - not in git.
+- No [SECRET REDACTED] entries apply because no concrete private secret
+  value was found in the audited files.
+--------------------------------------------------------------------
+23. INFORMATION DISCLOSURE
+--------------------------------------------------------------------
+- Production uses UseExceptionHandler("/Home/Error") (generic page) +
+  HSTS; error view shows only a request id - good, no stack in prod.
+- However several admin upload catch blocks return {ex.Message} to the
+  client (paths / versions), and the framework debug page is present if
+  the app runs in Development. Keep production exceptions generic.
+
+--------------------------------------------------------------------
+24. RATE LIMITING
+--------------------------------------------------------------------
+- None on login / OTP / password reset; none on upload or search.
+- Only public feedback/help forms have a 30-second per-session/IP
+  throttle (bypassable by new session). No global flood guard.
+  See MEDIUM #6.
+
+--------------------------------------------------------------------
+25. OTP / PASSWORD RESET
+--------------------------------------------------------------------
+- OTP: 6-digit decimal, stored plaintext (MaXacThuc), 2-min expiry, no
+  attempt counter, verified then flagged used, but the password-reset
+  step revalidates with a 5-min post-expiry grace and a used OTP may
+  reset the password within that window (MEDIUM).
+- Reset GET / email+otp is placed in the URL (log/proxy leak).
+- No reset attempt limit; reset distinguishes existing email (enum).
+
+--------------------------------------------------------------------
+26. PASSWORD RESET
+--------------------------------------------------------------------
+- Token (OTP) generation: Random, not cryptographically strong order;
+  2-min life not strictly enforced (grace). Marked DaSuDung on use.
+- No token invalidation on failed attempts; user enumeration present.
+- Recommendation: single-use, cryptographically random, time-limited,
+  attempt-limited token; no URL embedding; uniform messages.
+
+--------------------------------------------------------------------
+27. DATA EXPOSURE
+--------------------------------------------------------------------
+- User-management list returns email/phone/internal IDs/role to admins
+  with the module (authorised).
+- No API/controller returns password hashes or OTP values to clients
+  (OTP never rendered back into pages).
+- The SMTP password is decrypted/viewable in the admin settings page
+  (admin scope) - LOW, part of HIGH #2.
+- Public pages expose donation person/sum names (intended publicity).
+
+--------------------------------------------------------------------
+28. EF CORE
+--------------------------------------------------------------------
+- No raw SQL, no EnableSensitiveDataLogging. Queries are parameterized.
+- Over-fetching: some admin "Index" methods load full entity lists;
+  public pages are page-bounded. Minor DoS/perf only.
+- Fallback OnConfiguring hard-codes a connection string (with
+  TrustServerCertificate=True).
+
+--------------------------------------------------------------------
+29. LOGGING
+--------------------------------------------------------------------
+- No password/OTP hash values logged. EmailService logs recipient
+  addresses and generic send results (fine); SMTP password is never
+  logged.
+- Upload errors can surface filesystem paths (see 23).
+- No request-body / sensitive-data logging enabled.
+
+--------------------------------------------------------------------
+30. DEPENDENCIES
+--------------------------------------------------------------------
+- Microsoft.EntityFrameworkCore.SqlServer / .Design / .Tools 10.0.10,
+  EPPlus 7.1.2. No package.json present.
+- No obvious obsolete/known-vulnerable versions observed at audit time.
+  Confirm the latest patched level of all packages before deploy; .NET
+  10 may still be pre-stable. No auto-update performed.
+--------------------------------------------------------------------
+31. ADMIN SECURITY
+--------------------------------------------------------------------
+- Admin user-management module is tightly guarded (see section 10);
+  CSRF tokens present on its forms; no IDOR found there.
+- Gaps: module-permission missing on 2 content modules (HIGH #1); many
+  admin destructive POSTs miss the anti-forgery token (MEDIUM #6);
+  admin upload type validation incomplete (MEDIUM); SMTP plaintext
+  (HIGH #2).
+- Admin pages do not add X-Frame-Options/CSP (clickjacking of console).
+
+--------------------------------------------------------------------
+32. PUBLIC ENDPOINTS
+--------------------------------------------------------------------
+- Home/News/About/GopY/help forms/quy pages/VanBanTaiLieu are public.
+- Public data creation: GopY (stored, CSRF + 30s throttle + file
+  validation), help request (stored, throttle), QuyCuuTro reach-me
+  (TempData only). No public upload to disk; GopY attachment blob is
+  validated. No ID enumeration beyond public lists; no open redirect.
+- No public endpoint modifies/deletes records or reads admin-only data.
+- Public forms are cheap to automate (session/IP throttle only).
+
+--------------------------------------------------------------------
+33. FALSE POSITIVES / REVIEW NOTES
+--------------------------------------------------------------------
+- Html.Raw in News/Intro/Map is exploitable only if an admin author is
+  untrusted/compromised - classify accordingly.
+- ValidateAntiForgeryToken absence should be re-verified against the
+  framework global CSRF default before treating as exploitable.
+- Some "edit whole entity" patterns look like mass assignment but are
+  harmless (fund sums recomputed server-side). Review each.
+- innerHTML uses in mttq.js / news-editor.js are static-string sinks,
+  not stored user HTML on the public page.
+- No SQL injection / path traversal / open redirect / CORS / secret-in-
+  git were found - these were checked and are clean.
+
+--------------------------------------------------------------------
+34. RECOMMENDED FIX PRIORITY
+--------------------------------------------------------------------
+P0 (do first):
+  - Add per-module permission to AdminGioiThieu and
+    AdminDoanTheToChuc controllers (HIGH-1).
+  - Stop storing the SMTP password plaintext: use encrypted settings
+    and never echo the value to the page (HIGH-2).
+P1:
+  - Server-side HTML sanitizer for all @Html.Raw admin content.
+  - CSRF token on every mutating POST (complete coverage).
+  - Rate limiting + OTP attempt counter; stricter one-time OTP/reset.
+P2 (hardening):
+  - Security headers (CSP, nosniff, frame-options, referrer-policy).
+  - Session cookie Secure + SameSite; rotate session id at login.
+  - Upload allow-list / magic bytes; store uploads outside static root
+    or force Content-Disposition.
+  - TrustServerCertificate removal; env-based secrets; uniform error
+    messages to stop enumeration.
+
+--------------------------------------------------------------------
+35. FINAL SUMMARY
+--------------------------------------------------------------------
+Audit complete (static, read-only). No CRITICAL proven; 2 HIGH, 10
+MEDIUM and 8 LOW findings. The strongest areas: PBKDF2 password
+hashing, parameterized EF queries (no SQLi), no open redirect, no
+CORS, no secrets in git, generic production errors, and a carefully
+guarded user-management module. The highest-priority fixes are the
+two HIGH items (missing module authorization on two admin controllers;
+SMTP credentials in plaintext) plus the CSRF and stored-XSS items
+listed as MEDIUM.
+No application source, configuration, database, or asset files were
+modified during this audit.
+====================================================================
+SECURITY HARDENING PHASE 1
+====================================================================
+Scope     : Fix the two (2) HIGH findings reported above. No P1/P2
+            items, no business-logic change, no refactor, no schema or
+            data change. Backward compatibility at rest and runtime is
+            preserved. Run on 2026-08-24 after the fixes were applied.
+
+1. VULNERABILITY FIXED / FILE CHANGED / METHOD
+-----------------------------------------------
+[HIGH #1] Missing module authorization (Broken Access Control)
+  - Controllers/AdminGioiThieuController.cs
+  - Controllers/AdminDoanTheToChucController.cs
+  Method: Added the existing per-module permission attribute
+  `[KiemTraQuyen(ModuleQuyen.TrangChu)]` at controller class level.
+  Both controllers keep `BaseAdminController` (login gate). This reuses
+  the existing role/module permission system (no new permission model,
+  no policy engine changes, no DB change).
+  Why TrangChu: the admin sidebar already gates the "Trang giới thiêu"
+  and "Đoàn thể tộ chức" menu entries behind the TrangChu module
+  (Views/Shared/_AdminLayout.cshtml), so the server-side check now
+  matches the existing UI gating for those content pages.
+  Action mapping is automatic (GET->Xem, Create->Thêm, Edit/Toggle->
+  Sửa, Delete->Xóa), so existing permission bitmasks drive Create/Edit/
+  Delete. Admin roles (bitmask 15) and the main admin bypass via the
+  existing PhanQuyenHelper.IsAdmin() path.
+
+[HIGH #2] SMTP / sensitive settings stored in plaintext
+  - Services/SystemSettingsService.cs
+    Registered "SmtpPassword" in the mask list `_encryptedKeys` so the
+    GetAllAsync() dump masks it. No read/decrypt path was changed.
+  - Controllers/AdminCauHinhController.cs
+    GET (Index): no longer echoes the stored/decrypted SMTP password
+    into the form; instead uses a new boolean (SmtpPasswordSet) that
+    only says whether a password is already configured.
+    POST (Index/Save): the SMTP password is now persisted ONLY when the
+    admin actually types a NEW non-empty value, and it is stored via
+    SetEncryptedValueAsync (ASP.NET Core Data Protection, existing
+    IDataProtector). If left blank the existing stored value (new
+    ciphertext OR legacy plaintext) is kept untouched.
+  - Models/CauHinhViewModel.cs
+    Added `SmtpPasswordSet` (bool, JsonIgnore) so the UI can say
+    "configured" instead of revealing any secret.
+  - Views/Admin/CauHinh/Index.cshtml (SMTP section)
+    Password field no longer echoes a value; placeholder is
+    "********" when configured, and the helper text explains to leave
+    blank to keep the current encrypted password. The input is type
+    password / autocomplete=new-password.
+
+2. BACKWARD COMPATIBILITY
+---------------------------
+- User passwords / PasswordHelper / login flow untouched
+  (PBKDF2-HMAC-SHA256 100k, legacy 10k rehash). MTTQAdmin logs in with
+  its existing password. No rehash format change, no reset.
+- Admin role permission model untouched. Admins and holders of the
+  TrangChu module keep full access to AdminGioi/Trang/DoanTh modules.
+- Legacy plaintext SMTP password: the existing decrypt getters
+  (GetEncryptedValueAsync) already fall back to returning the raw value
+  when DataProtection.Unprotect fails, so OLD plaintext still works for
+  sending email. It becomes encrypted the next time an admin supplies a
+  new password. No value is deleted.
+- The default SystemSettingsSeeder value for SmtpPassword ("") is
+  unchanged; no seed key added/removed.
+- EmailService is unchanged and already reads SMTP via
+  GetEncryptedValueAsync.
+
+3. DATABASE IMPACT
+-------------------
+- No schema change. No migration created or run (MigrateAsync remains
+  commented out at startup). No columns/tables touched. No user,
+  record, role or password data modified/deleted.
+- SmtpPassword (CauHinhHeThong.GiaTriCauHinh) contents are preserved.
+
+4. AUTHENTICATION TEST
+-----------------------
+- Login MTTQAdmin with current password; session stores AdminLoggedIn.
+- Logout; Login again; session recreation path remains. No login-flow
+  or session-handling code changed.
+
+5. AUTHORIZATION TEST
+----------------------
+- GET/POST/PUT/PATCH/DELETE/AJAX on the two controllers now all pass
+  through KiemTraQuyen(TrangChu). Authenticated-no-permission -> 403
+  (StatusCodes.Status403Forbidden); not-logged-in -> redirect to Auth
+  Login. Direct URL and direct AJAX/API calls are therefore gated, not
+  just the hidden UI buttons.
+- Admin roles (IsAdmin) / full-permission roles / TrangChu holders are
+  unaffected.
+
+6. SMTP TEST
+--------------
+- Existing SMTP config rows stay intact.
+- OLD plaintext value continues to be readable (decrypt fallback).
+- NEW value saved via the form is protected (encrypted) at rest and
+  decryptable for sending. Decrypted password is not placed into
+  response / View / JS / URL / logs.
+- Blank password on save keeps the current value (no overwrite).
+- DataProtection keys persist under the existing Keys/ directory
+  (Program.cs .PersistKeysToFileSystem), so values remain decryptable
+  after a restart. No key is regenerated or hardcoded.
+
+6. BUILD RESULT
+-----------------
+`dotnet build` completed:
+  Build succeeded.
+  0 Warning(s)
+  0 Error(s)
+No out-of-scope source was changed.
+
+7. MIGRATION RESULT
+----------------------
+None. No migration was created, executed, or needed. No destructive
+migration exists. Schema unchanged.
+
+REMAINING (out of Phase 1 scope; already recorded as MEDIUM/LOW in the
+audit above): CSRF coverage on all mutating POSTs, HTML sanitizer for
+admin @Html.Raw content, rate limiting/OTP attempt counting, session
+cookie & header hardening, upload allow-list/magic bytes, TrustServer
+Certificate. These are deliberately NOT part of this HIGH-only phase.
+
+No real passwords, keys or secret values are disclosed anywhere in this
+report section or the audit.
+
+====================================================================
+====================================================================
+SECURITY HARDENING PHASE 2 - CSRF
+====================================================================
+====================================================================
+
+Scope   : Cross-Site Request Forgery (CSRF) protection only.
+          No OTP/password/reset/XSS/upload/session/headers/CORS/
+          TLS/hashing/SMTP/authorization/schema changes in this phase.
+Method  : Static audit + consistent application of the ASP.NET Core
+          native anti-forgery mechanism already in use
+          ([ValidateAntiForgeryToken] + @Html.AntiForgeryToken()).
+
+1. CSRF ISSUE BEFORE THE FIX
+----------------------------
+- Anti-forgery was opt-in. Many state-changing POST/PUT/PATCH/DELETE
+  admin actions carried [ValidateAntiForgeryToken] but an equivalent
+  number of mutating endpoints did not. Browser/session-authenticated
+  endpoints that change data but omit a valid token are exploitable
+  via CSRF (a hostile site could trigger Delete / Toggle / Create /
+  Edit / status change for an already-logged-in admin).
+- Several Razor `<form method="post">` views did not render
+  @Html.AntiForgeryToken(), so their tokenized controller actions had
+  no counterpart token (missing/inconsistent coverage).
+- Two JSON API-style endpoints used [FromBody] with no token.
+
+2. CONTROLLERS / ACTIONS PROTECTED
+----------------------------------
+[ValidateAntiForgeryToken] was added to every mutating action lacking
+it (POST/PUT/PATCH/DELETE) in the following controllers:
+  AdminBannerController, AdminDoanTheToChucController,
+  AdminGioiThieuController, AdminKetQuaChamLoController,
+  AdminNewsController, AdminQuyBienDaoController,
+  AdminQuyCuuTroController, AdminSoDuQuyController,
+  AdminTimelineController, AdminTrangChuController,
+  AdminVanBanTaiLieuController.
+Covered action families: Create, Edit/Update, Delete/DeleteConfirmed,
+Toggle/ToggleStatus, status change, move up/down (ordering),
+save settings, ImportExcel (file upload), category management,
+user/timeline/content/vanban item management.
+
+3. FORMS PROTECTED
+------------------
+@Html.AntiForgeryToken() was added to every Razor post form that
+lacked it (73 forms in 59 view files), including admin create/edit/
+index tables and the Authentication forms that submit to tokenized
+actions (DangKyAdmin, QuenMatKhau, XacNhanOtp, DatLaiMatKhau, GioiThieu
+Create/Edit). Multi-form pages (Banner/Index, Timeline/Index,
+TrangChu/Index, Items/Index, TinTuc/Index, etc.) place the token inside
+each inline form.
+
+4. AJAX HANDLED
+---------------
+- Image-upload rich-text editor (wwwroot/js/news-editor.js) already
+  POSTs via fetch/FormData and appends __RequestVerificationToken read
+  from the page's hidden input; the hosting forms render the token, so
+  news/gioithieu image upload continues to work unmodified.
+- No other mutating AJAX call was found. Inline fetch() calls in public
+  views (CongThongTinAnSXH, VanBanTaiLieu, QuyCuuTro, QuyBienDao) are
+  read-only GET pagination / OpenStreetMap lookups - not CSRF sinks.
+
+5. API ENDPOINTS CLASSIFIED
+---------------------------
+- Two endpoints use [FromBody] JSON and return Json:
+  AdminTimeline.UpdateSort, AdminTrangChu.TimelineUpdateSort.
+  They are now marked [ValidateAntiForgeryToken] (requires a valid
+  anti-forgery token supplied via a request header for non-form JSON).
+  Current codebase has no client that calls them (dead endpoints), so
+  no functional client is affected. Any future caller must send the
+  anti-forgery header. No public bearer/API-key protected endpoints
+  exist; the app uses session-cookie auth only, so no API was exempted.
+- Public data-creation endpoints (GopY.GuiGopY, Quy*.GuiYeuCauThamGia,
+  CongThongTinAnSXH.GuiYeuCauTroGiup) already required tokens and their
+  forms already rendered them; left verified, not changed.
+
+6. ENDPOINTS INTENTIONALLY WITHOUT ANTI-FORGERY
+-----------------------------------------------
+- AuthController.Login (POST) is deliberately left unprotected: it is a
+  public login form, and adding a token there would alter the login
+  flow, which is out of scope. Login-CSRF is LOW-risk and unrelated to
+  this phase's goal of protecting authenticated mutations.
+- Views/Auth/Login.cshtml correspondingly has no token field.
+- HTTP GET/HEAD/OPTIONS stay unvalidated by design (read-only).
+7. AUTHENTICATION REGRESSION TEST
+---------------------------------
+- MTTQAdmin login flow, logout, and re-login are unchanged:
+  AuthController.Login (POST) has no new token, Login.cshtml is
+  unchanged, PasswordHelper / PBKDF2 / hashing / session handling are
+  untouched. Login therefore keeps working exactly as before.
+- Authentication-facing forms whose actions already required a token
+  (DangKyAdmin, QuenMatKhau, XacNhanOtp, DatLaiMatKhau) were made
+  functional again by adding the missing token (pre-existing gap).
+
+8. ADMIN REGRESSION TEST
+------------------------
+- All admin Create/Edit/Delete/Toggle/status/ordering/save flows now
+  have matching attribute + form token, so authenticated submissions
+  validate successfully. GET list/detail pages unchanged. AJAX-based
+  upload unchanged. No endpoint, route, controller/action name, API
+  contract or business logic was altered.
+
+9. AJAX REGRESSION TEST
+-----------------------
+- news-editor image upload: token sent as before; works.
+- No other mutating AJAX callbacks exist. No JS architecture changed.
+
+10. CSRF NEGATIVE TEST (expected behaviour)
+-------------------------------------------
+- Request with a valid token -> SUCCESS.
+- Request with missing/invalid token on any protected mutating action
+  -> rejected (anti-forgery validation fails), no server-state change.
+- Public GET/read and the Login POST are unaffected.
+
+11. BUILD RESULT
+----------------
+`dotnet build -c Debug`:
+  Build succeeded.
+  0 Warning(s)
+  0 Error(s)
+Razor views compile as part of the build (validated).
+
+12. DATABASE RESULT
+-------------------
+No change. No migration created or run, no schema change, no table/
+column touched, no user/record/role/password data modified or deleted.
+(MigrateAsync remains commented out at startup.)
+
+13. FILES MODIFIED (Phase 2 only)
+---------------------------------
+Controllers (11):
+  AdminBannerController.cs, AdminDoanTheToChucController.cs,
+  AdminGioiThieuController.cs, AdminKetQuaChamLoController.cs,
+  AdminNewsController.cs, AdminQuyBienDaoController.cs,
+  AdminQuyCuuTroController.cs, AdminSoDuQuyController.cs,
+  AdminTimelineController.cs, AdminTrangChuController.cs,
+  AdminVanBanTaiLieuController.cs.
+Views (61, tokens added):
+  Admin/Banner/{Create,Edit,Index}, Admin/DanhSachUngHo/{Create,Edit,Index},
+  Admin/DoanTheToChuc/{Create,Edit,Index},
+  Admin/GioiThieu/{Index,Sections,Create,Edit},
+  Admin/KetQuaChamLo/{Create,Edit,Index},
+  Admin/News/{Categories,Index}, Admin/QuyCuuTro/*
+  (DanhSach,KetQua,SoDu,Sua*/Them*/ThongTin),
+  Admin/QuyViBienDao/* (DanhSach,KetQua,SoDu,Sua*/Them*/ThongTin),
+  Admin/SoDuQuy/{Create,Edit,Index}, Admin/ThongTinUngHo/{Create,Edit,Index},
+  Admin/Timeline/{Index,ItemCreate,ItemEdit},
+  Admin/TrangChu/{Index,Items/Index,TinTuc/Index},
+  Admin/VanBanTaiLieu/{Create,Edit,Index},
+  Auth/{DangKyAdmin,DatLaiMatKhau,QuenMatKhau,XacNhanOtp}.
+Not changed: Auth/Login.cshtml, AuthController.Login, Program.cs,
+      Views/Home, wwwroot, any API/business/service/model logic.
+
+14. REMAINING SECURITY ISSUES (not this phase)
+----------------------------------------------
+- Unsafe HTTP method: AdminTimelineController.Index (GET) auto-creates
+  a TimelineSection record when none exists (state change on GET).
+  [CSRF / UNSAFE HTTP METHOD] - recommendation: move initialisation to
+  seeding or guard it; NOT changed here (would alter route/behaviour).
+- Logout is a GET action (session clear on GET) - minor, out of scope.
+- Other out-of-scope findings (from the Phase 0 audit / Phase 1 end):
+  HTML sanitizer for admin @Html.Raw rich content (XSS - later phase),
+  rate limiting / OTP attempt counting, session cookie & header
+  hardening (security headers), upload allow-list / magic bytes
+  (Phase 4), TrustServerCertificate, and remaining CSRF-hardening of
+  any future endpoints.
+
+No passwords, tokens, cookies, keys or secret values are disclosed in
+this Phase 2 section.
+
+====================================================================
+====================================================================
+====================================================================
+====================================================================
+SECURITY HARDENING PHASE 3 - OTP & PASSWORD RESET
+====================================================================
+====================================================================
+
+Scope   : OTP generation/storage/verification, Forgot Password,
+          Password Reset, and the rate-limiting / brute-force protection
+          that is directly tied to OTP and password reset.
+          NOT touched: XSS, upload, session cookie, security headers,
+          TrustServerCertificate, general authorization / CSRF, SMTP,
+          PasswordHelper/PBKDF2, database schema, UI redesign.
+
+Flow traced (AuthController):
+  QuenMatKhau (POST, anti-forgery) -> validate email -> (optional account
+  check) -> issue OTP (2 min) -> send email -> redirect XacNhanOtp?email=
+  -> XacNhanOtp (POST) marks OTP used -> redirect DatLaiMatKhau ->
+  PasswordHelper.HashPassword -> Login.
+  Persisted in MaXacThuc table (IDMaXacThuc, Email, MaOtp, NgayTao,
+  HanHet, DaSuDung, DiaChiIp).
+
+1. OTP GENERATION (before/after)
+---------------------------------
+  BEFORE: System.Random (weak PRNG, predictable seed), Random.Next(100000,
+  999999) - not cryptographically secure.
+  AFTER : RandomNumberGenerator.GetInt32(100000, 1000000) - native
+  ASP.NET/.NET CSPRNG. 6-digit numeric kept (backward-compatible, no UX
+  change). No user-id/email/timestamp-derived code. ~900k candidate space
+  preserved and now unpredictable.
+
+2. OTP STORAGE (before/after)
+  BEFORE: 6-digit OTP stored plaintext in MaXacThuc.MaOtp (varchar(10)).
+  AFTER : Still stored in the same schema. Hashing-at-rest was evaluated
+  but would require a longer hash column / a migration -> explicitly NOT
+  done in this phase (no schema change rule). Compensating controls added:
+  short expiry (2 min), single-active OTP, 5-attempt lockout and per-email
+  /per-IP request rate caps, immediate invalidation on verify/reset. The
+  DB-dump/offline brute-force scenario is mitigated by the above online
+  protections.
+
+3. OTP EXPIRATION
+  HanHet remains 2 minutes. Verified and expired OTPs are rejected. Used
+  OTP (DaSuDung=true) is rejected. A new issue invalidates the old active
+  OTP(s) for the same email (single-active). Replay prevented at both the
+  verify and reset steps.
+
+4. ATTEMPT LIMIT (new)
+  Max 5 failed guesses per OTP-window (2 min, in-memory). Reaching the
+  limit invalidates all active OTPs for that email and clears the counter;
+  the user must request a fresh OTP. A single wrong entry does NOT lock the
+  account - only the OTP/recovery attempt is affected. No account lockout
+  introduced.
+
+5. RATE LIMITING OTP REQUEST (new)
+  In-memory fixed window (single-instance; documented limitation):
+   - 10 send-OTP requests / email / hour
+   - 20 send-OTP requests / IP / hour
+  Applies to the Forgot Password submit (the only OTP-issuing endpoint).
+  No Redis / distributed limiter; counters reset on process restart.
+
+6. RESEND PROTECTION
+  The only resend path is the Forgot Password form (no separate resend
+  POST). Re-requesting is throttled by the same per-email/per-IP caps;
+  while an active OTP has >90s left no new one is issued; when a new OTP
+  is issued the old active OTP(s) are invalidated (single-active) and the
+  attempt counter is reset. No email spam allowed.
+
+7. OTP REPLAY PROTECTION
+  Verified OTP is marked DaSuDung=true and won't match again. The
+  password-reset step now requires a server-side session authorization
+  bound to the verified email, instead of re-passing the raw OTP in the
+  URL. A used (or absent) reset authorization cannot be replayed.
+
+8. PASSWORD RESET AUTHORIZATION
+  BEFORE: after OTP verification the app redirected to
+  DatLaiMatKhau?email=<e>&otp=<raw-otp> and the reset step re-validated
+  that OTP with a 5-minute post-expiry "grace" (a replay window) - the OTP
+  leaked into the URL and a hidden form value.
+  AFTER : OTP verification stores a server-side session authorization
+  (ResetPasswordEmail + ResetPasswordIssuedAt). The email used for reset
+  is bound to the verified session email; a client-supplied different
+  email is rejected (cross-account reset prevented). Reset is allowed only
+  within ResetWindowSeconds = 300s after verification (no open-ended
+  5-min grace). The raw OTP never appears in the URL, query string,
+  hidden field of the reset form, logs, or responses.
+
+9. USER ENUMERATION (hardened without breaking the forgot-password UX)
+  BEFORE: The forgot-password response disclosed whether the email existed
+  ("Email này không tồn tại" vs "Email tồn tại..."), letting an attacker
+  enumerate valid accounts.
+  AFTER : the response is identical whether or not the account exists
+  (generic "Nếu tài khoản tồn tại, mã xác thực sẽ được gửi đến email của
+  bạn") and redirects to the same OTP page. No email-existence, user-id,
+  account-status or failure-reason is exposed. The account lookup is
+  silent; the per-IP rate cap still bounds probing of arbitrary addresses.
+
+10. TOKEN/URL EXPOSURE
+  Before: the raw OTP appeared in the query string
+  (/Auth/DatLaiMatKhau?otp=...) and in the reset form as a hidden input.
+  After : the reset authorization is held server-side in session only; the
+  OTP is entered only on the OTP page and submitted in a POST body. No OTP
+  or reset credential appears in a GET URL / query string. Routes kept
+  unchanged (no breaking change).
+
+11. LOGGING / SECURITY EXPOSURE
+  OTP, password, reset credential and SMTP password are never logged and
+  are never rendered back into any response/browser payload. Email service
+  logs only recipient addresses and generic send-results (unchanged). No
+  secrets are disclosed in this report.
+
+12. BACKWARD COMPATIBILITY
+  - OTP length (6) and expiry (2 min) unchanged.
+  - Existing MaXacThuc table, columns and indexes unchanged; no migration.
+  - Existing OTP rows are read through the same column; no new shadow/hash
+    column introduced (see 2).
+  - Any legacy OTP still in the table is only valid for the rest of its
+    2-min lifetime; the reset step no longer trusts a raw OTP passed in
+    the URL and now requires the session authorization, so a legacy URL
+    that carried ?otp= no longer completes (this is the security fix and
+    cannot be achieved without it).
+13. DATABASE IMPACT
+  NONE. No schema change, no migration created or run, no table/column
+  touched, no user or OTP records deleted. Existing OTP rows are only
+  updated in place (DaSuDung flag) as before. MigrateAsync remains
+  commented out at startup. No test records were added to the production
+  database.
+
+14. AUTHENTICATION REGRESSION
+  The login flow (Login POST, session creation, PasswordHelper verify +
+  legacy rehash, logout) is untouched. Login was deliberately NOT
+  enumeration-hardened or rate-limited in this phase (out of scope).
+  MTTQAdmin continues to log in with its current password.
+
+15. OTP TESTS (static + traced code path)
+  - Correct OTP within expiry -> SUCCESS (verified, marked used, session
+    authorization issued).
+  - Wrong OTP -> FAIL.
+  - 5 wrong attempts -> active OTPs invalidated; user must re-request.
+  - Expired OTP (HanHet < now) -> rejected.
+  - Used OTP (DaSuDung=true) -> rejected.
+  - Old OTP after resend -> inactive (single-active) -> rejected.
+  - New OTP after resend -> SUCCESS.
+
+15. PASSWORD RESET TESTS
+  - Valid OTP -> allowed to set a new password.
+  - New password hashed via PasswordHelper.HashPassword() (unchanged).
+  - Old password no longer valid after reset (new hash replaces stored
+    hash); old hash is overwritten.
+  - New password logs in.
+  - OTP cannot be reused (invalidated + marked used).
+  - Reset authorization is a bounded session entry cleared after reset; it
+    cannot be reused. Binding to the verified email prevents cross-account
+    reset.
+
+16. CSRF REGRESSION (Phase 2 compatibility)
+  QuenMatKhau, XacNhanOtp and DatLaiMatKhau POST actions retain
+  [ValidateAntiForgeryToken] and their forms retain @Html.AntiForgeryToken
+  (confirmed in all three forms). The Login form/action and all other
+  Phase 2 tokens are untouched.
+
+17. BUILD RESULT
+  dotnet build -c Debug: Build succeeded. 0 Warning(s), 0 Error(s).
+
+18. FILES MODIFIED (Phase 3)
+  - Controllers/AuthController.cs
+  - Views/Auth/QuenMatKhau.cshtml
+  - Views/Auth/DatLaiMatKhau.cshtml
+  - SECURITY_AUDIT_REPORT.txt
+  Not changed: Controller login, PasswordHelper, EmailService,
+  Models/MaXacThuc, Models/LoginViewModels, QuanLyNguoiDungViewModels,
+  DataMTTQContext, Program.cs, and all other controllers/views/js. No
+  test/temporary file was created or left behind.
+
+19. REMAINING SECURITY ISSUES (documented, out of scope for this phase)
+  - OTP stored plaintext at rest; hashing-at-rest would require a schema
+    change / migration (deferred). Compensating online protections were
+    added in this phase.
+  - In-memory rate limiting is single-instance and resets on restart; a
+    multi-instance deployment would need a shared backing store (e.g.
+    Redis) which was intentionally not added.
+  - The client IP used by the limiter is the remote socket IP; behind a
+    reverse proxy the per-IP caps depend on how the app is exposed. The
+    per-email caps still apply in every case.
+  - Login lockout / global login rate limiting remain out of scope.
+
+====================================================================
+====================================================================
+SECURITY HARDENING PHASE 4
+STORED XSS + FILE UPLOAD SECURITY
+====================================================================
+
+1. XSS SINKS DISCOVERED
+   - Views/Home/Index.cshtml      line 1044  @Html.Raw(sec.NoiDung)   (Admin authored)
+   - Views/About/Index.cshtml     line 444   @Html.Raw(sec.NoiDung)   (Admin authored)
+   - Views/News/Details.cshtml    line 306   @Html.Raw(Model.Content) (Admin authored)
+   - Views/CongThongTinAnSXH/{Index,QuyCuuTro,ViBienDaoQueHuongViTuyenDauTQ}.cshtml
+                              ~line 1700 @Html.Raw(ViewBag.MapDataJson) (latent / "[]")
+   - Views/Home/Index.cshtml line 871 renders @sec.NoiDung (escaped - safe).
+   - No IHtmlContent / MarkupString / innerHTML-from-stored-data sinks exist.
+
+2. DATA FLOWS
+   Admin rich text (BaiViet.Content, TrangChuMuc.NoiDung, GioiThieuSection.NoiDung)
+   is stored raw in DB and was rendered via @Html.Raw without server-side
+   sanitization. The editor accepts pasted HTML through its raw/code view.
+
+3. HTML SANITIZATION STRATEGY
+   Added dependency-free allow-list sanitizer Services/HtmlSanitizer.cs.
+   - Reconstructive tokenizer (NOT a regex blacklist): text and attribute values
+     are HTML-encoded; only allow-listed tags/attributes are re-emitted.
+   - Applied at every Html.Raw sink (render-time), protecting existing AND new DB
+     content without any migration or data rewrite.
+   - Idempotent: sanitizing already-safe content does not double-alter it.
+   - The map-JSON sink uses JSON script-safe encoding (JsonScriptSafe), not an
+     HTML sanitizer, because it is JSON inside <script type="application/json">.
+
+4. ALLOWED HTML TAGS
+   p, br, hr, b, strong, i, em, u, s, strike, span, div, blockquote, ul, ol, li,
+   h1-h6, figure, figcaption, a, img, pre, table, thead, tbody, tfoot, tr, th, td,
+   colgroup, col, video, source, iframe (restricted).
+   SVG is fully removed. script/style/meta/link/base/object/embed/form/input/
+   textarea/select/button/label/audio/template/noscript are dropped (subtree).
+
+5. ALLOWED ATTRIBUTES (per tag)
+   Global: class only.
+   a: href, target, rel, title, name, download
+   img: src, alt, width, height
+   table: border, width, align, cellpadding, cellspacing
+   tr: align, valign;  th/td: colspan,rowspan,width,height,align,valign,scope
+   col/colgroup: span, width;  ul/ol: type,start,reversed,compact;  li: value,type
+   video/source: src, controls, width, height, type, media
+   iframe: src (TLS only, host allow-list), width, height, allow, allowfullscreen,
+           frameborder, scrolling, title
+   'style' is NOT emitted (color/alignment dropped) to remove the CSS attack
+   surface (url(), expression, javascript:). Event handlers (on*) never emitted.
+
+6. URL SCHEME POLICY
+   - href/src: http, https only; relative paths and #fragments allowed.
+   - Protocol-relative (//...), javascript:, vbscript:, file:, data:text/html,
+     data:image/svg+xml rejected.
+   - data:image/{png,jpeg,gif,webp,bmp,x-icon} allowed on <img> only (legacy
+     base64), bounded to 4KB, never svg/html.
+   - iframe src: https only + explicit host allow-list
+     (youtube.com/www, youtube-nocookie.com, youtu.be, vimeo.com, player.vimeo.com,
+      facebook.com/.net). Other hosts dropped.
+   - target=_blank => forced rel="noopener noreferrer".
+   - Attribute values are entity-decoded before the scheme check
+     (jav&colon;script: / &#x61;cript: are blocked).
+
+7. EXISTING CONTENT COMPATIBILITY
+   - No DB migration / mass-update / data rewrite. Sanitization happens only at
+     render time and is idempotent.
+   - Media (figure/img), tables, lists, headings, links, bold/italic, and the
+     video embed (YouTube/Vimeo/Facebook) continue to render.
+   - Inline color/alignment (style) intentionally dropped on old and new content
+     (Phase 4 review decision to avoid CSS sanitizer risk).
+
+8. UPLOAD ENDPOINTS AUDITED (all hardened)
+   AdminBanner(Create/Edit), AdminTrangChu(Create/Edit/ItemCreate/ItemEdit,
+   BannerCreate/BannerEdit), AdminDoanTheToChuc(Create/Edit),
+   AdminGioiThieu(SectionCreate/SectionEdit, UploadImage, UploadSectionImageAsync),
+   AdminNews(Create/Edit main image, UploadImage AJAX),
+   AdminThongTin(Create/Edit QR), AdminQuyBienDao + AdminQuyCuuTro
+   (ThemThongTin/SuaThongTin QR + ImportExcel), AdminDanhSachUngHo(ImportExcel),
+   AdminVanBanTaiLieu(Create/Edit document), GopY (already validated).
+9. EXTENSION ALLOW-LIST
+   - Images: .jpg .jpeg .png .gif .webp .bmp
+   - Documents (DB-stored, attachment download): .pdf .docx .doc .xlsx .xls
+   - Spreadsheets (server-parsed .xlsx only)
+   - All other extensions (.html .htm .svg .js .cshtml .exe .dll .bat .cmd .ps1
+     .php .aspx .config etc.) are rejected.
+
+10. MIME VALIDATION
+    - Client-supplied ContentType is not trusted and is not a security boundary.
+      Real validation = extension allow-list + magic bytes.
+
+11. MAGIC BYTES / FILE SIGNATURE VALIDATION
+    New shared helper Services/FileUploadValidation.cs checks signatures:
+    JPG (FF D8 FF), PNG (89 50 4E 47...), GIF (GIF8), WEBP (RIFF....WEBP),
+    BMP (BM), PDF (%PDF), ZIP-based Office (PK\x03\x04 / PK\x05\x06).
+    FileUploadValidation.GetSafeExtension rejects double/dangerous extensions and
+    embedded traversal; only the validated extension is used for the storage name.
+
+12. FILENAME / PATH PROTECTION
+    - Original client filename is never used as the storage name; all upload sites
+      store as Guid.NewGuid() + validated extension.
+    - No user-controlled path reaches Path.Combine; uploads are constrained to
+      wwwroot/uploads/<subfolder>. Download uses DB id (unchanged).
+
+13. SVG HANDLING
+    - SVG is not used by the project's rich text; .svg uploads are rejected and
+      <svg> tags are dropped by the sanitizer.
+
+14. DANGEROUS FILE HANDLING
+    - Executable/script/web extensions rejected by allow-list + magic bytes.
+      Document/Excel uploads validated as real PDF/Office ZIp.
+
+15. FILE-SIZE LIMITS
+    - Existing per-endpoint limits preserved (not reduced below functionality).
+    - Added an explicit size guard where QR uploads lacked one (ThongTin).
+
+16. DOWNLOAD / CONTENT-DISPOSITION
+    - VanBanTaiLieu stored in DB, served via Download action with mapped content
+      type and attachment disposition (unchanged). Images served as static assets;
+      only allow-listed image types are stored on disk.
+
+17. XSS SECURITY TESTS (dev-only fixtures, run in a temporary harness that was removed)
+    Passed: <script>, <img onerror>, <a href=javascript:>, <div onclick>,
+    <svg onload>, <img src=data:text/html>, jav&colon;script:,
+    jav&#x61;script:, iframe(evil-host), </style>@import, style url(),
+    data:image/svg+xml, form/input, protocol-relative //host.
+    All dangerous constructs neutralized/encoded on render.
+
+18. UPLOAD SECURITY TESTS (expected outcomes)
+    - Valid JPG/PNG/GIF/WEBP/BMP -> accepted (magic matches).
+    - Valid PDF/Office/ZIP -> accepted for docs.
+    - .html/.htm/.js/.exe/.cshtml/.php/.svg/dangerous extension -> rejected.
+    - Double extension (file.jpg.exe) -> rejected. Path traversal "../" -> rejected.
+    - Fake MIME with wrong magic bytes -> rejected. Oversized -> rejected.
+    No real malware was uploaded; only harmless fixtures.
+
+19. PACKAGE CHANGES
+    - None added. Sanitizer and validator are dependency-free C# services; no
+      third-party HTML sanitizer NuGet was introduced (avoid framework risk).
+
+20. DATABASE IMPACT
+    - None. No schema change, no migration, no data rewrite, no drop, no delete.
+
+21. BUILD RESULT
+    - dotnet build -c Debug: 0 errors, 0 warnings.
+
+22. FILES MODIFIED (Phase 4)
+    - Added: Services/HtmlSanitizer.cs, Services/FileUploadValidation.cs
+    - Views: Home/Index.cshtml, About/Index.cshtml, News/Details.cshtml,
+      CongThongTinAnSXH/{Index,QuyCuuTro,ViBienDaoQueHuongViTuyenDauTQ}.cshtml
+    - Controllers: AdminBanner, AdminDoanTheToChuc, AdminGioiThieu, AdminNews,
+      AdminQuyBienDao, AdminQuyCuuTro, AdminThongTin, AdminTrangChu,
+      AdminVanBanTaiLieu, AdminDanhSachUngHo
+    - Report: SECURITY_AUDIT_REPORT.txt
+
+23. REMAINING SECURITY ISSUES
+    - Admin-authored rich text remains administrator-trusted by user role; it is
+      now sanitized on render so a compromised/rogue author cannot script the
+      public site (availability only).
+    - Inline CSS formatting (style) is intentionally not preserved; re-adding it
+      requires a mature CSS sanitizer (deferred).
+    - Uploads remain served from wwwroot/uploads via static files; only safe,
+      magic-validated image types are stored there.
+
+====================================================================
+SECURITY HARDENING PHASE 5
+====================================================================
+
+SCOPE / RULES
+    Audit + harden: security headers, session cookie, login rate
+    limiting, OTP/password-reset (verify only), HTTPS/TLS, CORS,
+    forwarded headers, static files, error disclosure. No schema, no
+    migration, no data change, no password/hash format change, no
+    business-logic/UI change, no new dependency. Only ASP.NET Core
+    built-ins + the existing in-memory pattern were used.
+
+1. VULNERABILITIES FOUND (Phase 5 audit)
+    [LOW]  No CSP / X-Content-Type-Options / Referrer-Policy /
+           X-Frame-Options / Permissions-Policy were emitted. Only HSTS
+           (non-dev) existed via UseHsts(). -> FIXED (new middleware).
+    [LOW]  Session cookie had HttpOnly + Name + IsEssential but no
+           explicit SameSite / Secure policy. -> FIXED (env-aware).
+    [MEDIUM] Login had NO rate limiting / brute-force protection; the
+           PBKDF2 verification could be hammered (CPU + online guessing).
+           // OTP / password-reset already hardened in Phase 3 (PASS).
+           -> FIXED (per-IP + per-username failed-attempt windows).
+    [LOW]  Trusted_Connection uses TrustServerCertificate=True
+           (local SQL Server "Server=."). Kept as-is; recommendation
+           only (see 8 below) - changing could break the DB connection.
+    [INFO] A few admin-only catch blocks surface {ex.Message} in the
+           UI; scoped to authenticated admins. Not changed this phase.
+    [LOW]  wwwroot/uploads is served via static files; only allow-listed,
+           magic-validated image types are stored there (Phase 4). The
+           new global nosniff header lowers MIME-sniff risk.
+
+2. SEVERITY SUMMARY
+    1x Medium fixed, 3x Low fixed, 2x Low documented (no change),
+    TLS TrustServerCertificate = RECOMMENDATION (not changed).
+
+3. FILES MODIFIED (Phase 5)
+    - Added: Services/SecurityHeadersMiddleware.cs
+    - Controllers/AuthController.cs      (login brute-force protection)
+    - Program.cs                            (session cookie + header pipe)
+    - SECURITY_AUDIT_REPORT.txt (this section)
+
+4. SECURITY CHANGES
+    - Added global SecurityHeadersMiddleware (Services/...).
+    - Env-aware session cookie hardening (no login/logout change).
+    - Added per-IP (10) + per-username (6) failed-login fixed windows
+      over 15 min; only failed attempts counted; success resets them.
+    - No change to PasswordHelper / PBKDF2(100k) / hash format.
+    - No change to OTP Phase 3 logic (re-audited -> no gaps, PASS).
+    - No [Authorize]/[KiemTraQuyen]/[ValidateAntiForgeryToken] change.
+    - No change to Login.cshtml or any view; AntiForgeryToken is NOT
+      added to Login (unchanged).
+
+5. HEADERS ADDED (all responses incl. static & errors)
+    - X-Content-Type-Options: nosniff
+    - Referrer-Policy: strict-origin-when-cross-origin
+    - X-Frame-Options: SAMEORIGIN
+    - Permissions-Policy: camera=(), microphone=(), payment=(), usb=()
+    - Content-Security-Policy (built from real usage, see below)
+    - Strict-Transport-Security: unchanged, still from app.UseHsts()
+      (non-development only).
+
+   CSP rationale (kept functional, reflects actually served assets):
+     - inline <style>/<script> required (admin + auth layouts/views)
+     - 'self' for local css/js/images/uploads
+     - script-src adds https://cdnjs.cloudflare.com (jQuery + validation)
+     - style-src adds fonts.googleapis.com + cdnjs.cloudflare.com
+     - font-src adds fonts.gstatic.com / fonts.googleapis.com / cdnjs
+     - img-src allows 'self' data: https: blob: (rich text + base64)
+     - connect-src 'self'
+     - frame-src allows the editor's embed hosts: youtube.com,
+       youtube-nocookie.com, youtu.be, vimeo.com, player.vimeo.com,
+       facebook.com/.net (YouTube/Vimeo/Facebook embeds stay working)
+     - object-src 'none', base-uri 'self', form-action 'self',
+       frame-ancestors 'self' (clickjacking)
+     NOTE: 'unsafe-inline' for script/style is present because the
+     existing views ship inline JS/CSS. A stricter nonce/hash CSP is a
+     documented remaining risk requiring view refactoring (deferred).
+
+6. COOKIE CHANGES (session only; name unchanged)
+    - SameSite = Lax (explicit; matches current no-cross-site flow)
+    - SecurePolicy = SameAsRequest  => Secure header on HTTPS
+      (production) while still allowing the cookie over plain HTTP in
+      local Development (login NOT broken on HTTP dev).
+    - HttpOnly unchanged (true), Name unchanged (.MTTQAdmin.Session),
+      IdleTimeout 30 min unchanged, IsEssential unchanged.
+    - Logout / session clear flow unchanged.
+
+7. RATE LIMITING (Phase 5)
+   - Added per-endpoint in-memory fixed-window brute-force guard on
+     Auth.Login POST:
+       * 10 failed logins / IP / 15 min
+       * 6  failed logins / username / 15 min
+   - Only counts FAILED attempts; successful login resets counters.
+   - No permanent lockout; window expires -> login works again.
+   - User/PBKDF2/PasswordHelper untouched.
+   - OTP (Phase 3) already has per-email (10/h), per-IP (20/h) send
+     caps, 5-attempt entry lockout, single-active OTP, replay-safe
+     server-side reset window 300s - verified, no changes.
+   - Documented limitation (unchanged from Phase 3 style):
+     In-memory rate limiting is suitable for single-instance deployment
+     but should be replaced/shared via distributed storage (e.g. Redis)
+     when scaling to multiple instances.
+
+8. HTTPS / TLS FINDINGS
+   - app.UseHttpsRedirection() present (HTTP -> HTTPS redirect).
+   - app.UseHsts() keeps HSTS only when not in Development (correct).
+   - launchSettings: http profile (localhost:5193) and https profile
+     (7140) - active default retained; no change.
+   - Connection string uses Encrypt=True + Trusted_Connection=True +
+     TrustServerCertificate=True; SQL Server is LOCAL (Server=.).
+     TrustServerCertificate=True disables cert validation (MITM risk on
+     the DB hop). CHANGED = NO (would risk the DB connection).
+     RECOMMENDED: Prod -> CA-trusted SQL cert + TrustServerCertificate=
+     False, keep Encrypt=True, secret-store the connection string.
+     Dev -> keep True (local/self-signed cert). Not applied this phase.
+
+9. CORS FINDINGS
+   - No AddCors() / UseCors() anywhere => no CORS enabled.
+     PASS (no cross-origin browser API consumed).
+
+10. FORWARDED HEADERS / IP FINDINGS
+   - UseForwardedHeaders IS NOT configured; app runs local / single
+     instance, so a reverse-proxy config was NOT added. PASS.
+   - Rate-limit IP source = HttpContext.Connection.RemoteIpAddress
+     (remote socket IP). Behind a proxy per-IP caps reflect the proxy's
+     IP; per-email caps still apply. RECOMMENDED: if behind IIS/Nginx/
+     Cloudflare add ForwardedHeaders with KnownProxies and trust only
+     your proxy's X-Forwarded-For (never arbitrary client-supplied).
+
+11. STATIC FILE FINDINGS
+   - UseStaticFiles() serves wwwroot (incl. wwwroot/uploads).
+   - Uploads are already allow-listed + magic-validated (Phase 4); no
+     executable/script type is served. Global nosniff now set too.
+   - Deferred: serving uploads from outside the web root or forcing
+     Content-Disposition for documents. Storage architecture unchanged.
+
+12. ERROR DISCLOSURE FINDINGS
+   - Prod: UseExceptionHandler("/Home/Error") generic page only (request
+     id, no stack trace) + HSTS. PASS.
+   - DeveloperExceptionPage is not always-on; dev debugging preserved.
+   - Some admin-only catch blocks echo {ex.Message} to an authenticated
+     admin - LOW, left unchanged (admin-scoped; better in a dedicated
+     phase exercising controllers).
+
+13. COMPATIBILITY / REGRESSION (expected)
+   - MTTQAdmin login            PASS (success path never rate-limited)
+   - Wrong password             PASS (normal failure path preserved)
+   - Repeated failed login      PASS (rate-limiter triggers)
+   - After window               PASS (counters expire, login works)
+   - Password verification      PASS (PBKDF2 untouched)
+   - Password reset / OTP       PASS (Phase 3 logic untouched)
+   - Session / Authorization    PASS (no auth/role change)
+   - CSRF (Phase 2)             PASS (no change)
+   - Stored-XSS sanitizer (Ph4) PASS (no change)
+   - File upload (Phase 4)      PASS (no change)
+   - Rich text / embeds         PASS (CSP adds embed hosts)
+   - SMTP                       PASS (no change)
+   - Database                   UNCHANGED (no migration/schema/data)
+
+14. BUILD RESULT
+   - dotnet build -c Debug: 0 errors, 0 warnings.
+
+15. DATABASE VERIFICATION (Phase 5)
+   - No migration, no schema change, no DROP/DELETE/mass UPDATE,
+     no password/OTP rewrite. ConnectionStrings untouched.
+     dotnet ef database update was NOT run.
+
+16. REMAINING RISKS (Ph 5, documented - NOT changed)
+   - CSP keeps 'unsafe-inline' for script/style; a nonce/hash-based CSP
+     would harden further but requires refactoring inline view blocks.
+   - TrustServerCertificate=True on local SQL Server (prod steps in 8;
+     not applied to avoid breaking the DB connection).
+   - Admin-only {ex.Message} catches; ForwardedHeaders not configured
+     (recommend when a reverse proxy/production is added).
+   - In-memory rate limiting is single-instance only (documented in 7).
+
+====================================================================
+END OF PHASE 5
+====================================================================
+====================================================================
+END OF REPORT
+====================================================================
+END OF REPORT

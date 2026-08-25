@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebMTTQ.Models;
 using System.Linq;
@@ -65,11 +65,16 @@ namespace WebMTTQ.Controllers
 
                     try
                     {
+                        if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(FileAnh, out var ext) || ext == null)
+                        {
+                            ModelState.AddModelError("HinhAnh", "Định dạng ảnh không hợp lệ.");
+                            return View("~/Views/Admin/TrangChu/Create.cshtml", section);
+                        }
+
                         string webRoot = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
                         string uploadsFolder = Path.Combine(webRoot, "uploads", "trangchu");
                         Directory.CreateDirectory(uploadsFolder);
 
-                        string ext = Path.GetExtension(FileAnh.FileName);
                         string uniqueFileName = $"{Guid.NewGuid()}{ext}";
                         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -138,11 +143,16 @@ namespace WebMTTQ.Controllers
 
                     try
                     {
+                        if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(FileAnh, out var ext) || ext == null)
+                        {
+                            ModelState.AddModelError("HinhAnh", "Định dạng ảnh không hợp lệ.");
+                            return View("~/Views/Admin/TrangChu/Edit.cshtml", existing);
+                        }
+
                         string webRoot = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
                         string uploadsFolder = Path.Combine(webRoot, "uploads", "trangchu");
                         Directory.CreateDirectory(uploadsFolder);
 
-                        string ext = Path.GetExtension(FileAnh.FileName);
                         string uniqueFileName = $"{Guid.NewGuid()}{ext}";
                         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -170,6 +180,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /AdminTrangChu/Delete/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             var section = await _context.TrangChuMucs.FindAsync(id);
@@ -193,6 +204,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /AdminTrangChu/ToggleStatus/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleStatus(int id)
         {
             var section = await _context.TrangChuMucs.FindAsync(id);
@@ -241,10 +253,16 @@ namespace WebMTTQ.Controllers
                         return View("~/Views/Admin/Banner/Create.cshtml", banner);
                     }
 
+                    if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(FileAnh, out var ext) || ext == null)
+                    {
+                        ModelState.AddModelError("HinhAnh", "Định dạng ảnh không hợp lệ.");
+                        return View("~/Views/Admin/Banner/Create.cshtml", banner);
+                    }
+
                     string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "banners");
                     if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
-                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(FileAnh.FileName);
+                    string uniqueFileName = Guid.NewGuid().ToString() + ext;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -306,10 +324,16 @@ namespace WebMTTQ.Controllers
                         return View("~/Views/Admin/Banner/Edit.cshtml", existingBanner);
                     }
 
+                    if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(FileAnh, out var ext) || ext == null)
+                    {
+                        ModelState.AddModelError("HinhAnh", "Định dạng ảnh không hợp lệ.");
+                        return View("~/Views/Admin/Banner/Edit.cshtml", existingBanner);
+                    }
+
                     string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "banners");
                     if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
-                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(FileAnh.FileName);
+                    string uniqueFileName = Guid.NewGuid().ToString() + ext;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -329,6 +353,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /AdminTrangChu/BannerDelete/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> BannerDelete(int id)
         {
             var banner = await _context.Banners.FindAsync(id);
@@ -343,6 +368,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /AdminTrangChu/BannerToggleStatus/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> BannerToggleStatus(int id)
         {
             var banner = await _context.Banners.FindAsync(id);
@@ -483,6 +509,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /AdminTrangChu/TimelineItemDelete/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> TimelineItemDelete(int id)
         {
             var item = await _context.TimelineItems.FindAsync(id);
@@ -497,6 +524,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /AdminTrangChu/TimelineItemToggle/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> TimelineItemToggle(int id)
         {
             var item = await _context.TimelineItems.FindAsync(id);
@@ -511,6 +539,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /AdminTrangChu/TimelineItemMoveUp/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> TimelineItemMoveUp(int id)
         {
             var item = await _context.TimelineItems.FindAsync(id);
@@ -534,6 +563,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /AdminTrangChu/TimelineItemMoveDown/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> TimelineItemMoveDown(int id)
         {
             var item = await _context.TimelineItems.FindAsync(id);
@@ -557,6 +587,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /AdminTrangChu/TimelineUpdateSort
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> TimelineUpdateSort([FromBody] List<SortItem> items)
         {
             if (items == null || items.Count == 0) return Json(new { success = false });
@@ -726,12 +757,18 @@ namespace WebMTTQ.Controllers
 
                 try
                 {
+                    if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(FileAnh, out var ext) || ext == null)
+                    {
+                        ModelState.AddModelError("HinhAnh", "Định dạng ảnh không hợp lệ.");
+                        ViewBag.Section = section;
+                        return View("~/Views/Admin/TrangChu/Items/Create.cshtml", item);
+                    }
+
                     // Use content root path to ensure we save to wwwroot/uploads
                     string webRoot = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
                     string uploadsFolder = Path.Combine(webRoot, "uploads", "trangchu");
                     Directory.CreateDirectory(uploadsFolder);
 
-                    string ext = Path.GetExtension(FileAnh.FileName);
                     string uniqueFileName = $"{Guid.NewGuid()}{ext}";
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -854,11 +891,17 @@ namespace WebMTTQ.Controllers
 
                     try
                     {
+                        if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(FileAnh, out var ext) || ext == null)
+                        {
+                            ModelState.AddModelError("HinhAnh", "Định dạng ảnh không hợp lệ.");
+                            ViewBag.Section = existing.TrangChuMuc;
+                            return View("~/Views/Admin/TrangChu/Items/Edit.cshtml", existing);
+                        }
+
                         string webRoot = _env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
                         string uploadsFolder = Path.Combine(webRoot, "uploads", "trangchu");
                         Directory.CreateDirectory(uploadsFolder);
 
-                        string ext = Path.GetExtension(FileAnh.FileName);
                         string uniqueFileName = $"{Guid.NewGuid()}{ext}";
                         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
@@ -886,6 +929,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /AdminTrangChu/Items/Delete/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ItemDelete(int id)
         {
             var item = await _context.TrangChuTinTucs.FindAsync(id);
@@ -903,6 +947,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /AdminTrangChu/Items/ToggleStatus/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ItemToggleStatus(int id)
         {
             var item = await _context.TrangChuTinTucs.FindAsync(id);

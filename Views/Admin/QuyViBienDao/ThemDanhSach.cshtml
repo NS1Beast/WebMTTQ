@@ -17,6 +17,7 @@
 <div class="admin-card">
     <div class="admin-card-body">
         <form action="/AdminQuyBienDao/ThemDanhSach" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn thêm lượt ủng hộ mới này?');">
+            @Html.AntiForgeryToken()
 
             <div class="admin-form-group">
                 <label class="admin-form-label">Cá nhân / Đơn vị ủng hộ <span class="required">*</span></label>

@@ -1,4 +1,4 @@
-@model WebMTTQ.Models.DangKyAdminViewModel
+﻿@model WebMTTQ.Models.DangKyAdminViewModel
 @{
     Layout = null;
 }
@@ -295,6 +295,7 @@
             }
 
             <form asp-action="DangKyAdmin" method="post">
+                @Html.AntiForgeryToken()
                 <div class="form-group">
                     <label for="TenDangNhap">Tên đăng nhập</label>
                     <div class="input-wrap">

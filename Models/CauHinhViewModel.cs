@@ -1,5 +1,7 @@
 ﻿namespace WebMTTQ.Models
 {
+    using System.Text.Json.Serialization;
+
     public class CauHinhViewModel
     {
         // ================================================
@@ -55,6 +57,8 @@
         public int SmtpPort { get; set; } = 587;
         public bool SmtpUseSsl { get; set; } = true;
         public string? SmtpUsername { get; set; }
+        [JsonIgnore]
+        public bool SmtpPasswordSet { get; set; } // true → a SMTP password is already configured (never expose the value)
         public string? SmtpPassword { get; set; }
         public string? SmtpFromEmail { get; set; }
         public string? SmtpFromName { get; set; }

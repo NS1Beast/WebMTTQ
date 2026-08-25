@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 namespace WebMTTQ.Controllers
 {
     [Route("admin/gioithieu")]
+    [KiemTraQuyen(ModuleQuyen.TrangChu)]
     public class AdminGioiThieuController : BaseAdminController
     {
         private readonly DataMTTQContext _context;
@@ -91,6 +92,7 @@ namespace WebMTTQ.Controllers
         }
 
         [HttpPost("Delete/{id}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             var item = await _context.GioiThieuChungs.FindAsync(id);
@@ -104,6 +106,7 @@ namespace WebMTTQ.Controllers
         }
 
         [HttpPost("Toggle/{id}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Toggle(int id)
         {
             var item = await _context.GioiThieuChungs.FindAsync(id);
@@ -228,6 +231,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /admin/gioithieu/sections/delete/5
         [HttpPost("sections/delete/{id}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SectionDelete(int id)
         {
             var item = await _context.GioiThieuSections.FindAsync(id);
@@ -242,6 +246,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /admin/gioithieu/sections/toggle/5
         [HttpPost("sections/toggle/{id}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SectionToggle(int id)
         {
             var item = await _context.GioiThieuSections.FindAsync(id);
@@ -256,6 +261,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /admin/gioithieu/sections/moveup/5
         [HttpPost("sections/moveup/{id}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SectionMoveUp(int id)
         {
             var item = await _context.GioiThieuSections.FindAsync(id);
@@ -276,6 +282,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /admin/gioithieu/sections/movedown/5
         [HttpPost("sections/movedown/{id}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SectionMoveDown(int id)
         {
             var item = await _context.GioiThieuSections.FindAsync(id);
@@ -310,9 +317,7 @@ namespace WebMTTQ.Controllers
                 return Json(new { success = false, message = "Kích thước ảnh không được vượt quá 10MB." });
             }
 
-            var allowedExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp" };
-            string ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-            if (!allowedExts.Contains(ext))
+            if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(file, out var ext) || ext == null)
             {
                 return Json(new { success = false, message = "Định dạng ảnh không hợp lệ. Chỉ chấp nhận JPG, PNG, GIF, WEBP, BMP." });
             }
@@ -347,9 +352,7 @@ namespace WebMTTQ.Controllers
                 return (false, null, "Kích thước ảnh không được vượt quá 5MB.");
             }
 
-            var allowedExts = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp" };
-            string ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-            if (!allowedExts.Contains(ext))
+            if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(file, out var ext) || ext == null)
             {
                 return (false, null, "Định dạng ảnh không hợp lệ. Chỉ chấp nhận JPG, PNG, GIF, WEBP, BMP.");
             }

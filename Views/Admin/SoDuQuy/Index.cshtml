@@ -78,6 +78,7 @@
                                             <i class="fas fa-edit"></i> Sửa
                                         </a>
                                         <form action="/admin/soduquy/Delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa số dư này?');">
+                                            @Html.AntiForgeryToken()
                                             <button type="submit" class="admin-btn admin-btn-danger admin-btn-sm">
                                                 <i class="fas fa-trash"></i> Xóa
                                             </button>

@@ -59,16 +59,23 @@ namespace WebMTTQ.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(VanBanTaiLieu model, IFormFile? FileUpload)
         {
             if (FileUpload != null && FileUpload.Length > 0)
             {
+                if (!WebMTTQ.Services.FileUploadValidator.IsValidDocument(FileUpload, out var documentExt) || documentExt == null)
+                {
+                    ModelState.AddModelError("TepDinhKem", "Định dạng file không hợp lệ. Chỉ chấp nhận PDF, DOCX, DOC, XLSX, XLS.");
+                    return View("~/Views/Admin/VanBanTaiLieu/Create.cshtml", model);
+                }
+
                 using (var ms = new MemoryStream())
                 {
                     await FileUpload.CopyToAsync(ms);
                     model.TepDinhKem = ms.ToArray();
                 }
-                model.LoaiTep = Path.GetExtension(FileUpload.FileName);
+                model.LoaiTep = documentExt;
                 model.DungLuong = FileUpload.Length;
             }
 
@@ -94,6 +101,7 @@ namespace WebMTTQ.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(VanBanTaiLieu model, IFormFile? FileUpload)
         {
             var existingItem = await _context.VanBanTaiLieus.AsNoTracking().FirstOrDefaultAsync(x => x.IdvanBan == model.IdvanBan);
@@ -101,12 +109,18 @@ namespace WebMTTQ.Controllers
 
             if (FileUpload != null && FileUpload.Length > 0)
             {
+                if (!WebMTTQ.Services.FileUploadValidator.IsValidDocument(FileUpload, out var documentExt) || documentExt == null)
+                {
+                    ModelState.AddModelError("TepDinhKem", "Định dạng file không hợp lệ. Chỉ chấp nhận PDF, DOCX, DOC, XLSX, XLS.");
+                    return View("~/Views/Admin/VanBanTaiLieu/Edit.cshtml", model);
+                }
+
                 using (var ms = new MemoryStream())
                 {
                     await FileUpload.CopyToAsync(ms);
                     model.TepDinhKem = ms.ToArray();
                 }
-                model.LoaiTep = Path.GetExtension(FileUpload.FileName);
+                model.LoaiTep = documentExt;
                 model.DungLuong = FileUpload.Length;
             }
             else
@@ -124,6 +138,7 @@ namespace WebMTTQ.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             var item = await _context.VanBanTaiLieus.FindAsync(id);

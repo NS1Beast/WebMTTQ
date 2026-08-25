@@ -10,7 +10,6 @@
         width: 100%;
         overflow: hidden;
         background: var(--m26-ink, #1a1a2e);
-        /* Thêm !important để ghi đè inline style chiều cao bị giới hạn trong HTML */
         height: auto !important;
     }
 
@@ -18,7 +17,6 @@
         display: flex;
         width: 100%;
         will-change: transform;
-        /* Ghi đè inline style height:100% */
         height: auto !important;
         align-items: flex-start;
     }
@@ -26,8 +24,8 @@
     .banner-slide {
         min-width: 100%;
         box-sizing: border-box;
-        /* Ghi đè inline style height:100% */
         height: auto !important;
+        transition: opacity 0.6s ease, transform 0.6s ease;
     }
         /* Xử lý thẻ a bọc ngoài ảnh để không giới hạn chiều cao */
         .banner-slide a {
@@ -39,17 +37,60 @@
             width: 100%;
             height: auto !important;
             display: block;
-            object-fit: cover;
+            object-fit: contain;
             object-position: center;
             transition: transform 8s ease-out;
-            max-height: none !important;
+            max-height: 500px !important;
         }
+
+    /* ===== CENTERED CAROUSEL LAYOUT (Desktop) ===== */
+    .banner-track.centered {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 18px;
+        position: relative;   /* slides' offsetParent = track, so offsetLeft is track-local */
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        will-change: transform;
+    }
+
+    .banner-track.centered .banner-slide {
+        flex: 0 0 auto;
+        min-width: 0;
+        width: 66%;            /* ACTIVE ~66% of viewport, PREV/NEXT peek ~17% each side */
+        box-sizing: border-box;
+        opacity: 0.5;
+        transform: scale(0.9);
+        transform-origin: center;
+        transition: opacity 0.6s ease, transform 0.6s ease;
+        cursor: pointer;
+        will-change: transform;
+        z-index: 1;
+    }
+
+    .banner-track.centered .banner-slide img {
+        width: 100%;
+        height: auto;
+        display: block;
+        object-fit: cover;     /* fill edges so peek really shows neighbor image (no blank sides) */
+        object-position: center;
+    }
+
+    .banner-track.centered .banner-slide.active {
+        opacity: 1;
+        transform: scale(1);
+        z-index: 2;
+        cursor: default;
+    }
+
     /* XỬ LÝ RIÊNG CHO MÁY TÍNH (Màn hình rộng từ 992px trở lên) */
     @@media (min-width: 992px) {
         .banner-slide img {
-            max-height: none;
-            height: 500px !important;
-            object-fit: cover;
+            max-height: 500px !important;
+            height: auto !important;
+            object-fit: contain;
             object-position: center;
         }
     }
@@ -57,8 +98,30 @@
     /* Mobile: chiều cao banner 250-300px */
     @@media (max-width: 991px) {
         .banner-slide img {
-            height: 280px !important;
-            object-fit: cover;
+            max-height: 300px !important;
+            height: auto !important;
+            object-fit: contain;
+        }
+    }
+
+    /* Mobile: chuyển về dạng 1 slide tiêu chuẩn */
+    @@media (max-width: 768px) {
+        .banner-track.centered {
+            width: 100%;
+            gap: 0;
+        }
+        .banner-track.centered .banner-slide {
+            min-width: 100%;
+            width: 100%;
+            flex: 0 0 auto;
+            margin: 0;
+            opacity: 1;
+            transform: scale(1);
+            cursor: default;
+        }
+        /* Mobile: only ACTIVE full width, no PREV/NEXT peek buttons */
+        .banner-btn {
+            display: none;
         }
     }
 
@@ -675,7 +738,7 @@
     var thoiGianDung = firstBanner?.ThoiGianDung > 0 ? firstBanner.ThoiGianDung : 5000;
     var mauNen = firstBanner?.MauNen ?? "#1a1a2e";
     <div class="banner-wrapper" id="homeBanner" style="background:@mauNen;">
-        <div class="banner-track @(hieuUng != "slide" ? hieuUng : "")" id="bannerTrack">
+        <div class="banner-track @(hieuUng == "centered" ? "centered" : "") @(hieuUng != "slide" && hieuUng != "centered" ? hieuUng : "")" id="bannerTrack">
             @foreach (var item in Model.Banners)
             {
                 <div class="banner-slide @(hieuUng == "zoom" ? "zoom" : "")" data-effect="@(item.HieuUng ?? hieuUng)">
@@ -978,7 +1041,7 @@
                                 <div style="color:#666;font-size:0.95rem;line-height:1.6;text-align:center;">
                                     @if (!string.IsNullOrEmpty(sec.NoiDung))
                                     {
-                                        @Html.Raw(sec.NoiDung)
+                                        @Html.Raw(WebMTTQ.Services.HtmlSanitizer.Sanitize(sec.NoiDung ?? ""))
                                     }
                                     else
                                     {
@@ -1037,43 +1100,112 @@
     <script>
         let currentBannerIndex = 0;
         const bannerTrack = document.getElementById('bannerTrack');
-        const slides = document.querySelectorAll('.banner-slide');
-        const dots = document.querySelectorAll('.dot');
+        const wrapper = document.getElementById('homeBanner');
+        const dots = Array.from(document.querySelectorAll('.dot'));
         const progressBar = document.getElementById('bannerProgress');
-        const totalBanners = slides.length;
+        const baseSlides = Array.from(document.querySelectorAll('.banner-slide'));
+        const totalBanners = baseSlides.length;
         let slideInterval, progressInterval;
         let isTransitioning = false;
-        const firstSlide = slides[0];
-        const defaultEffect = firstSlide?.dataset?.effect || 'slide';
+        let snapTimer = null;
+        const defaultEffect = baseSlides[0] ? (baseSlides[0].dataset.effect || 'slide') : 'slide';
         const defaultSpeed = @(Model.Banners?.FirstOrDefault()?.TocDo ?? 600);
         const defaultDelay = @(Model.Banners?.FirstOrDefault()?.ThoiGianDung ?? 5000);
+        const isCentered = defaultEffect === 'centered';
+        const MOBILE_BREAK = 768;
 
-        function getSlideEffect(index) { return slides[index]?.dataset?.effect || defaultEffect; }
+        // allSlides = slides currently attached to the track (includes clones on desktop centered)
+        let allSlides = baseSlides.slice();
+        let offset = 0; // clones placed before the first real slide
+        let builtCarousel = false; // whether the track currently holds closed-loop clones
 
-        function updateBannerUI() {
-            isTransitioning = true;
-            const effect = getSlideEffect(currentBannerIndex);
-            slides.forEach(s => s.classList.remove('active'));
-            if (effect === 'fade') {
-                slides.forEach((slide, i) => {
-                    slide.style.opacity = i === currentBannerIndex ? '1' : '0';
-                    slide.style.position = i === currentBannerIndex ? 'relative' : 'absolute';
-                });
-                slides[currentBannerIndex].classList.add('active');
+        const isMobile = () => window.innerWidth <= MOBILE_BREAK;
+        const useCarousel = () => isCentered && totalBanners >= 3 && !isMobile();
+
+        function getSlideEffect(index) { return allSlides[index] ? (allSlides[index].dataset.effect || defaultEffect) : defaultEffect; }
+
+        function trackTranslateX(px, animate) {
+            bannerTrack.style.transition = animate
+                ? 'transform ' + defaultSpeed + 'ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                : 'none';
+            // px can be a number (px) or a "%"-suffixed string (non-carousel 100%-wide slides)
+            bannerTrack.style.transform = 'translateX(' + (typeof px === 'number' ? px + 'px' : px) + ')';
+            if (!animate) void bannerTrack.offsetWidth; // force reflow so the snap is instant
+        }
+
+        // formula: translateX = viewportCenter - activeSlideCenter
+        function slideCenter(childIndex) {
+            const el = allSlides[childIndex];
+            if (!el) return 0;
+            return el.offsetLeft + el.offsetWidth / 2;
+        }
+        function centerChild(childIndex, animate) {
+            trackTranslateX(wrapper.clientWidth / 2 - slideCenter(childIndex), animate);
+        }
+
+        function buildTrack() {
+            if (snapTimer) { clearTimeout(snapTimer); snapTimer = null; }
+            const fragment = document.createDocumentFragment();
+            while (bannerTrack.firstChild) bannerTrack.removeChild(bannerTrack.firstChild);
+            if (useCarousel()) {
+                // [lastClone, ...originals..., firstClone] for seamless infinite loop
+                fragment.appendChild(baseSlides[totalBanners - 1].cloneNode(true));
+                baseSlides.forEach(s => fragment.appendChild(s.cloneNode(true)));
+                fragment.appendChild(baseSlides[0].cloneNode(true));
+                offset = 1;
+                builtCarousel = true;
             } else {
-                bannerTrack.style.transition = 'transform ' + defaultSpeed + 'ms cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-                bannerTrack.style.transform = 'translateX(-' + (currentBannerIndex * 100) + '%)';
-                slides[currentBannerIndex].classList.add('active');
+                baseSlides.forEach(s => {
+                    const c = s.cloneNode(true);
+                    if (isCentered) c.style.width = '100%'; // non-carousel (1-2 banners / mobile) -> full width slide
+                    fragment.appendChild(c);
+                });
+                offset = 0;
+                builtCarousel = false;
             }
+            bannerTrack.appendChild(fragment);
+            allSlides = Array.from(bannerTrack.querySelectorAll('.banner-slide'));
+        }
+
+        function updateContent() {
+            allSlides.forEach(s => s.classList.remove('active'));
+            const activeChild = useCarousel() ? offset + currentBannerIndex : currentBannerIndex;
+            const el = allSlides[activeChild];
+            if (el) el.classList.add('active');
             dots.forEach(d => d.classList.remove('active'));
-            if (dots.length > 0) dots[currentBannerIndex].classList.add('active');
+            if (dots[currentBannerIndex]) dots[currentBannerIndex].classList.add('active');
             if (progressBar) {
                 progressBar.style.width = '0%';
                 clearInterval(progressInterval);
                 startProgress();
             }
+        }
+
+        function positionActive() {
+            const effect = getSlideEffect(currentBannerIndex);
+            if (effect === 'fade') {
+                allSlides.forEach((s, i) => {
+                    s.style.opacity = i === currentBannerIndex ? '1' : '0';
+                    s.style.position = i === currentBannerIndex ? 'relative' : 'absolute';
+                    s.style.transform = i === currentBannerIndex ? 'scale(1)' : 'scale(0.9)';
+                });
+            } else if (useCarousel()) {
+                centerChild(offset + currentBannerIndex, true);
+            } else {
+                // Each slide is 100% of the track width, so advance by full percentages
+                // (previously used -N*100 as px, which never actually switched banners).
+                trackTranslateX('-' + (currentBannerIndex * 100) + '%', true);
+            }
+        }
+
+        function finishMove() {
+            updateContent();
             setTimeout(function() { isTransitioning = false; }, defaultSpeed);
         }
+
+        /* old setupCenteredCarousel()/updateCenteredPosition() replaced by buildTrack()/centerChild() */
+
+        /* old updateBannerUI() removed -- use positionActive() + updateContent() instead */
 
         function startProgress() {
             if (!progressBar) return;
@@ -1086,46 +1218,114 @@
             }, 50);
         }
 
+        function resetAutoPlay() {
+            if (slideInterval) { clearInterval(slideInterval); slideInterval = null; }
+            slideInterval = setInterval(function() { moveBanner(1); }, defaultDelay);
+        }
+
         function moveBanner(step) {
             if (isTransitioning) return;
-            currentBannerIndex += step;
-            if (currentBannerIndex < 0) currentBannerIndex = totalBanners - 1;
-            else if (currentBannerIndex >= totalBanners) currentBannerIndex = 0;
-            updateBannerUI();
+            isTransitioning = true;
+            resetAutoPlay(); // any interaction (autoplay/button/dot/swipe) restarts the autoplay timer
+            if (useCarousel()) {
+                const maxIndex = totalBanners - 1;
+                const next = currentBannerIndex + step;
+                if (next < 0) {
+                    // Move onto the left LAST-clone (visually the previous banner), then snap back seamlessly
+                    centerChild(offset - 1, true);
+                    snapTimer = setTimeout(function() {
+                        currentBannerIndex = maxIndex;
+                        centerChild(offset + maxIndex, false);
+                        finishMove();
+                    }, defaultSpeed);
+                } else if (next > maxIndex) {
+                    // Move onto the right FIRST-clone (visually the next banner), then snap back seamlessly
+                    centerChild(offset + totalBanners, true);
+                    snapTimer = setTimeout(function() {
+                        currentBannerIndex = 0;
+                        centerChild(offset, false);
+                        finishMove();
+                    }, defaultSpeed);
+                } else {
+                    currentBannerIndex = next;
+                    centerChild(offset + currentBannerIndex, true);
+                    finishMove();
+                }
+            } else {
+                currentBannerIndex = (currentBannerIndex + step + totalBanners) % totalBanners;
+                positionActive();
+                finishMove();
+            }
         }
 
         function setBanner(index) {
             if (isTransitioning || index === currentBannerIndex) return;
+            resetAutoPlay();
             currentBannerIndex = index;
-            updateBannerUI();
+            isTransitioning = true;
+            positionActive();
+            finishMove();
         }
 
-        function startAutoPlay() {
-            if (slideInterval) clearInterval(slideInterval);
-            slideInterval = setInterval(function() { moveBanner(1); }, defaultDelay);
-        }
+        /* side-slide (peek) click delegation is handled by the click listener in the init block below */
 
-        if (totalBanners > 0) {
-            var effect = getSlideEffect(0);
-            if (effect === 'fade') {
+        function initSlider() {
+            buildTrack();
+            if (getSlideEffect(0) === 'fade') {
                 bannerTrack.style.transform = 'none';
-                slides.forEach(function(slide, i) {
+                allSlides.forEach(function(slide, i) {
                     slide.style.opacity = i === 0 ? '1' : '0';
                     slide.style.position = i === 0 ? 'relative' : 'absolute';
                     slide.style.width = '100%'; slide.style.height = '100%';
                     slide.style.top = '0'; slide.style.left = '0';
                 });
-                slides[0].classList.add('active');
+            } else if (useCarousel()) {
+                currentBannerIndex = 0;
+                centerChild(offset, false); // snap first slide to the exact viewport center
+            } else {
+                currentBannerIndex = 0;
+                trackTranslateX(0, false);
             }
-            startAutoPlay(); startProgress();
-            var wrapper = document.getElementById('homeBanner');
-            // Autoplay continues even when hovering - do NOT pause on mouseenter/mouseleave
+            updateContent();
+        }
+
+        if (totalBanners > 0) {
+            initSlider();
+            startProgress();
+            resetAutoPlay();
+
             var touchStartX = 0;
             wrapper.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
             wrapper.addEventListener('touchend', function(e) {
                 var diff = touchStartX - e.changedTouches[0].screenX;
                 if (Math.abs(diff) > 50) { if (diff > 0) moveBanner(1); else moveBanner(-1); }
             }, { passive: true });
+
+            // Clicking a peeked side slide (desktop carousel) -> PREV / NEXT
+            bannerTrack.addEventListener('click', function(e) {
+                if (!isCentered || !useCarousel()) return;
+                var node = e.target;
+                while (node && node.classList && !node.classList.contains('banner-slide')) node = node.parentElement;
+                if (!node) return;
+                var childIndex = allSlides.indexOf(node);
+                var activeChild = offset + currentBannerIndex;
+                if (childIndex === activeChild) return; // let the ACTIVE slide's own <a> behave normally
+                if (childIndex === activeChild - 1 || (childIndex === 0 && currentBannerIndex === 0)) {
+                    e.preventDefault();
+                    moveBanner(-1);
+                } else if (childIndex === activeChild + 1 || (childIndex === allSlides.length - 1 && currentBannerIndex === totalBanners - 1)) {
+                    e.preventDefault();
+                    moveBanner(1);
+                }
+            });
+
+            // Responsive: rebuild clones when crossing the 768px breakpoint, else recenter on resize
+            window.addEventListener('resize', function() {
+                if (!isCentered) return;
+                if (useCarousel() !== builtCarousel) buildTrack();
+                if (useCarousel()) centerChild(offset + currentBannerIndex, false);
+                else { trackTranslateX('-' + (currentBannerIndex * 100) + '%', false); updateContent(); }
+            });
         }
     </script>
 }

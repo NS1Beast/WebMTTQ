@@ -11,6 +11,7 @@ using WebMTTQ.Models;
 namespace WebMTTQ.Controllers
 {
     [Route("admin/doanthe")]
+    [KiemTraQuyen(ModuleQuyen.TrangChu)]
     public class AdminDoanTheToChucController : BaseAdminController
     {
         private readonly DataMTTQContext _context;
@@ -45,9 +46,15 @@ namespace WebMTTQ.Controllers
             {
                 if (FileAnh != null && FileAnh.Length > 0)
                 {
+                    if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(FileAnh, out var ext) || ext == null)
+                    {
+                        ModelState.AddModelError("HinhAnh", "Định dạng ảnh không hợp lệ.");
+                        return View("~/Views/Admin/DoanTheToChuc/Create.cshtml", model);
+                    }
+
                     string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "doanthe");
                     if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
-                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(FileAnh.FileName);
+                    string uniqueFileName = Guid.NewGuid().ToString() + ext;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
@@ -89,9 +96,15 @@ namespace WebMTTQ.Controllers
 
                 if (FileAnh != null && FileAnh.Length > 0)
                 {
+                    if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(FileAnh, out var ext) || ext == null)
+                    {
+                        ModelState.AddModelError("HinhAnh", "Định dạng ảnh không hợp lệ.");
+                        return View("~/Views/Admin/DoanTheToChuc/Edit.cshtml", model);
+                    }
+
                     string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "doanthe");
                     if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
-                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(FileAnh.FileName);
+                    string uniqueFileName = Guid.NewGuid().ToString() + ext;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
                     {
@@ -111,6 +124,7 @@ namespace WebMTTQ.Controllers
         }
 
         [HttpPost("Delete/{id}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             var item = await _context.DoanTheToChucs.FindAsync(id);

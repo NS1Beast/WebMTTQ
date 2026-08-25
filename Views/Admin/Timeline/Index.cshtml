@@ -1,4 +1,4 @@
-@model WebMTTQ.Models.TimelineSection
+﻿@model WebMTTQ.Models.TimelineSection
 
 @{
     ViewData["Title"] = "Hành trình chuyển đổi số";
@@ -65,6 +65,7 @@
             <i class="fas fa-cog"></i> Cài đặt Section
         </h3>
         <form asp-action="TimelineSaveSettings" asp-controller="AdminTrangChu" method="post">
+            @Html.AntiForgeryToken()
             <input type="hidden" name="id" value="@Model.Id" />
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:15px;">
                 <div>
@@ -111,11 +112,13 @@
                     <div class="tl-card" data-id="@item.Id">
                         <div class="tl-sort-btns">
                             <form asp-action="TimelineItemMoveUp" asp-controller="AdminTrangChu" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
                                 <button type="submit" class="tl-sort-btn" title="Di chuyển lên" @(isFirst ? "disabled" : "")>
                                     <i class="fas fa-chevron-up"></i>
                                 </button>
                             </form>
                             <form asp-action="TimelineItemMoveDown" asp-controller="AdminTrangChu" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
                                 <button type="submit" class="tl-sort-btn" title="Di chuyển xuống" @(isLast ? "disabled" : "")>
                                     <i class="fas fa-chevron-down"></i>
                                 </button>
@@ -132,10 +135,12 @@
                         <span class="badge @(item.IsEnabled ? "badge-on" : "badge-off")">@(item.IsEnabled ? "Hiển thị" : "Ẩn")</span>
                         <div class="tl-actions">
                             <form asp-action="TimelineItemToggle" asp-controller="AdminTrangChu" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái hiển thị mốc thời gian @item.TimeLabel?');">
+                                @Html.AntiForgeryToken()
                                 <button type="submit" class="tl-btn" title="Bật/tắt"><i class="fas fa-eye@(item.IsEnabled ? "-slash" : "")"></i></button>
                             </form>
                             <a href="@Url.Action("TimelineItemEdit", "AdminTrangChu", new { id = item.Id })" class="tl-btn" title="Sửa"><i class="fas fa-edit" style="color:#17a2b8;"></i></a>
                             <form asp-action="TimelineItemDelete" asp-controller="AdminTrangChu" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Xóa mốc thời gian này?');">
+                                @Html.AntiForgeryToken()
                                 <button type="submit" class="tl-btn" title="Xóa"><i class="fas fa-trash" style="color:#dc3545;"></i></button>
                             </form>
                         </div>

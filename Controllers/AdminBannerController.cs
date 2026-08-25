@@ -55,12 +55,18 @@ namespace WebMTTQ.Controllers
                         return View("~/Views/Admin/Banner/Create.cshtml", banner);
                     }
 
+                    if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(FileAnh, out var ext) || ext == null)
+                    {
+                        ModelState.AddModelError("HinhAnh", "Định dạng ảnh không hợp lệ.");
+                        return View("~/Views/Admin/Banner/Create.cshtml", banner);
+                    }
+
                     // Tạo thư mục nếu chưa có
                     string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "banners");
                     if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
-                    // Tạo tên file duy nhất tránh trùng lặp
-                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(FileAnh.FileName);
+                    // Tạo tên file duy nhất bằng GUID + extension đã kiểm tra magic bytes
+                    string uniqueFileName = Guid.NewGuid().ToString() + ext;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                     // Lưu file vào thư mục wwwroot/uploads/banners
@@ -129,10 +135,16 @@ namespace WebMTTQ.Controllers
                         return View("~/Views/Admin/Banner/Edit.cshtml", existingBanner);
                     }
 
+                    if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(FileAnh, out var ext) || ext == null)
+                    {
+                        ModelState.AddModelError("HinhAnh", "Định dạng ảnh không hợp lệ.");
+                        return View("~/Views/Admin/Banner/Edit.cshtml", existingBanner);
+                    }
+
                     string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "banners");
                     if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
-                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(FileAnh.FileName);
+                    string uniqueFileName = Guid.NewGuid().ToString() + ext;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -152,6 +164,7 @@ namespace WebMTTQ.Controllers
 
         // 6. XÓA BANNER
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             var banner = await _context.Banners.FindAsync(id);
@@ -166,6 +179,7 @@ namespace WebMTTQ.Controllers
 
         // 7. BẬT/TẮT BANNER
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleStatus(int id)
         {
             var banner = await _context.Banners.FindAsync(id);

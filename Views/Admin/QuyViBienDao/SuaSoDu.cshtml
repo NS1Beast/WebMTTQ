@@ -1,4 +1,4 @@
-@model WebMTTQ.Models.SoDuQuy
+﻿@model WebMTTQ.Models.SoDuQuy
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Sửa số dư Quỹ Biển Đảo";
@@ -17,6 +17,7 @@
 <div class="admin-card">
     <div class="admin-card-body">
         <form action="/AdminQuyBienDao/SuaSoDu" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn lưu các thay đổi của số dư này?');">
+            @Html.AntiForgeryToken()
             <input type="hidden" name="Id" value="@Model.Id" />
             <input type="hidden" name="NgayCapNhat" value="@Model.NgayCapNhat?.ToString("yyyy-MM-ddTHH:mm:ss")" />
 

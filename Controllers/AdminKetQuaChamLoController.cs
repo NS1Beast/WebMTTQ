@@ -75,6 +75,7 @@ namespace WebMTTQ.Controllers
         }
 
         [HttpPost("Delete/{id}")]
+        [ValidateAntiForgeryToken]
         [KiemTraQuyen(ModuleQuyen.KetQuaChamLo, "Xoa")]
         public async Task<IActionResult> Delete(int id)
         {

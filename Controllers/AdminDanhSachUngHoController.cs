@@ -51,7 +51,7 @@ namespace WebMTTQ.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ImportExcel(IFormFile file)
         {
-            if (file == null || file.Length == 0 || !Path.GetExtension(file.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+            if (file == null || file.Length == 0 || !WebMTTQ.Services.FileUploadValidator.IsValidSpreadsheet(file, out _))
             {
                 TempData["ErrorMessage"] = "Vui lòng chọn file Excel định dạng .xlsx hợp lệ.";
                 return RedirectToAction(nameof(Index));

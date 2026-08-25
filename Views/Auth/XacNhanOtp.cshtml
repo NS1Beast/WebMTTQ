@@ -1,4 +1,4 @@
-@model WebMTTQ.Models.XacNhanOtpViewModel
+﻿@model WebMTTQ.Models.XacNhanOtpViewModel
 @{
     Layout = null;
 }
@@ -297,6 +297,7 @@
             }
 
             <form asp-action="XacNhanOtp" method="post">
+                @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="Email" />
 
                 <div class="form-group">

@@ -64,7 +64,8 @@ namespace WebMTTQ.Controllers
                 SmtpPort = await _settings.GetIntAsync("SmtpPort"),
                 SmtpUseSsl = await _settings.GetBooleanAsync("SmtpUseSsl"),
                 SmtpUsername = await _settings.GetValueAsync("SmtpUsername"),
-                SmtpPassword = await _settings.GetEncryptedValueAsync("SmtpPassword"),
+                SmtpPasswordSet = !string.IsNullOrEmpty(await _settings.GetValueAsync("SmtpPassword")),
+                SmtpPassword = null, // DO NOT echo the stored (or decrypted) password back to the form
                 SmtpFromEmail = await _settings.GetValueAsync("SmtpFromEmail"),
                 SmtpFromName = await _settings.GetValueAsync("SmtpFromName"),
 
@@ -132,7 +133,12 @@ namespace WebMTTQ.Controllers
                 await _settings.SetValueAsync("SmtpPort", model.SmtpPort.ToString(), "SMTP Port");
                 await _settings.SetValueAsync("SmtpUseSsl", model.SmtpUseSsl ? "1" : "0", "Bật SSL/TLS cho SMTP");
                 await _settings.SetValueAsync("SmtpUsername", model.SmtpUsername, "SMTP Username");
-                await _settings.SetValueAsync("SmtpPassword", model.SmtpPassword, "SMTP Password");
+                // SMTP password: only overwrite when the admin actually supplies a NEW value.
+                // If left blank, the existing (already encrypted OR legacy plaintext) value is kept.
+                if (!string.IsNullOrEmpty(model.SmtpPassword))
+                {
+                    await _settings.SetEncryptedValueAsync("SmtpPassword", model.SmtpPassword, "SMTP Password");
+                }
                 await _settings.SetValueAsync("SmtpFromEmail", model.SmtpFromEmail, "Email gửi (From)");
                 await _settings.SetValueAsync("SmtpFromName", model.SmtpFromName, "Tên hiển thị (From)");
 

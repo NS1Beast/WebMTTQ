@@ -18,6 +18,7 @@
     <div class="admin-card-body">
         <!-- Đã thêm enctype để gửi file ảnh -->
         <form asp-action="Create" method="post" enctype="multipart/form-data" onsubmit="return confirm('Bạn có chắc chắn muốn lưu tài khoản mới này?');">
+            @Html.AntiForgeryToken()
             <div asp-validation-summary="ModelOnly" class="admin-alert admin-alert-danger"></div>
 
             <div class="admin-form-row">

@@ -187,6 +187,7 @@
     </div>
 
     <form asp-action="Create" enctype="multipart/form-data" method="post">
+        @Html.AntiForgeryToken()
 
         <div class="form-grid">
             <div class="admin-form-group">

@@ -17,6 +17,7 @@
 <div class="admin-card" style="max-width: 600px;">
     <div class="admin-card-body">
         <form asp-action="Edit" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn lưu các thay đổi của lượt ủng hộ này?');">
+            @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Id" />
 
             <div class="admin-form-group">

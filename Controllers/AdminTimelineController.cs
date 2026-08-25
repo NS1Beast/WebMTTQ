@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebMTTQ.Models;
 using System.Linq;
@@ -142,6 +142,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /AdminTimeline/ItemDelete/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ItemDelete(int id)
         {
             var item = await _context.TimelineItems.FindAsync(id);
@@ -156,6 +157,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /AdminTimeline/ItemToggle/5
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ItemToggle(int id)
         {
             var item = await _context.TimelineItems.FindAsync(id);
@@ -170,6 +172,7 @@ namespace WebMTTQ.Controllers
 
         // POST: /AdminTimeline/UpdateSort
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateSort([FromBody] List<SortItem> items)
         {
             if (items == null || items.Count == 0) return Json(new { success = false });

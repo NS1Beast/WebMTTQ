@@ -42,6 +42,7 @@ namespace WebMTTQ.Controllers
         public IActionResult ThemThongTin() => View("~/Views/Admin/QuyCuuTro/ThemThongTin.cshtml");
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ThemThongTin(ThongTinNhanUngHoCuuTro model, IFormFile? QrCodeFile)
         {
             if (QrCodeFile != null && QrCodeFile.Length > 0)
@@ -51,10 +52,17 @@ namespace WebMTTQ.Controllers
                     TempData["ErrorMessage"] = "Kích thước ảnh vượt quá 2MB!";
                     return View("~/Views/Admin/QuyCuuTro/ThemThongTin.cshtml", model);
                 }
+
+                if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(QrCodeFile, out var ext) || ext == null)
+                {
+                    TempData["ErrorMessage"] = "Định dạng ảnh không hợp lệ!";
+                    return View("~/Views/Admin/QuyCuuTro/ThemThongTin.cshtml", model);
+                }
+
                 string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "qrcodes");
                 if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
-                string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(QrCodeFile.FileName);
+                string uniqueFileName = Guid.NewGuid().ToString() + ext;
                 string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -79,6 +87,7 @@ namespace WebMTTQ.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SuaThongTin(ThongTinNhanUngHoCuuTro model, IFormFile? QrCodeFile)
         {
             if (QrCodeFile != null && QrCodeFile.Length > 0)
@@ -88,10 +97,17 @@ namespace WebMTTQ.Controllers
                     TempData["ErrorMessage"] = "Kích thước ảnh vượt quá 2MB!";
                     return RedirectToAction("SuaThongTin", new { id = model.Id });
                 }
+
+                if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(QrCodeFile, out var ext) || ext == null)
+                {
+                    TempData["ErrorMessage"] = "Định dạng ảnh không hợp lệ!";
+                    return RedirectToAction("SuaThongTin", new { id = model.Id });
+                }
+
                 string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "qrcodes");
                 if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
-                string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(QrCodeFile.FileName);
+                string uniqueFileName = Guid.NewGuid().ToString() + ext;
                 string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -107,6 +123,7 @@ namespace WebMTTQ.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> XoaThongTin(int id)
         {
             var item = await _context.ThongTinNhanUngHoCuuTros.FindAsync(id);
@@ -136,6 +153,7 @@ namespace WebMTTQ.Controllers
         public IActionResult ThemSoDu() => View("~/Views/Admin/QuyCuuTro/ThemSoDu.cshtml");
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ThemSoDu(SoDuQuy model)
         {
             model.NgayCapNhat = DateTime.Now;
@@ -156,6 +174,7 @@ namespace WebMTTQ.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SuaSoDu(SoDuQuy model)
         {
             var existingItem = await _context.SoDuQues.FindAsync(model.Id);
@@ -170,6 +189,7 @@ namespace WebMTTQ.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> XoaSoDu(int id)
         {
             var item = await _context.SoDuQues.FindAsync(id);
@@ -197,6 +217,7 @@ namespace WebMTTQ.Controllers
         public IActionResult ThemDanhSach() => View("~/Views/Admin/QuyCuuTro/ThemDanhSach.cshtml");
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ThemDanhSach(DanhSachUngHoCuuTro model)
         {
             model.HienThi = true;
@@ -209,7 +230,7 @@ namespace WebMTTQ.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ImportExcel(IFormFile file)
         {
-            if (file == null || file.Length == 0 || !Path.GetExtension(file.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+            if (file == null || file.Length == 0 || !WebMTTQ.Services.FileUploadValidator.IsValidSpreadsheet(file, out _))
             {
                 TempData["ErrorMessage"] = "Vui lòng chọn file Excel định dạng .xlsx hợp lệ.";
                 return RedirectToAction("DanhSach");
@@ -351,6 +372,7 @@ namespace WebMTTQ.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SuaDanhSach(DanhSachUngHoCuuTro model)
         {
             _context.DanhSachUngHoCuuTros.Update(model);
@@ -360,6 +382,7 @@ namespace WebMTTQ.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> XoaDanhSach(int id)
         {
             var item = await _context.DanhSachUngHoCuuTros.FindAsync(id);
@@ -387,6 +410,7 @@ namespace WebMTTQ.Controllers
         [HttpGet] public IActionResult ThemKetQua() => View("~/Views/Admin/QuyCuuTro/ThemKetQua.cshtml");
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ThemKetQua(KetQuaHoatDong model)
         {
             model.TrangThai = true;
@@ -406,6 +430,7 @@ namespace WebMTTQ.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SuaKetQua(KetQuaHoatDong model)
         {
             var existingItem = await _context.KetQuaHoatDongs.FindAsync(model.Id);
@@ -424,6 +449,7 @@ namespace WebMTTQ.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> XoaKetQua(int id)
         {
             var item = await _context.KetQuaHoatDongs.FindAsync(id);

@@ -89,6 +89,7 @@
     </div>
 
     <form asp-action="@(Model?.Id > 0 ? "Edit" : "Create")" method="post">
+        @Html.AntiForgeryToken()
         @if (Model?.Id > 0)
         {
             <input type="hidden" asp-for="Id" />

@@ -48,10 +48,22 @@ namespace WebMTTQ.Controllers
                 // Xử lý lưu file ảnh nếu có tải lên
                 if (FileQr != null && FileQr.Length > 0)
                 {
+                    if (FileQr.Length > 2 * 1024 * 1024)
+                    {
+                        ModelState.AddModelError("QrCodeUrl", "Kích thước ảnh QR không được vượt quá 2MB.");
+                        return View("~/Views/Admin/ThongTinUngHo/Create.cshtml", model);
+                    }
+
+                    if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(FileQr, out var ext) || ext == null)
+                    {
+                        ModelState.AddModelError("QrCodeUrl", "Định dạng ảnh không hợp lệ.");
+                        return View("~/Views/Admin/ThongTinUngHo/Create.cshtml", model);
+                    }
+
                     string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "qrcodes");
                     if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
-                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(FileQr.FileName);
+                    string uniqueFileName = Guid.NewGuid().ToString() + ext;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                     using (var fileStream = new FileStream(filePath, FileMode.Create))
@@ -97,10 +109,22 @@ namespace WebMTTQ.Controllers
                     // Nếu người dùng chọn tải ảnh QR mới lên
                     if (FileQr != null && FileQr.Length > 0)
                     {
+                        if (FileQr.Length > 2 * 1024 * 1024)
+                        {
+                            ModelState.AddModelError("QrCodeUrl", "Kích thước ảnh QR không được vượt quá 2MB.");
+                            return View("~/Views/Admin/ThongTinUngHo/Edit.cshtml", model);
+                        }
+
+                        if (!WebMTTQ.Services.FileUploadValidator.IsValidImage(FileQr, out var ext) || ext == null)
+                        {
+                            ModelState.AddModelError("QrCodeUrl", "Định dạng ảnh không hợp lệ.");
+                            return View("~/Views/Admin/ThongTinUngHo/Edit.cshtml", model);
+                        }
+
                         string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "qrcodes");
                         if (!Directory.Exists(uploadsFolder)) Directory.CreateDirectory(uploadsFolder);
 
-                        string uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(FileQr.FileName);
+                        string uniqueFileName = Guid.NewGuid().ToString() + ext;
                         string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
                         using (var fileStream = new FileStream(filePath, FileMode.Create))

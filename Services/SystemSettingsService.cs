@@ -16,7 +16,7 @@ namespace WebMTTQ.Services
         private readonly IDataProtector _protector;
 
         // List of keys that should be encrypted
-        private static readonly List<string> _encryptedKeys = new();
+        private static readonly List<string> _encryptedKeys = new() { "SmtpPassword" };
 
         public SystemSettingsService(DataMTTQContext context, IDataProtectionProvider protectionProvider)
         {

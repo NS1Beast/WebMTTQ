@@ -17,6 +17,7 @@
 <div class="admin-card">
     <div class="admin-card-body">
         <form action="/AdminQuyBienDao/SuaThongTin" method="post" enctype="multipart/form-data" onsubmit="return confirm('Bạn có chắc chắn muốn lưu các thay đổi của tài khoản này?');">
+            @Html.AntiForgeryToken()
             <input type="hidden" name="Id" value="@Model.Id" />
             <input type="hidden" name="TrangThai" value="true" />
             <!-- Lưu giữ URL ảnh cũ trong trường hợp người dùng không chọn ảnh mới -->

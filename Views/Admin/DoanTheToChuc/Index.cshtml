@@ -55,6 +55,7 @@
                     <td>
                         <a href="/admin/doanthe/Edit/@item.Id" class="admin-btn admin-btn-warning btn-sm"><i class="fas fa-edit"></i> Sửa</a>
                         <form action="/admin/doanthe/Delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Xóa thành viên này?');">
+                            @Html.AntiForgeryToken()
                             <button type="submit" class="admin-btn admin-btn-danger btn-sm"><i class="fas fa-trash"></i> Xóa</button>
                         </form>
                     </td>

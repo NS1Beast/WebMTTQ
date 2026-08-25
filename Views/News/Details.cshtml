@@ -303,7 +303,7 @@
                 </div>
 
                 <div class="content">
-                    @Html.Raw(Model.Content ?? "")
+                    @Html.Raw(WebMTTQ.Services.HtmlSanitizer.Sanitize(Model.Content ?? ""))
                 </div>
             </article>
 

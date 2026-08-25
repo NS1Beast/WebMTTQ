@@ -441,7 +441,7 @@
                     @if (!string.IsNullOrEmpty(sec.NoiDung))
                     {
                         <div class="org-section-content" style="font-size:0.95rem; line-height:1.7; color:#333; text-align:justify;">
-                            @Html.Raw(sec.NoiDung)
+                            @Html.Raw(WebMTTQ.Services.HtmlSanitizer.Sanitize(sec.NoiDung ?? ""))
                         </div>
                     }
                 </div>

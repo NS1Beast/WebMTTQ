@@ -65,12 +65,11 @@ namespace WebMTTQ.Controllers
                     .ToList();
             }
 
-            // Featured News (bài viết nổi bật)
+            // Featured News (bài viết nổi bật) - chỉ hiển thị các bài có LaTinNoiBat == true
             var featuredNews = await _context.BaiViets
                 .Include(b => b.IdchuyenMucNavigation)
-                .Where(b => b.TrangThai == "DaDang")
-                .OrderByDescending(b => b.LaTinNoiBat)
-                .ThenByDescending(b => b.NgayXuatBan)
+                .Where(b => b.TrangThai == "DaDang" && b.LaTinNoiBat == true)
+                .OrderByDescending(b => b.NgayXuatBan)
                 .Take(5)
                 .ToListAsync();
 

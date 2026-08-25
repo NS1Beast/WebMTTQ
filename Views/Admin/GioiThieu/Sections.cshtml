@@ -1,4 +1,4 @@
-@model IEnumerable<WebMTTQ.Models.GioiThieuSection>
+﻿@model IEnumerable<WebMTTQ.Models.GioiThieuSection>
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Nội dung giới thiệu";
@@ -66,11 +66,13 @@
                 <div class="gt-section-card">
                     <div class="gt-sort-btns">
                         <form action="/admin/gioithieu/sections/moveup/@item.Id" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
                             <button type="submit" class="gt-sort-btn" title="Di chuyển lên" @(isFirst ? "disabled" : "")>
                                 <i class="fas fa-chevron-up"></i>
                             </button>
                         </form>
                         <form action="/admin/gioithieu/sections/movedown/@item.Id" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
                             <button type="submit" class="gt-sort-btn" title="Di chuyển xuống" @(isLast ? "disabled" : "")>
                                 <i class="fas fa-chevron-down"></i>
                             </button>
@@ -105,10 +107,12 @@
 
                     <div class="gt-actions">
                         <form action="/admin/gioithieu/sections/toggle/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái hiển thị section @item.TieuDe?');">
+                            @Html.AntiForgeryToken()
                             <button type="submit" class="gt-btn" title="Bật/tắt"><i class="fas fa-eye@(item.TrangThai ? "-slash" : "")"></i></button>
                         </form>
                         <a href="/admin/gioithieu/sections/edit/@item.Id" class="gt-btn" title="Sửa"><i class="fas fa-edit" style="color:#17a2b8;"></i></a>
                         <form action="/admin/gioithieu/sections/delete/@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Xóa section này?');">
+                            @Html.AntiForgeryToken()
                             <button type="submit" class="gt-btn" title="Xóa"><i class="fas fa-trash" style="color:#dc3545;"></i></button>
                         </form>
                     </div>

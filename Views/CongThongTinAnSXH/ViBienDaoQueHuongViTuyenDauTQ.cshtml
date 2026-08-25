@@ -1696,7 +1696,7 @@
 @if (ViewBag.HienThiBanDo == true)
 {
     <script type="application/json" id="mapDataJson">
-        @Html.Raw(ViewBag.MapDataJson ?? "[]")
+        @Html.Raw(WebMTTQ.Services.HtmlSanitizer.JsonScriptSafe(ViewBag.MapDataJson ?? "[]"))
     </script>
     <script>
         // 3. LEAFLET MAP & BỘ LỌC
