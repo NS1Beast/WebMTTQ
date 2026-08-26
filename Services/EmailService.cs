@@ -208,7 +208,7 @@ namespace WebMTTQ.Services
         <p>Nếu bạn không yêu cầu đặt lại mật khẩu, hãy bỏ qua email này. Tài khoản của bạn vẫn an toàn.</p>
     </div>
     <div class='footer'>
-        © 2025 Ủy ban MTTQ Việt Nam Phường Tân Định. Email này được gửi tự động, vui lòng không trả lời.
+        © 2026 Ủy ban MTTQ Việt Nam Phường Tân Định. Email này được gửi tự động, vui lòng không trả lời.
     </div>
 </div>
 </body>
